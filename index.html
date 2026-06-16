@@ -465,7 +465,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
   <img class="hero-img" id="hero-cover-img" src="https://drive.google.com/thumbnail?id=1hmVacMoedAUMRdnprgd-ajPTeMCbnKbo&amp;sz=w1000" alt="" onerror="this.style.opacity='0'" style="width: 100%; height: 100%; object-fit: cover; object-position: 42.3312% 39.0464%; transform: scale(0.5); transform-origin: 42.3312% 39.0464%; opacity: 0.65;">
   <div class="hero-overlay"></div>
   <div class="hero-text">
-    <div class="hero-title" id="hero-title-el">Кино сонгоод шууд авах</div>
+    <div class="hero-title" id="hero-title-el">ЧАНАРТАЙ МОНГОЛ ХАДМАЛ</div>
     <p class="hero-sub" id="hero-sub-el">Ангилал сонгож кинонуудаа үзээрэй</p>
   </div>
 </div>
@@ -642,13 +642,7 @@ const DEFAULT_MOVIES=[
   {id:10,name:"Босс Эмэгтэй",price:"5,000 ₮",cat:2,cover:"",trailer:""}
 ];
 
-const DEFAULT_TAB_COVER_POS = {
-  0:{x:42.33121618442719, y:39.046427578537674, scale:0.5},
-  1:{x:50.60137834160045, y:49.815728146141005, scale:0.76},
-  2:{x:53.136290243362225, y:51.35588012198487, scale:0.7}
-};
-
-const DEFAULT_TAB_COVER_POS = {
+var DEFAULT_TAB_COVER_POS = {
   0:{x:42.33121618442719, y:39.046427578537674, scale:0.5},
   1:{x:50.60137834160045, y:49.815728146141005, scale:0.76},
   2:{x:53.136290243362225, y:51.35588012198487, scale:0.7}
@@ -1692,12 +1686,12 @@ function downloadUpdatedHtml(){
   ).join(',\n') + '\n];';
 
   const tabCoversStr = `const DEFAULT_TAB_COVER_POS = {
-  0:{x:${TAB_COVER_POS[0].x}, y:${TAB_COVER_POS[0].y}, scale:${TAB_COVER_POS[0].scale}},
-  1:{x:${TAB_COVER_POS[1].x}, y:${TAB_COVER_POS[1].y}, scale:${TAB_COVER_POS[1].scale}},
-  2:{x:${TAB_COVER_POS[2].x}, y:${TAB_COVER_POS[2].y}, scale:${TAB_COVER_POS[2].scale}}
+  0:{x:42.33121618442719, y:39.046427578537674, scale:0.5},
+  1:{x:50.60137834160045, y:49.815728146141005, scale:0.76},
+  2:{x:53.136290243362225, y:51.35588012198487, scale:0.7}
 };
 
-const DEFAULT_TAB_COVERS = {0:${JSON.stringify(TAB_COVERS[0]||'')}, 1:${JSON.stringify(TAB_COVERS[1]||'')}, 2:${JSON.stringify(TAB_COVERS[2]||'')}};`;
+const DEFAULT_TAB_COVERS = {0:"https://drive.google.com/thumbnail?id=1hmVacMoedAUMRdnprgd-ajPTeMCbnKbo&sz=w1000", 1:"https://drive.google.com/thumbnail?id=1ZFRnE6VGX8r5LbFH47vGqEDRT_Pts8pd&sz=w1000", 2:"https://drive.google.com/thumbnail?id=1eMQDyHgjcVRuJvWPBz5Y93AwFzD50FDf&sz=w1000"};`;
 
   const groupPricesStr = `const DEFAULT_GROUP_PRICES = {
   0: {price:${JSON.stringify(GROUP_PRICES[0].price)}, period:${JSON.stringify(GROUP_PRICES[0].period)}},
@@ -1708,7 +1702,21 @@ const DEFAULT_TAB_COVERS = {0:${JSON.stringify(TAB_COVERS[0]||'')}, 1:${JSON.str
 
   // Regex-ээр хуучин DEFAULT_* блокуудыг шинэ утгаар солих
   html = html.replace(/const DEFAULT_MOVIES=\[[\s\S]*?\];/, moviesStr);
-  html = html.replace(/const DEFAULT_TAB_COVERS = \{[\s\S]*?\};/, tabCoversStr);
+  // DEFAULT_TAB_COVER_POS бүгдийг устгаад tabCoversStr-ээр (POS+COVERS хамт) орлуулна
+  // DEFAULT_TAB_COVER_POS + DEFAULT_TAB_COVERS — split/join аргаар давхардлыг арилгана
+  // 1. Хуучин POS+COVERS блокийг олж нэг удаа tabCoversStr-ээр солино
+  const _posStart = 'const DEFAULT_TAB_COVER_POS';
+  const _coversEnd = '};';
+  if(html.includes(_posStart)){
+    const _pi = html.indexOf(_posStart);
+    // POS блокийн эхнээс COVERS блокийн төгсгөл хүртэлх хэсгийг олно
+    // COVERS блок нь POS-ийн дараа байдаг тул 2-р '};' хүртэл авна
+    let _pe = html.indexOf(_coversEnd, _pi);
+    _pe = html.indexOf(_coversEnd, _pe + 2); // 2-р '};'
+    if(_pe > -1){
+      html = html.slice(0, _pi) + tabCoversStr + html.slice(_pe + 2);
+    }
+  }
   html = html.replace(/const DEFAULT_GROUP_PRICES = \{[\s\S]*?\};/, groupPricesStr);
 
   // DOCTYPE нэмэх (outerHTML-д байхгүй)
