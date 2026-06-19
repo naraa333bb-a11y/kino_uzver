@@ -436,6 +436,34 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
   border-radius:8px;padding:10px 12px;font-size:11px;color:#f59e0b;
   line-height:1.6;margin-bottom:12px;
 }
+#admin-panel .cf-subtab{
+  padding:9px 12px;border-radius:8px;border:1.5px solid var(--ad-border2);
+  background:var(--ad-card2);color:var(--ad-muted);font-size:11px;font-weight:700;
+  font-family:'Times New Roman',Times,serif;cursor:pointer;white-space:nowrap;
+}
+#admin-panel .cf-subtab.active{
+  background:linear-gradient(135deg,var(--ad-accent),var(--ad-accent2));
+  border-color:transparent;color:#fff;
+}
+#admin-panel .cf-divider{
+  font-size:11px;font-weight:700;color:var(--ad-accent2);text-transform:uppercase;
+  letter-spacing:.05em;margin:18px 0 8px;padding-top:14px;border-top:1px solid var(--ad-border);
+}
+#admin-panel .cf-hint{font-size:10px;color:var(--ad-muted);margin-top:4px;line-height:1.5;}
+#admin-panel .cf-hint a{color:var(--ad-accent2);}
+#admin-panel textarea{
+  width:100%;padding:11px 13px;background:var(--ad-card2);
+  border:1.5px solid var(--ad-border2);border-radius:8px;
+  color:var(--ad-text);font-size:13px;outline:none;resize:vertical;
+}
+#admin-panel textarea:focus{border-color:var(--ad-accent2);}
+#admin-panel .diag-row{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:var(--ad-card2);border-radius:8px;margin-bottom:6px;font-size:12px;
+}
+#admin-panel .diag-icon{font-size:16px;flex-shrink:0;width:20px;text-align:center;}
+#admin-panel .diag-text{flex:1;}
+#admin-panel .diag-text b{color:#fff;}
 
 </style>
 </head>
@@ -465,8 +493,8 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
   <img class="hero-img" id="hero-cover-img" src="https://drive.google.com/thumbnail?id=1hmVacMoedAUMRdnprgd-ajPTeMCbnKbo&amp;sz=w1000" alt="" onerror="this.style.opacity='0'" style="width: 100%; height: 100%; object-fit: cover; object-position: 42.3312% 39.0464%; transform: scale(0.5); transform-origin: 42.3312% 39.0464%; opacity: 0.65;">
   <div class="hero-overlay"></div>
   <div class="hero-text">
-    <div class="hero-title" id="hero-title-el">ЧАНАРТАЙ МОНГОЛ ХАДМАЛ</div>
-    <p class="hero-sub" id="hero-sub-el">Ангилал сонгож кинонуудаа үзээрэй</p>
+    <div class="hero-title" id="hero-title-el">ЧАНАРТАЙ МОНГОЛ ХАДМАЛ КИНОНУУД</div>
+    <p class="hero-sub" id="hero-sub-el">ЖАРГАЛТАЙ МӨЧИЙГ ӨӨРТӨӨ ЗОРИУЛ</p>
   </div>
 </div>
 
@@ -627,13 +655,10 @@ const IMAGES={
 };
 
 const DEFAULT_MOVIES=[
-  {id:16,name:"НУУЦ ТОХИРОЛЦОО",price:"12",cat:0,cover:"https://drive.google.com/thumbnail?id=1GL0b_dP6I7sQtCz3KZft4EytEgqae4rC&sz=w1000",trailer:""},
-  {id:15,name:"ЦАГИЙН БАГШ",price:"11",cat:0,cover:"https://drive.google.com/thumbnail?id=1-5428tJ-q2vFATtCZSv0D5dy_B5OKN7X&sz=w1000",trailer:"https://archive.org/embed/2_20260616_20260616"},
-  {id:14,name:"ИХЭРҮҮДИЙН БОСС ААВ",price:"10",cat:0,cover:"https://drive.google.com/thumbnail?id=1qnYYkyCe2kNn3Dz7J-1Yfm4MlPJhqHbx&sz=w1000",trailer:"https://archive.org/embed/5_20260616_20260616"},
-  {id:13,name:"ТУСГАЙ ДААЛГАВАР",price:"10",cat:0,cover:"https://drive.google.com/thumbnail?id=1n64qbYIAy3oSezfYj5RDs9nm2kgTMcix&sz=w1000",trailer:"https://archive.org/embed/1_20260616_20260616_1221"},
-  {id:12,name:"ЛУУГИЙН УДАМ",price:"10 ₮",cat:0,cover:"https://drive.google.com/thumbnail?id=1CvtzjCyLqtpDHyhI44Dptib4HqvvPCjy&sz=w1000",trailer:"https://archive.org/embed/1_20260616_20260616_1208"},
-  {id:11,name:"АЛТАН НҮДЭТ ХҮҮ",price:"10",cat:0,cover:"https://drive.google.com/thumbnail?id=1Rj4yl2WbEK2CUvZa7WNmK9O3nbwm38t4&sz=w1000",trailer:"https://archive.org/embed/1_20260615_20260615_1636"},
+  {id:11,name:"АЛТАН НҮДЭТ ХҮҮ",price:"1500",cat:0,cover:"https://drive.google.com/thumbnail?id=1Rj4yl2WbEK2CUvZa7WNmK9O3nbwm38t4&sz=w1000",trailer:"https://archive.org/embed/1_20260615_20260615_1636"},
   {id:6,name:"Эмч Бүсгүй",price:"2500",cat:1,cover:"",trailer:""},
+  {id:2,name:"Номын Санч",price:"5,000 ₮",cat:0,cover:"",trailer:""},
+  {id:3,name:"Өндөр Эмэгтэй",price:"5,000 ₮",cat:0,cover:"",trailer:""},
   {id:4,name:"Тосгоны Охинтой Учирсан Нь",price:"5,000 ₮",cat:1,cover:"",trailer:""},
   {id:5,name:"Хойд Ээж",price:"5,000 ₮",cat:1,cover:"",trailer:""},
   {id:7,name:"Гудамжинд Таарсан Эмэгтэй",price:"5,000 ₮",cat:2,cover:"",trailer:""},
@@ -767,20 +792,28 @@ function getSessionId(){
 
 // ══ WELCOME GATE LOGIC ══
 const SESSION_ID = getSessionId();
+const GATE_STATE_KEY = 'toorxon_gate_clicked';
 
-// Gate-г HTML нээх бүрд шууд харуулна (localStorage шалгалт байхгүй)
+// Хэрэв "Эхлэх" аль хэдийн 1 удаа дарагдсан бол gate-г шууд нуух
 function setupGate(){
-  // Хоосон функц — gate нь HTML.classList.open байдлаар анхнаасаа харагдана
+  const gate = document.getElementById('welcomeGate');
+  const clicked = localStorage.getItem(GATE_STATE_KEY);
+  if(clicked === 'yes'){
+    gate.classList.add('hidden');
+  }
 }
 
 
 // "ЭХЛЭХ" дарсан үед:
+// - localStorage-д "дарсан" гэж тэмдэглэнэ — дараагийн удаа gate шууд нуугдана
 // - m.me?ref=SESSION-XXXX линкийг шинэ tab-д нээж PSID-г webhook-аар бүртгэнэ
 // - ШУУД каталог нээгдэнэ, хэрэглэгч буцаад ирэх шаардлагагүй
 // - 2.5с дараа шинэ tab-ыг автоматаар хаах оролдлого хийнэ
 //   (Chrome/Android-д ихэвчлэн амжилттай, Safari/iOS дээр амжилтгүй бол
 //    "Цонх хаах" мэдэгдэл анхны HTML дээр гарч ирнэ)
 function onGateStart(){
+  localStorage.setItem(GATE_STATE_KEY, 'yes');
+
   const pageId = getMessengerPageId(0);
   const link = `https://m.me/${pageId}?ref=SESSION-${SESSION_ID}`;
   const w = window.open(link, '_blank');
@@ -1792,6 +1825,267 @@ async function deployToGitHub(html, token){
 
 // ══ INIT (admin) — DOMContentLoaded дотор дуудагдана ══
 
+// ══════════════════════════════════════════
+// ТОП-LEVEL TAB СЭЛГҮҮР (Кино каталог / Cloudflare)
+// ══════════════════════════════════════════
+function setTopTab(tab){
+  const catBtn = document.getElementById('toptab-catalog');
+  const cfBtn  = document.getElementById('toptab-cloudflare');
+  const catPanel = document.getElementById('toppanel-catalog');
+  const cfPanel  = document.getElementById('toppanel-cloudflare');
+
+  if(tab === 'catalog'){
+    catBtn.style.background = 'linear-gradient(135deg,var(--ad-accent),var(--ad-accent2))';
+    catBtn.style.borderColor = 'var(--ad-accent2)'; catBtn.style.color = '#fff';
+    cfBtn.style.background = 'var(--ad-card2)'; cfBtn.style.borderColor = 'var(--ad-border2)'; cfBtn.style.color = 'var(--ad-muted)';
+    catPanel.style.display = ''; cfPanel.style.display = 'none';
+  } else {
+    cfBtn.style.background = 'linear-gradient(135deg,var(--ad-accent),var(--ad-accent2))';
+    cfBtn.style.borderColor = 'var(--ad-accent2)'; cfBtn.style.color = '#fff';
+    catBtn.style.background = 'var(--ad-card2)'; catBtn.style.borderColor = 'var(--ad-border2)'; catBtn.style.color = 'var(--ad-muted)';
+    cfPanel.style.display = ''; catPanel.style.display = 'none';
+    renderMovieLinkList(); // Cloudflare tab руу орох бүрд кино жагсаалт шинэчилнэ
+  }
+}
+
+// ══════════════════════════════════════════
+// CLOUDFLARE САБ-TAB СЭЛГҮҮР (A/B/C/D/E)
+// ══════════════════════════════════════════
+function setCfTab(tab){
+  ['a','b','c','d','e'].forEach(t=>{
+    const btn = document.getElementById('cftab-'+t);
+    const panel = document.getElementById('cfpanel-'+t);
+    if(t === tab){
+      btn.classList.add('active');
+      if(panel) panel.style.display = '';
+    } else {
+      btn.classList.remove('active');
+      if(panel) panel.style.display = 'none';
+    }
+  });
+}
+
+// ══════════════════════════════════════════
+// CLOUDFLARE CONFIG — localStorage-д хадгалах бүтэц
+// ══════════════════════════════════════════
+function loadCfConfig(){
+  try{
+    const saved = localStorage.getItem('toorxon_cf_config');
+    if(saved) return JSON.parse(saved);
+  }catch(e){}
+  return {
+    geminiKey: '', workerUrl: '', refreshSecret: '',
+    tokenAi: '', tokenAction: '', tokenErotic: '',
+    movieLinks: {}, groupLinks: {ai:'', action:'', erotic:'', all:''},
+    promptChat: '', promptVision: ''
+  };
+}
+function saveCfConfigToStorage(cfg){
+  localStorage.setItem('toorxon_cf_config', JSON.stringify(cfg));
+}
+let CF_CONFIG = loadCfConfig();
+
+// ══ A. CREDENTIAL хадгалах ══
+function saveCfCredentials(){
+  CF_CONFIG.geminiKey     = document.getElementById('cf-gemini-key').value.trim();
+  CF_CONFIG.workerUrl     = document.getElementById('cf-worker-url').value.trim();
+  CF_CONFIG.refreshSecret = document.getElementById('cf-refresh-secret').value.trim();
+  CF_CONFIG.tokenAi       = document.getElementById('cf-token-ai').value.trim();
+  CF_CONFIG.tokenAction   = document.getElementById('cf-token-action').value.trim();
+  CF_CONFIG.tokenErotic   = document.getElementById('cf-token-erotic').value.trim();
+  saveCfConfigToStorage(CF_CONFIG);
+  showToast('Credential локал хадгалагдлаа');
+}
+
+// ══ B. КИНО ЛИНК жагсаалт автоматаар MOVIES-аас үүсгэх ══
+function renderMovieLinkList(){
+  const container = document.getElementById('movie-link-list');
+  if(!container) return;
+  if(MOVIES.length === 0){
+    container.innerHTML = '<p class="cf-hint">Кино байхгүй байна.</p>';
+    return;
+  }
+  const catNames = {0:'AI Drama', 1:'Action', 2:'+18 Erotic'};
+  container.innerHTML = MOVIES.map(m=>{
+    const code = 'M'+String(m.id).padStart(2,'0');
+    const savedLink = (CF_CONFIG.movieLinks && CF_CONFIG.movieLinks[code]) || '';
+    return `
+    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
+      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">${m.name} <span style="color:var(--ad-muted);font-weight:400;">(${code} · ${catNames[m.cat]})</span></p>
+      <input type="text" id="movielink-${code}" value="${savedLink.replace(/"/g,'&quot;')}" placeholder="https://... контент линк" style="margin-top:0;">
+    </div>`;
+  }).join('');
+}
+
+function saveMovieLinks(){
+  if(!CF_CONFIG.movieLinks) CF_CONFIG.movieLinks = {};
+  MOVIES.forEach(m=>{
+    const code = 'M'+String(m.id).padStart(2,'0');
+    const el = document.getElementById('movielink-'+code);
+    if(el) CF_CONFIG.movieLinks[code] = el.value.trim();
+  });
+  CF_CONFIG.groupLinks = {
+    ai:      document.getElementById('cf-link-grp-ai').value.trim(),
+    action:  document.getElementById('cf-link-grp-action').value.trim(),
+    erotic:  document.getElementById('cf-link-grp-erotic').value.trim(),
+    all:     document.getElementById('cf-link-grp-all').value.trim(),
+  };
+  saveCfConfigToStorage(CF_CONFIG);
+  showToast('Кино/групп линкүүд локал хадгалагдлаа');
+}
+
+// ══ C/D. ПРОМПТ хадгалах ══
+function savePrompt(type){
+  if(type === 'chat'){
+    CF_CONFIG.promptChat = document.getElementById('cf-prompt-chat').value;
+  } else {
+    CF_CONFIG.promptVision = document.getElementById('cf-prompt-vision').value;
+  }
+  saveCfConfigToStorage(CF_CONFIG);
+  showToast('Промпт локал хадгалагдлаа');
+}
+
+// ══════════════════════════════════════════
+// CLOUDFLARE-РУУ ШИНЭЧЛЭХ — Worker-ийн /config endpoint рүү дамжуулна
+// ══════════════════════════════════════════
+async function pushCfConfig(section){
+  const workerUrl = (CF_CONFIG.workerUrl || document.getElementById('cf-worker-url')?.value || '').trim();
+  const secret     = (CF_CONFIG.refreshSecret || document.getElementById('cf-refresh-secret')?.value || '').trim();
+
+  if(!workerUrl){
+    showError('Эхлээд Cloudflare Worker URL-г A хэсэгт оруулна уу');
+    return;
+  }
+  if(!secret){
+    showError('Эхлээд Шинэчлэх Secret түлхүүрийг A хэсэгт оруулна уу');
+    return;
+  }
+
+  // Section-аас хамаарч аль өгөгдлийг илгээхээ тодорхойлно
+  let payload = { section };
+  if(section === 'credentials'){
+    payload.geminiKey   = CF_CONFIG.geminiKey;
+    payload.tokenAi      = CF_CONFIG.tokenAi;
+    payload.tokenAction  = CF_CONFIG.tokenAction;
+    payload.tokenErotic  = CF_CONFIG.tokenErotic;
+  } else if(section === 'links'){
+    payload.movieLinks = CF_CONFIG.movieLinks;
+    payload.groupLinks = CF_CONFIG.groupLinks;
+  } else if(section === 'prompt_chat'){
+    payload.promptChat = CF_CONFIG.promptChat;
+  } else if(section === 'prompt_vision'){
+    payload.promptVision = CF_CONFIG.promptVision;
+  }
+
+  showToast('Cloudflare-руу илгээж байна...');
+
+  try{
+    const res = await fetch(`${workerUrl}/config?secret=${encodeURIComponent(secret)}`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if(data.success){
+      showToast('✅ Cloudflare амжилттай шинэчлэгдлээ');
+    } else {
+      showError('Cloudflare алдаа: ' + (data.error || res.status));
+    }
+  }catch(e){
+    showError('Холболтын алдаа: ' + e.message + ' (Worker URL зөв эсэхийг шалгана уу)');
+  }
+}
+
+// ══════════════════════════════════════════
+// E. АЛДАА ШАЛГАХ САМБАР
+// ══════════════════════════════════════════
+let LAST_DIAGNOSTICS = null;
+
+async function runDiagnostics(){
+  const resultsEl = document.getElementById('diagnostics-results');
+  resultsEl.innerHTML = '<p class="cf-hint">⏳ Шалгаж байна...</p>';
+
+  const workerUrl = (CF_CONFIG.workerUrl || document.getElementById('cf-worker-url')?.value || '').trim();
+  const secret     = (CF_CONFIG.refreshSecret || document.getElementById('cf-refresh-secret')?.value || '').trim();
+
+  const report = { timestamp: new Date().toISOString(), checks: [] };
+
+  if(!workerUrl){
+    report.checks.push({name:'Worker URL', status:'error', detail:'A хэсэгт Worker URL оруулаагүй байна'});
+    renderDiagnostics(report);
+    return;
+  }
+
+  // 1. Worker amжилттай хариу өгч байгаа эсэх
+  try{
+    const res = await fetch(`${workerUrl}/diagnostics?secret=${encodeURIComponent(secret)}`, {method:'GET'});
+    if(res.ok){
+      const data = await res.json();
+      report.checks.push({name:'Worker холболт', status:'ok', detail:'Амжилттай холбогдлоо'});
+
+      if(data.facebook){
+        report.checks.push({
+          name:'Facebook Token',
+          status: data.facebook.valid ? 'ok' : 'error',
+          detail: data.facebook.valid ? 'Token хүчинтэй' : (data.facebook.error || 'Token хүчингүй эсвэл дуусгавар болсон')
+        });
+      }
+      if(data.gemini){
+        report.checks.push({
+          name:'Gemini API',
+          status: data.gemini.valid ? 'ok' : 'error',
+          detail: data.gemini.valid ? `Ажиллаж байна (${data.gemini.model||''})` : (data.gemini.error || 'API алдаа')
+        });
+      }
+      if(data.catalog){
+        report.checks.push({
+          name:'Кино каталог',
+          status: data.catalog.valid ? 'ok' : 'warn',
+          detail: data.catalog.valid ? `${data.catalog.movieCount||0} кино олдсон` : 'Каталог уншигдсангүй'
+        });
+      }
+      if(data.kv){
+        report.checks.push({
+          name:'Cloudflare KV',
+          status: data.kv.valid ? 'ok' : 'error',
+          detail: data.kv.valid ? 'KV холболт хэвийн' : 'KV холбогдоогүй байна'
+        });
+      }
+    } else {
+      report.checks.push({name:'Worker холболт', status:'error', detail:'HTTP ' + res.status + ' — Worker ажиллахгүй байна эсвэл /diagnostics endpoint байхгүй'});
+    }
+  }catch(e){
+    report.checks.push({name:'Worker холболт', status:'error', detail:'Холбогдох боломжгүй: ' + e.message});
+  }
+
+  renderDiagnostics(report);
+}
+
+function renderDiagnostics(report){
+  LAST_DIAGNOSTICS = report;
+  const resultsEl = document.getElementById('diagnostics-results');
+  const icons = {ok:'✅', warn:'⚠️', error:'❌'};
+
+  resultsEl.innerHTML = report.checks.map(c=>`
+    <div class="diag-row">
+      <span class="diag-icon">${icons[c.status]||'❓'}</span>
+      <span class="diag-text"><b>${c.name}:</b> ${c.detail}</span>
+    </div>
+  `).join('');
+
+  const hasError = report.checks.some(c=>c.status==='error');
+  document.getElementById('diagnostics-copy-section').style.display = hasError ? '' : 'none';
+}
+
+function copyDiagnostics(){
+  if(!LAST_DIAGNOSTICS) return;
+  const text = '⚠ Системийн алдааны тайлан (' + LAST_DIAGNOSTICS.timestamp + ')\n\n' +
+    LAST_DIAGNOSTICS.checks.map(c=>`${c.status==='ok'?'✓':'✗'} ${c.name}: ${c.detail}`).join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    showToast('Алдааны тайлан хуулагдлаа — Claude-д буулгана уу');
+  });
+}
+
 // Admin panel toggle
 function toggleAdminPanel(){
   document.getElementById('admin-panel').classList.toggle('show');
@@ -1819,6 +2113,21 @@ window.addEventListener('DOMContentLoaded', function(){
   document.getElementById('cur-erotic').textContent = `${GROUP_PRICES[2].price} / ${GROUP_PRICES[2].period}`;
   document.getElementById('cur-all').textContent = `${GROUP_PRICES.all.price} / ${GROUP_PRICES.all.period}`;
   renderMovieList();
+
+  // ══ Cloudflare config inputs бөглөх (localStorage-аас) ══
+  document.getElementById('cf-gemini-key').value     = CF_CONFIG.geminiKey || '';
+  document.getElementById('cf-worker-url').value     = CF_CONFIG.workerUrl || '';
+  document.getElementById('cf-refresh-secret').value = CF_CONFIG.refreshSecret || '';
+  document.getElementById('cf-token-ai').value       = CF_CONFIG.tokenAi || '';
+  document.getElementById('cf-token-action').value   = CF_CONFIG.tokenAction || '';
+  document.getElementById('cf-token-erotic').value   = CF_CONFIG.tokenErotic || '';
+  document.getElementById('cf-link-grp-ai').value     = (CF_CONFIG.groupLinks && CF_CONFIG.groupLinks.ai) || '';
+  document.getElementById('cf-link-grp-action').value = (CF_CONFIG.groupLinks && CF_CONFIG.groupLinks.action) || '';
+  document.getElementById('cf-link-grp-erotic').value = (CF_CONFIG.groupLinks && CF_CONFIG.groupLinks.erotic) || '';
+  document.getElementById('cf-link-grp-all').value     = (CF_CONFIG.groupLinks && CF_CONFIG.groupLinks.all) || '';
+  document.getElementById('cf-prompt-chat').value   = CF_CONFIG.promptChat || '';
+  document.getElementById('cf-prompt-vision').value = CF_CONFIG.promptVision || '';
+  renderMovieLinkList();
 });
 
 
@@ -1917,12 +2226,24 @@ window.addEventListener('DOMContentLoaded', function(){
 
 <div class="header">
   <h1>⚙ Admin — КИНО ҮЗВЭР</h1>
-  <p>Кино нэмэх, засах, устгах, тохиргоо хийх</p>
+  <p>Кино нэмэх, засах, устгах, bot тохиргоо хийх</p>
 </div>
+
+<!-- ══ ТОП-LEVEL TAB: Кино каталог / Cloudflare дамжуулалт ══ -->
+<div style="display:flex;gap:6px;padding:14px 16px 0;">
+  <button id="toptab-catalog" onclick="setTopTab('catalog')" style="flex: 1 1 0%; padding: 12px 8px; border-radius: 10px; border-color: var(--ad-accent2); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: linear-gradient(135deg,var(--ad-accent),var(--ad-accent2)); color: rgb(255, 255, 255); font-size: 12px; font-weight: 700; font-family: &quot;Times New Roman&quot;, Times, serif; cursor: pointer;">🎬 1. Кино каталог</button>
+  <button id="toptab-cloudflare" onclick="setTopTab('cloudflare')" style="flex: 1 1 0%; padding: 12px 8px; border-radius: 10px; border-color: var(--ad-border2); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--ad-card2); color: var(--ad-muted); font-size: 12px; font-weight: 700; font-family: &quot;Times New Roman&quot;, Times, serif; cursor: pointer;">☁ 2. Cloudflare дамжуулалт</button>
+</div>
+
+<!-- ══════════════════════════════════ -->
+<!-- TOP TAB 1: КИНО КАТАЛОГ            -->
+<!-- ══════════════════════════════════ -->
+<div id="toppanel-catalog" style="">
 
 <!-- ══ ҺYYНДСЭН ТОХИРГОО ══ -->
 <div class="section">
   <p class="sec-title">📌 Үндсэн тохиргоо</p>
+
   <div class="card">
     <label>Кино нэр</label>
     <input type="text" id="f-name" placeholder="Жишээ: Шинэ Кино">
@@ -1950,7 +2271,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
 
   <!-- MOVIE LIST — 3 tab -->
-  <p class="sec-title">🎬 Кино жагсаалт <span style="color:var(--muted);font-size:11px;font-weight:400;text-transform:none;letter-spacing:0;" id="movieCount">(13)</span></p>
+  <p class="sec-title">🎬 Кино жагсаалт <span style="color:var(--muted);font-size:11px;font-weight:400;text-transform:none;letter-spacing:0;" id="movieCount">(10)</span></p>
 
   <!-- Tab buttons -->
   <div style="display:flex;gap:6px;margin-bottom:10px;">
@@ -2095,6 +2416,195 @@ window.addEventListener('DOMContentLoaded', function(){
     <button class="btn btn-primary" onclick="downloadUpdatedHtml()" style="margin-top:10px;">💾 ФАЙЛ ТАТАХ + GitHub БАЙРШУУЛАХ</button>
   </div>
 </div>
+
+</div>
+<!-- ══ /TOP TAB 1: КИНО КАТАЛОГ ══ -->
+
+
+<!-- ══════════════════════════════════ -->
+<!-- TOP TAB 2: CLOUDFLARE ДАМЖУУЛАЛТ   -->
+<!-- ══════════════════════════════════ -->
+<div id="toppanel-cloudflare" style="display: none;">
+
+  <!-- ══ САБ-TAB СЭЛГҮҮР ══ -->
+  <div class="section" style="padding-bottom:0;">
+    <div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
+      <button id="cftab-a" onclick="setCfTab('a')" class="cf-subtab" style="flex-shrink:0;">🔑 A. Credential</button>
+      <button id="cftab-b" onclick="setCfTab('b')" class="cf-subtab" style="flex-shrink:0;">🎬 B. Кино линк</button>
+      <button id="cftab-c" onclick="setCfTab('c')" class="cf-subtab" style="flex-shrink:0;">💬 C. Харилцаа</button>
+      <button id="cftab-d" onclick="setCfTab('d')" class="cf-subtab" style="flex-shrink:0;">🧾 D. Гүйлгээ/Зураг</button>
+      <button id="cftab-e" onclick="setCfTab('e')" class="cf-subtab active" style="flex-shrink:0;">🩺 E. Алдаа шалгах</button>
+    </div>
+  </div>
+
+  <!-- ══ A. CREDENTIAL САН ══ -->
+  <div id="cfpanel-a" class="cf-panel" style="display: none;">
+    <div class="section">
+      <p class="sec-title">🔑 Bot credential-ууд</p>
+      <div class="card">
+        <div class="info-box">
+          ⚙ Эдгээр утгууд Cloudflare KV-д хадгалагдана. Worker код дотор шууд бичигдэхгүй тул асуудал гарвал энд солиод "ШИНЭЧЛЭХ" дарахад л шууд шинэчлэгдэнэ — Worker дахин deploy хийх шаардлагагүй.
+        </div>
+
+        <label>Gemini API Key</label>
+        <input type="password" id="cf-gemini-key" placeholder="AIzaSy...">
+        <p class="cf-hint">Авах: <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey →</a></p>
+
+        <label>Cloudflare Worker URL</label>
+        <input type="text" id="cf-worker-url" placeholder="https://kinobot.xxx.workers.dev">
+
+        <label>Cloudflare Worker шинэчлэх Secret түлхүүр</label>
+        <input type="password" id="cf-refresh-secret" placeholder="kino-refresh-2026">
+        <p class="cf-hint">Worker дотрох REFRESH_SECRET-тэй яг адил байх ёстой</p>
+
+        <div class="cf-divider">Facebook Page Token-ууд (пэйж тус бүрт тусдаа)</div>
+
+        <label>AI DRAMA пэйж (Open Zone) — Page Access Token</label>
+        <input type="password" id="cf-token-ai" placeholder="EAAxxxxxxxxxxxxx">
+
+        <label>ACTION пэйж — Page Access Token</label>
+        <input type="password" id="cf-token-action" placeholder="EAAxxxxxxxxxxxxx (хоосон бол ашиглахгүй)">
+
+        <label>+18 EROTIC пэйж — Page Access Token</label>
+        <input type="password" id="cf-token-erotic" placeholder="EAAxxxxxxxxxxxxx (хоосон бол ашиглахгүй)">
+
+        <p class="cf-hint">Авах: Facebook Developer → App → Messenger → API Settings → Generate access tokens</p>
+
+        <button class="btn btn-primary" onclick="saveCfCredentials()" style="margin-top:14px;">💾 Credential хадгалах (локал)</button>
+        <button class="btn btn-green" onclick="pushCfConfig('credentials')" style="margin-top:8px;">☁ CLOUDFLARE-РУУ ШИНЭЧЛЭХ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ B. КИНО ЛИНК САН ══ -->
+  <div id="cfpanel-b" class="cf-panel" style="display: none;">
+    <div class="section">
+      <p class="sec-title">🎬 Кино/групп контент линк</p>
+      <div class="card">
+        <div class="info-box">
+          ⚙ Энд оруулсан линкийг хэрэглэгч төлбөр баталгаажуулсны дараа Gemini bot автоматаар Messenger-ээр илгээнэ. Кино каталогт нэмсэн кино бүр энд автоматаар жагсаалт болж гарч ирнэ.
+        </div>
+        <div id="movie-link-list">
+    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
+      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">АЛТАН НҮДЭТ ХҮҮ <span style="color:var(--ad-muted);font-weight:400;">(M11 · AI Drama)</span></p>
+      <input type="text" id="movielink-M11" value="" placeholder="https://... контент линк" style="margin-top:0;">
+    </div>
+    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
+      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Эмч Бүсгүй <span style="color:var(--ad-muted);font-weight:400;">(M06 · Action)</span></p>
+      <input type="text" id="movielink-M06" value="" placeholder="https://... контент линк" style="margin-top:0;">
+    </div>
+    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
+      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Номын Санч <span style="color:var(--ad-muted);font-weight:400;">(M02 · AI Drama)</span></p>
+      <input type="text" id="movielink-M02" value="" placeholder="https://... контент линк" style="margin-top:0;">
+    </div>
+    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
+      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Өндөр Эмэгтэй <span style="color:var(--ad-muted);font-weight:400;">(M03 · AI Drama)</span></p>
+      <input type="text" id="movielink-M03" value="" placeholder="https://... контент линк" style="margin-top:0;">
+    </div>
+    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
+      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Тосгоны Охинтой Учирсан Нь <span style="color:var(--ad-muted);font-weight:400;">(M04 · Action)</span></p>
+      <input type="text" id="movielink-M04" value="" placeholder="https://... контент линк" style="margin-top:0;">
+    </div>
+    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
+      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Хойд Ээж <span style="color:var(--ad-muted);font-weight:400;">(M05 · Action)</span></p>
+      <input type="text" id="movielink-M05" value="" placeholder="https://... контент линк" style="margin-top:0;">
+    </div>
+    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
+      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Гудамжинд Таарсан Эмэгтэй <span style="color:var(--ad-muted);font-weight:400;">(M07 · +18 Erotic)</span></p>
+      <input type="text" id="movielink-M07" value="" placeholder="https://... контент линк" style="margin-top:0;">
+    </div>
+    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
+      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Эхнэрийн Эмч Найз <span style="color:var(--ad-muted);font-weight:400;">(M08 · +18 Erotic)</span></p>
+      <input type="text" id="movielink-M08" value="" placeholder="https://... контент линк" style="margin-top:0;">
+    </div>
+    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
+      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Гадуурхагдсан Эмэгтэй <span style="color:var(--ad-muted);font-weight:400;">(M09 · +18 Erotic)</span></p>
+      <input type="text" id="movielink-M09" value="" placeholder="https://... контент линк" style="margin-top:0;">
+    </div>
+    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
+      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Босс Эмэгтэй <span style="color:var(--ad-muted);font-weight:400;">(M10 · +18 Erotic)</span></p>
+      <input type="text" id="movielink-M10" value="" placeholder="https://... контент линк" style="margin-top:0;">
+    </div></div>
+        <p class="cf-hint" style="margin-top:10px;">Дээрх жагсаалт хоосон бол эхлээд "1. Кино каталог" tab-аас кино нэмнэ үү.</p>
+
+        <div class="cf-divider">Групп линкүүд</div>
+        <label>AI DRAMA групп линк</label>
+        <input type="text" id="cf-link-grp-ai" placeholder="https://t.me/joinchat/... эсвэл fb групп линк">
+        <label>ACTION групп линк</label>
+        <input type="text" id="cf-link-grp-action" placeholder="https://...">
+        <label>+18 EROTIC групп линк</label>
+        <input type="text" id="cf-link-grp-erotic" placeholder="https://...">
+        <label>БҮХ VIP групп линк</label>
+        <input type="text" id="cf-link-grp-all" placeholder="https://...">
+
+        <button class="btn btn-primary" onclick="saveMovieLinks()" style="margin-top:14px;">💾 Линкүүд хадгалах (локал)</button>
+        <button class="btn btn-green" onclick="pushCfConfig('links')" style="margin-top:8px;">☁ CLOUDFLARE-РУУ ШИНЭЧЛЭХ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ C. ХАРИЛЦААНЫ ПРОМПТ ══ -->
+  <div id="cfpanel-c" class="cf-panel" style="display: none;">
+    <div class="section">
+      <p class="sec-title">💬 Харилцааны промпт (Bot-ийн зан төлөв)</p>
+      <div class="card">
+        <div class="info-box">
+          ⚙ Энэ нь Google Doc-г бүрэн орлоно. Bot хэрхэн мэндчилэх, аль өнгө аястай байх, ямар дүрэм баримтлахыг энд тодорхойлно. Кино жагсаалт энд бичих ШААРДЛАГАГҮЙ — тэр автоматаар "B. Кино линк" хэсгээс ирнэ.
+        </div>
+        <textarea id="cf-prompt-chat" rows="16" style="font-family:monospace;font-size:12px;line-height:1.6;" placeholder="Та &quot;Кино Үзвэр&quot; сервисийн AI туслах мөн...
+
+ХАРИУЛАХ ДҮРЭМ:
+1. Шинэ хэрэглэгчид мэндчилнэ
+2. Монгол хэлээр товч хариулна
+3. Мэдэхгүй зүйл дээр &quot;Менежертэй холбогдоно уу&quot; гэнэ
+..."></textarea>
+        <button class="btn btn-primary" onclick="savePrompt('chat')" style="margin-top:14px;">💾 Промпт хадгалах (локал)</button>
+        <button class="btn btn-green" onclick="pushCfConfig('prompt_chat')" style="margin-top:8px;">☁ CLOUDFLARE-РУУ ШИНЭЧЛЭХ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ D. ГҮЙЛГЭЭ/ЗУРАГ ПРОМПТ ══ -->
+  <div id="cfpanel-d" class="cf-panel" style="display: none;">
+    <div class="section">
+      <p class="sec-title">🧾 Гүйлгээ/Зураг унших промпт (Vision)</p>
+      <div class="card">
+        <div class="info-box">
+          ⚙ Хэрэглэгч төлбөрийн баримт зураг илгээхэд Gemini Vision энэ зааврын дагуу зургийг уншиж дүгнэлт гаргана.
+        </div>
+        <textarea id="cf-prompt-vision" rows="12" style="font-family:monospace;font-size:12px;line-height:1.6;" placeholder="Энэ зургийг төлбөрийн баримт гэж үзэж анализ хий:
+1. Гүйлгээний дүн
+2. Огноо
+3. Гүйлгээний утга/тайлбар
+Монгол хэлээр хариул."></textarea>
+        <button class="btn btn-primary" onclick="savePrompt('vision')" style="margin-top:14px;">💾 Промпт хадгалах (локал)</button>
+        <button class="btn btn-green" onclick="pushCfConfig('prompt_vision')" style="margin-top:8px;">☁ CLOUDFLARE-РУУ ШИНЭЧЛЭХ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ E. АЛДАА ШАЛГАХ САМБАР ══ -->
+  <div id="cfpanel-e" class="cf-panel" style="">
+    <div class="section">
+      <p class="sec-title">🩺 Системийн алдаа шалгах</p>
+      <div class="card">
+        <div class="info-box">
+          ⚙ Доорх товчийг дарвал Facebook Token, Gemini API, Worker холболт, Каталог бүгдийг шалгаж, аль хэсэгт асуудал байгааг тодорхой харуулна.
+        </div>
+        <button class="btn btn-primary" onclick="runDiagnostics()">🩺 СИСТЕМ ШАЛГАХ</button>
+
+        <div id="diagnostics-results" style="margin-top:14px;"></div>
+
+        <div id="diagnostics-copy-section" style="display:none;margin-top:14px;">
+          <p class="cf-hint" style="margin-bottom:6px;">Алдаа гарсан бол доорх товчийг дарж Claude-д хуулж өгөөрэй:</p>
+          <button class="btn-sm btn-edit" onclick="copyDiagnostics()">📋 Алдааны тайланг хуулах</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<!-- ══ /TOP TAB 2: CLOUDFLARE ДАМЖУУЛАЛТ ══ -->
 
 <!-- ══ CONFIRM DELETE MODAL ══ -->
 <div class="confirm-overlay" id="confirmOverlay">
