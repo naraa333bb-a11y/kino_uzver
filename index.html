@@ -415,17 +415,17 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
 .confirm-overlay{
   display:none;position:fixed;inset:0;z-index:3000;
   background:rgba(0,0,0,.7);align-items:center;justify-content:center;padding:20px;
-}#admin-panel .confirm-overlay.open{display:flex;}.confirm-box{
+}.confirm-overlay.open{display:flex !important;}.confirm-box{
   background:var(--ad-card);border:1.5px solid var(--ad-red);border-radius:14px;
   padding:20px;max-width:340px;width:100%;text-align:center;
-}.confirm-box p{font-size:14px;color:#fff;margin-bottom:18px;line-height:1.5;}.confirm-btns{display:flex;gap:10px;}.confirm-btns button{flex:1;margin-top:0;}#admin-panel /* SAVE OPTIONS MODAL (Хуучин байрлал / Эхэнд авчрах) */
+}.confirm-box p{font-size:14px;color:#fff;margin-bottom:18px;line-height:1.5;}.confirm-btns{display:flex;gap:10px;}.confirm-btns button{flex:1;margin-top:0;}/* SAVE OPTIONS MODAL (Хуучин байрлал / Эхэнд авчрах) */
 .save-overlay{
   display:none;position:fixed;inset:0;z-index:3000;
   background:rgba(0,0,0,.7);align-items:center;justify-content:center;padding:20px;
-}#admin-panel .save-overlay.open{display:flex;}.save-box{
+}.save-overlay.open{display:flex !important;}.save-box{
   background:var(--ad-card);border:1.5px solid var(--ad-accent2);border-radius:14px;
   padding:20px;max-width:340px;width:100%;text-align:center;
-}.save-box p{font-size:14px;color:#fff;margin-bottom:18px;line-height:1.5;}.save-btns{display:flex;flex-direction:column;gap:8px;}.save-btns button{margin-top:0;}#admin-panel /* OUTPUT CODE */
+}.save-box p{font-size:14px;color:#fff;margin-bottom:18px;line-height:1.5;}.save-btns{display:flex;flex-direction:column;gap:8px;}.save-btns button{margin-top:0;}/* OUTPUT CODE */
 .out{
   width:100%;min-height:120px;padding:12px;background:rgba(0,0,0,.5);
   border:1.5px solid var(--ad-green-mid);border-radius:8px;color:var(--ad-green-mid);
@@ -436,6 +436,32 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
   border-radius:8px;padding:10px 12px;font-size:11px;color:#f59e0b;
   line-height:1.6;margin-bottom:12px;
 }
+#admin-panel .cf-accordion{
+  border:1.5px solid var(--ad-border2);border-radius:10px;margin-bottom:8px;overflow:hidden;
+}
+#admin-panel .token-row{
+  background:var(--ad-card2);border-radius:8px;margin-bottom:8px;overflow:hidden;
+}
+#admin-panel .token-row-header{
+  display:flex;align-items:center;justify-content:space-between;padding:10px 12px;
+}
+#admin-panel .token-row-name{
+  font-size:12px;font-weight:700;color:#fff;
+}
+#admin-panel .token-row-fields{
+  padding:0 12px 10px;
+}
+#admin-panel .token-row-preview{
+  padding:0 12px 10px;
+}
+#admin-panel .cf-accordion-btn{
+  width:100%;display:flex;justify-content:space-between;align-items:center;
+  padding:13px 14px;background:var(--ad-card2);color:#fff;font-size:12px;font-weight:700;
+  font-family:'Times New Roman',Times,serif;border:none;cursor:pointer;text-align:left;
+}
+#admin-panel .cf-accordion-btn:hover{background:rgba(255,255,255,.04);}
+#admin-panel .cf-acc-arrow{font-size:11px;color:var(--ad-muted);}
+#admin-panel .cf-accordion-body{padding:14px;background:var(--ad-bg);}
 #admin-panel .cf-subtab{
   padding:9px 12px;border-radius:8px;border:1.5px solid var(--ad-border2);
   background:var(--ad-card2);color:var(--ad-muted);font-size:11px;font-weight:700;
@@ -498,78 +524,72 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
   </div>
 </div>
 
-<!-- TABS -->
+<!-- TABS — JS-аар CATEGORIES массиваас dynamic render хийгдэнэ -->
 <div class="tabs-wrap">
-  <div class="tab-row">
-    <button class="tab-chip active" onclick="openTab(0,this)">AI DRAMA</button>
-    <button class="tab-chip" onclick="openTab(1,this)">ACTION</button>
-    <button class="tab-chip" onclick="openTab(2,this)">+18 EROTIC</button>
-  </div>
-
-  <!-- PANEL 0: AI DRAMA -->
-  <div class="tab-panel open" id="panel-0">
-    <p class="panel-label">AI Drama</p>
-    <div class="vip-promo-row">
-      <div class="vip-promo" onclick="openBuyModal('GRP',0)">
-        <div class="vip-promo-overlay"></div>
-        <div class="vip-promo-content">
-          <p class="vip-promo-title">AI DRAMA ГРУПП</p>
-          <p class="vip-promo-price" id="price-grp-0"></p>
+  <div class="tab-row" id="tab-row-container"><button class="tab-chip active" onclick="openTab(0,this)">AI DRAMA</button><button class="tab-chip" onclick="openTab(1,this)">ACTION</button><button class="tab-chip" onclick="openTab(2,this)">+18 EROTIC</button></div>
+  <div id="tab-panels-container">
+    <div class="tab-panel open" id="panel-0">
+      <p class="panel-label">AI Drama</p>
+      <div class="vip-promo-row">
+        <div class="vip-promo" onclick="openBuyModal('GRP',0)">
+          <div class="vip-promo-overlay"></div>
+          <div class="vip-promo-content">
+            <p class="vip-promo-title">AI DRAMA ГРУПП</p>
+            <p class="vip-promo-price" id="price-grp-0"></p>
+          </div>
+        </div>
+        <div class="vip-promo" onclick="openBuyModal('ALL',0)">
+          <div class="vip-promo-overlay"></div>
+          <div class="vip-promo-content">
+            <p class="vip-promo-title">БҮХ VIP ГРУПП</p>
+            <p class="vip-promo-price" id="price-grp-all-0"></p>
+          </div>
         </div>
       </div>
-      <div class="vip-promo" onclick="openBuyModal('ALL',0)">
-        <div class="vip-promo-overlay"></div>
-        <div class="vip-promo-content">
-          <p class="vip-promo-title">БҮХ VIP ГРУПП</p>
-          <p class="vip-promo-price" id="price-grp-all-0"></p>
-        </div>
-      </div>
+      <div class="movie-grid" id="grid-0"></div>
     </div>
-    <div class="movie-grid" id="grid-0"></div>
-  </div>
-
-  <!-- PANEL 1: ACTION -->
-  <div class="tab-panel" id="panel-1">
-    <p class="panel-label">Action</p>
-    <div class="vip-promo-row">
-      <div class="vip-promo" onclick="openBuyModal('GRP',1)">
-        <div class="vip-promo-overlay"></div>
-        <div class="vip-promo-content">
-          <p class="vip-promo-title">ACTION ГРУПП</p>
-          <p class="vip-promo-price" id="price-grp-1"></p>
+  
+    <div class="tab-panel" id="panel-1">
+      <p class="panel-label">Action</p>
+      <div class="vip-promo-row">
+        <div class="vip-promo" onclick="openBuyModal('GRP',1)">
+          <div class="vip-promo-overlay"></div>
+          <div class="vip-promo-content">
+            <p class="vip-promo-title">ACTION ГРУПП</p>
+            <p class="vip-promo-price" id="price-grp-1"></p>
+          </div>
+        </div>
+        <div class="vip-promo" onclick="openBuyModal('ALL',1)">
+          <div class="vip-promo-overlay"></div>
+          <div class="vip-promo-content">
+            <p class="vip-promo-title">БҮХ VIP ГРУПП</p>
+            <p class="vip-promo-price" id="price-grp-all-1"></p>
+          </div>
         </div>
       </div>
-      <div class="vip-promo" onclick="openBuyModal('ALL',1)">
-        <div class="vip-promo-overlay"></div>
-        <div class="vip-promo-content">
-          <p class="vip-promo-title">БҮХ VIP ГРУПП</p>
-          <p class="vip-promo-price" id="price-grp-all-1"></p>
-        </div>
-      </div>
+      <div class="movie-grid" id="grid-1"></div>
     </div>
-    <div class="movie-grid" id="grid-1"></div>
-  </div>
-
-  <!-- PANEL 2: +18 EROTIC -->
-  <div class="tab-panel" id="panel-2">
-    <p class="panel-label">+18 Erotic</p>
-    <div class="vip-promo-row">
-      <div class="vip-promo" onclick="openBuyModal('GRP',2)">
-        <div class="vip-promo-overlay"></div>
-        <div class="vip-promo-content">
-          <p class="vip-promo-title">+18 ГРУПП</p>
-          <p class="vip-promo-price" id="price-grp-2"></p>
+  
+    <div class="tab-panel" id="panel-2">
+      <p class="panel-label">+18 Erotic</p>
+      <div class="vip-promo-row">
+        <div class="vip-promo" onclick="openBuyModal('GRP',2)">
+          <div class="vip-promo-overlay"></div>
+          <div class="vip-promo-content">
+            <p class="vip-promo-title">+18 EROTIC ГРУПП</p>
+            <p class="vip-promo-price" id="price-grp-2"></p>
+          </div>
+        </div>
+        <div class="vip-promo" onclick="openBuyModal('ALL',2)">
+          <div class="vip-promo-overlay"></div>
+          <div class="vip-promo-content">
+            <p class="vip-promo-title">БҮХ VIP ГРУПП</p>
+            <p class="vip-promo-price" id="price-grp-all-2"></p>
+          </div>
         </div>
       </div>
-      <div class="vip-promo" onclick="openBuyModal('ALL',2)">
-        <div class="vip-promo-overlay"></div>
-        <div class="vip-promo-content">
-          <p class="vip-promo-title">БҮХ VIP ГРУПП</p>
-          <p class="vip-promo-price" id="price-grp-all-2"></p>
-        </div>
-      </div>
+      <div class="movie-grid" id="grid-2"></div>
     </div>
-    <div class="movie-grid" id="grid-2"></div>
   </div>
 </div>
 
@@ -655,16 +675,16 @@ const IMAGES={
 };
 
 const DEFAULT_MOVIES=[
-  {id:11,name:"АЛТАН НҮДЭТ ХҮҮ",price:"1500",cat:0,cover:"https://drive.google.com/thumbnail?id=1Rj4yl2WbEK2CUvZa7WNmK9O3nbwm38t4&sz=w1000",trailer:"https://archive.org/embed/1_20260615_20260615_1636"},
-  {id:6,name:"Эмч Бүсгүй",price:"2500",cat:1,cover:"",trailer:""},
-  {id:2,name:"Номын Санч",price:"5,000 ₮",cat:0,cover:"",trailer:""},
-  {id:3,name:"Өндөр Эмэгтэй",price:"5,000 ₮",cat:0,cover:"",trailer:""},
-  {id:4,name:"Тосгоны Охинтой Учирсан Нь",price:"5,000 ₮",cat:1,cover:"",trailer:""},
-  {id:5,name:"Хойд Ээж",price:"5,000 ₮",cat:1,cover:"",trailer:""},
-  {id:7,name:"Гудамжинд Таарсан Эмэгтэй",price:"5,000 ₮",cat:2,cover:"",trailer:""},
-  {id:8,name:"Эхнэрийн Эмч Найз",price:"5,000 ₮",cat:2,cover:"",trailer:""},
-  {id:9,name:"Гадуурхагдсан Эмэгтэй",price:"5,000 ₮",cat:2,cover:"",trailer:""},
-  {id:10,name:"Босс Эмэгтэй",price:"5,000 ₮",cat:2,cover:"",trailer:""}
+  {id:11,name:"АЛТАН НҮДЭТ ХҮҮ",price:"1500",cat:0,cover:"https://drive.google.com/thumbnail?id=1Rj4yl2WbEK2CUvZa7WNmK9O3nbwm38t4&sz=w1000",trailer:"https://archive.org/embed/1_20260615_20260615_1636",eps:"1 анги"},
+  {id:6,name:"Эмч Бүсгүй",price:"2500",cat:1,cover:"",trailer:"",eps:"1 анги"},
+  {id:2,name:"Номын Санч",price:"5,000 ₮",cat:0,cover:"",trailer:"",eps:"1 анги"},
+  {id:3,name:"Өндөр Эмэгтэй",price:"5,000 ₮",cat:0,cover:"",trailer:"",eps:"1 анги"},
+  {id:4,name:"Тосгоны Охинтой Учирсан Нь",price:"5,000 ₮",cat:1,cover:"",trailer:"",eps:"1 анги"},
+  {id:5,name:"Хойд Ээж",price:"5,000 ₮",cat:1,cover:"",trailer:"",eps:"1 анги"},
+  {id:7,name:"Гудамжинд Таарсан Эмэгтэй",price:"5,000 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"},
+  {id:8,name:"Эхнэрийн Эмч Найз",price:"5,000 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"},
+  {id:9,name:"Гадуурхагдсан Эмэгтэй",price:"5,000 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"},
+  {id:10,name:"Босс Эмэгтэй",price:"5,000 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"}
 ];
 
 var DEFAULT_TAB_COVER_POS = {
@@ -682,6 +702,26 @@ const DEFAULT_GROUP_PRICES = {
   all: {price:"25,000 ₮", period:"3 сар"}
 };
 
+// ══ КАТЕГОРИ (TAB) ЖАГСААЛТ — динамик, admin-аар нэмэгдэж/нэр өөрчлөгдөнө ══
+// id нь тогтмол дугаар (cat:N холбоосд ашиглагдана), order нь харагдах дараалал
+const DEFAULT_CATEGORIES = [
+  {
+    "id": 0,
+    "name": "AI DRAMA",
+    "label": "AI Drama"
+  },
+  {
+    "id": 1,
+    "name": "ACTION",
+    "label": "Action"
+  },
+  {
+    "id": 2,
+    "name": "+18 EROTIC",
+    "label": "+18 Erotic"
+  }
+];
+
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
 function loadData(){
   try{
@@ -690,6 +730,7 @@ function loadData(){
       const parsed = JSON.parse(saved);
       const tabCovers = parsed.tabCovers || DEFAULT_TAB_COVERS;
       const movies = parsed.movies || DEFAULT_MOVIES;
+      const categories = parsed.categories || JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
       [0,1,2].forEach(k=>{ if(tabCovers[k]) tabCovers[k] = normalizeImageUrl(tabCovers[k]); });
       movies.forEach(m=>{
         if(m.cover) m.cover = normalizeImageUrl(m.cover);
@@ -698,22 +739,27 @@ function loadData(){
       return {
         movies: movies,
         tabCovers: tabCovers,
+        categories: categories,
         groupPrices: parsed.groupPrices || DEFAULT_GROUP_PRICES,
         heroTitle: parsed.heroTitle !== undefined ? parsed.heroTitle : DEFAULT_HERO_TITLE,
         heroSub: parsed.heroSub !== undefined ? parsed.heroSub : DEFAULT_HERO_SUBTITLE,
-        tabCoverPos: parsed.tabCoverPos || JSON.parse(JSON.stringify(DEFAULT_TAB_COVER_POS))
+        tabCoverPos: parsed.tabCoverPos || JSON.parse(JSON.stringify(DEFAULT_TAB_COVER_POS)),
+        nextCatId: parsed.nextCatId || (Math.max(...categories.map(c=>c.id))+1)
       };
     }
   }catch(e){}
   return {movies: DEFAULT_MOVIES, tabCovers: DEFAULT_TAB_COVERS, groupPrices: DEFAULT_GROUP_PRICES,
+          categories: JSON.parse(JSON.stringify(DEFAULT_CATEGORIES)),
           heroTitle: DEFAULT_HERO_TITLE, heroSub: DEFAULT_HERO_SUBTITLE,
-          tabCoverPos: JSON.parse(JSON.stringify(DEFAULT_TAB_COVER_POS))};
+          tabCoverPos: JSON.parse(JSON.stringify(DEFAULT_TAB_COVER_POS)),
+          nextCatId: 3};
 }
 
 function saveData(){
   try{
     localStorage.setItem('toorxon_data', JSON.stringify({
       movies: MOVIES, tabCovers: TAB_COVERS, groupPrices: GROUP_PRICES,
+      categories: CATEGORIES, nextCatId: NEXT_CAT_ID,
       heroTitle: HERO_TITLE, heroSub: HERO_SUBTITLE,
       tabCoverPos: TAB_COVER_POS
     }));
@@ -728,6 +774,8 @@ const _initialData = loadData();
 let MOVIES = _initialData.movies;
 let TAB_COVERS = _initialData.tabCovers;
 let GROUP_PRICES = _initialData.groupPrices;
+let CATEGORIES = _initialData.categories;
+let NEXT_CAT_ID = _initialData.nextCatId;
 let HERO_TITLE = _initialData.heroTitle;
 let HERO_SUBTITLE = _initialData.heroSub;
 let TAB_COVER_POS = _initialData.tabCoverPos;
@@ -747,8 +795,24 @@ const VIDEOS={
   10:"https://www.youtube.com/embed/dQw4w9WgXcQ"
 };
 
-// ══ БАНКНЫ ДАНС (placeholder — 8 пэйж адил 1 данс) ══
-const BANK_ACCOUNT = "5XXXXXXXXXXXXXXXXX"; // TODO: бодит дансны дугаар оруулна
+// ══ БАНКНЫ ДАНС / QPAY МЭДЭЭЛЭЛ — admin panel-аас засварлагдана ══
+const DEFAULT_BANK_INFO = {
+  "bankName": "Хаан Банк",
+  "accountNumber": "5XXXXXXXXXXXXXXXXX",
+  "accountHolder": "ОВОГ НЭР",
+  "qpayMerchant": ""
+};
+
+function loadBankInfo(){
+  try{
+    const saved = localStorage.getItem('toorxon_bank_info');
+    if(saved) return JSON.parse(saved);
+  }catch(e){}
+  return {...DEFAULT_BANK_INFO};
+}
+
+let BANK_INFO = loadBankInfo();
+const BANK_ACCOUNT = BANK_INFO.accountNumber; // backward-compat — модал доторх textContent-д ашиглагдана
 
 // ══ MODAL STATE ══
 let currentMovie=null;
@@ -877,6 +941,7 @@ function showManualCloseHint(winRef){
 function openBuyModal(movieId, catIndex){
   currentCat = catIndex;
   let title, price, vidSrc;
+  window._selectedFreeMovieIds = []; // Шинэ modal нээх бүрд урамшууллын сонголт цэвэрлэнэ
 
   if(movieId==='GRP'){
     // VIP групп
@@ -906,24 +971,28 @@ function openBuyModal(movieId, catIndex){
   document.getElementById('modalTrailer').innerHTML =
     `<iframe src="${vidSrc}" allow="autoplay;encrypted-media" allowfullscreen></iframe>`;
 
-  // AI DRAMA (cat=0) кино дарахад 1+1 хэсэг харуулна
-  const is11 = catIndex===0 && movieId!=='GRP' && movieId!=='ALL';
+  // Кино урамшуулалтай эсэхийг тухайн киноны m.promo11 талбараас шалгана
+  // (group/ALL биш, бодит кино сонгосон үед л үнэн)
+  let currentMovieObj = null;
+  if(movieId!=='GRP' && movieId!=='ALL'){
+    currentMovieObj = MOVIES.find(m=>m.id===movieId);
+  }
+  const is11 = !!(currentMovieObj && currentMovieObj.promo11);
+  const promoCount = is11 ? (currentMovieObj.promo11Count || 1) : 0;
+
   const section11 = document.getElementById('section-11');
   if(section11){
     section11.style.display = is11 ? '' : 'none';
     const hint = document.getElementById('free-movie-hint');
     if(hint) hint.style.display='none';
     if(is11){
-      render11Cards(movieId, catIndex);
-      // select onchange → txnCode шинэчлэх
-      const sel = document.getElementById('free-movie-select');
-      if(sel) sel.onchange = () => updateTxnCode(movieId, catIndex);
+      render11Cards(movieId, catIndex, promoCount);
     }
   }
 
   // Гүйлгээний утга үүсгэх
   updateTxnCode(movieId, catIndex);
-  document.getElementById('acctNumber').textContent = BANK_ACCOUNT;
+  document.getElementById('acctNumber').textContent = BANK_INFO.accountNumber;
 
   // Pay panel-уудыг хааж эхлэх
   document.getElementById('panelQpay').classList.remove('open');
@@ -934,16 +1003,18 @@ function openBuyModal(movieId, catIndex){
   document.getElementById('buyModal').classList.add('open');
 }
 
-// Гүйлгээний утга шинэчлэх (1+1 dropdown сонгоход ч дуудагдана)
+// Гүйлгээний утга шинэчлэх (1+N сонголт хийхэд ч дуудагдана)
 function updateTxnCode(movieId, catIndex){
   const codeMovieId = (movieId==='GRP'||movieId==='ALL') ? 'GRP' : movieId;
   let txnCode = genTxnCode(codeMovieId, catIndex);
 
-  // AI DRAMA 1+1: 2-р кино сонгосон бол txnCode-д нэмэх
-  const sel = document.getElementById('free-movie-select');
-  if(sel && sel.value && catIndex===0 && movieId!=='GRP' && movieId!=='ALL'){
-    const freeCode = 'M'+String(parseInt(sel.value)).padStart(2,'0');
-    txnCode = txnCode + '+' + freeCode;
+  // Сонгосон үнэгүй кино(ну)удыг txnCode-д нэмнэ — олон сонголттой бол бүгдийг +-аар холбоно
+  const selectedFreeIds = window._selectedFreeMovieIds || [];
+  if(selectedFreeIds.length){
+    selectedFreeIds.forEach(fid=>{
+      const freeCode = 'M'+String(fid).padStart(2,'0');
+      txnCode = txnCode + '+' + freeCode;
+    });
     const hint = document.getElementById('free-movie-hint');
     if(hint) hint.style.display='';
   }
@@ -953,19 +1024,29 @@ function updateTxnCode(movieId, catIndex){
   if(txnQpay) txnQpay.textContent = txnCode;
 }
 
-// 1+1 card scroll UI — кино cards үүсгэж бөглөх
-function render11Cards(mainMovieId, catIndex){
+// 1+N card scroll UI — promoCount тооны хэмжээгээр үнэгүй кино олон сонгох боломжтой
+function render11Cards(mainMovieId, catIndex, promoCount){
   const container = document.getElementById('free-movie-cards');
-  const sel = document.getElementById('free-movie-select');
-  if(!container || !sel) return;
+  if(!container) return;
 
-  const aiMovies = MOVIES.filter(m=>m.cat===0 && m.id!==mainMovieId);
-  sel.innerHTML = '<option value="">—</option>' +
-    aiMovies.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+  window._selectedFreeMovieIds = [];
+  window._promo11MaxCount = promoCount || 1;
+  window._promo11MainId = mainMovieId;
+  window._promo11CatIndex = catIndex;
 
-  container.innerHTML = aiMovies.map(m=>{
+  // Урамшууллын кино ижил ангиллаас (catIndex)-аас сонгогдоно, гол кинойг хасна
+  const eligibleMovies = MOVIES.filter(m=>m.cat===catIndex && m.id!==mainMovieId);
+
+  const hintLabel = document.getElementById('free-movie-label');
+  if(hintLabel){
+    hintLabel.textContent = promoCount > 1
+      ? `Дурын ${promoCount} киног үнэгүй сонгоно уу:`
+      : `Дурын нэг киног үнэгүй сонгоно уу:`;
+  }
+
+  container.innerHTML = eligibleMovies.map(m=>{
     const imgSrc = m.cover || IMAGES[m.id] || '';
-    return `<div class="free-movie-card" data-id="${m.id}" onclick="select11Movie(${m.id},${mainMovieId},${catIndex})" style="flex-shrink:0;width:90px;cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid var(--border);transition:border-color .2s;">
+    return `<div class="free-movie-card" data-id="${m.id}" onclick="select11Movie(${m.id})" style="flex-shrink:0;width:90px;cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid var(--border);transition:border-color .2s;">
       <div style="width:90px;height:120px;background:var(--card2);position:relative;">
         <img src="${imgSrc}" alt="${m.name}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">
         <div style="position:absolute;inset:0;background:rgba(0,0,0,.25);"></div>
@@ -977,19 +1058,31 @@ function render11Cards(mainMovieId, catIndex){
   }).join('');
 }
 
-function select11Movie(freeId, mainMovieId, catIndex){
+function select11Movie(freeId){
+  const maxCount = window._promo11MaxCount || 1;
+  let selected = window._selectedFreeMovieIds || [];
+
+  if(selected.includes(freeId)){
+    // Аль хэдийн сонгосон бол хасна (toggle off)
+    selected = selected.filter(id=>id!==freeId);
+  } else {
+    if(selected.length >= maxCount){
+      // Хязгаарт хүрсэн бол хамгийн эртний сонголтыг хасаад шинээр нэмнэ
+      selected.shift();
+    }
+    selected.push(freeId);
+  }
+  window._selectedFreeMovieIds = selected;
+
   // Card-уудыг визуалаар highlight хийх
   document.querySelectorAll('#free-movie-cards .free-movie-card').forEach(c=>{
-    const selected = parseInt(c.dataset.id)===freeId;
-    c.style.borderColor = selected ? 'var(--accent)' : 'var(--border)';
-    c.style.boxShadow = selected ? '0 0 0 2px rgba(255,56,96,.35)' : '';
+    const id = parseInt(c.dataset.id);
+    const isSelected = selected.includes(id);
+    c.style.borderColor = isSelected ? 'var(--accent)' : 'var(--border)';
+    c.style.boxShadow = isSelected ? '0 0 0 2px rgba(255,56,96,.35)' : '';
   });
-  // select-д утга тохируулах
-  const sel = document.getElementById('free-movie-select');
-  if(sel){
-    sel.value = String(freeId);
-    sel.dispatchEvent(new Event('change'));
-  }
+
+  updateTxnCode(window._promo11MainId, window._promo11CatIndex);
 }
 
 function closeModal(){
@@ -999,11 +1092,11 @@ function closeModal(){
 
 // ══ ТӨЛБӨРИЙН АРГА СОНГОХ ══
 function selectPay(method){
-  // 1+1 тохиолдолд: үнэгүй кино сонгоогүй бол төлбөрийн хэсгийг нээхгүй
+  // Урамшуулалтай кино бол: үнэгүй кино сонгоогүй бол төлбөрийн хэсгийг нээхгүй
   const section11 = document.getElementById('section-11');
-  const sel = document.getElementById('free-movie-select');
   const is11Visible = section11 && section11.style.display !== 'none';
-  if(is11Visible && sel && !sel.value){
+  const selectedCount = (window._selectedFreeMovieIds || []).length;
+  if(is11Visible && selectedCount === 0){
     show11Warning();
     return;
   }
@@ -1108,18 +1201,56 @@ function updateHeroCover(cat){
 }
 
 function setRandomCovers(){
-  updateHeroCover(0); // анхны tab (AI DRAMA)
+  const firstCat = CATEGORIES.length ? CATEGORIES[0].id : 0;
+  updateHeroCover(firstCat); // анхны tab
   const ids = Object.keys(IMAGES);
   const cardEl = document.getElementById('cover-tab-0-card');
   if(cardEl){
     cardEl.style.display='';
-    cardEl.src = TAB_COVERS[0] || (ids.length ? IMAGES[ids[Math.floor(Math.random()*ids.length)]] : '');
+    cardEl.src = TAB_COVERS[firstCat] || (ids.length ? IMAGES[ids[Math.floor(Math.random()*ids.length)]] : '');
   }
 }
 
 // ══ ГРУПП ҮНЭ ХАРУУЛАХ — GROUP_PRICES-ээс ══
+// ══ TAB CHIPS + PANEL-уудыг CATEGORIES-аас бүхэлд нь dynamic render хийнэ ══
+function renderTabsAndPanels(){
+  const tabRow = document.getElementById('tab-row-container');
+  const panelsContainer = document.getElementById('tab-panels-container');
+  if(!tabRow || !panelsContainer) return;
+
+  // Tab chips
+  tabRow.innerHTML = CATEGORIES.map((c,idx)=>
+    `<button class="tab-chip${idx===0?' active':''}" onclick="openTab(${c.id},this)">${c.name}</button>`
+  ).join('');
+
+  // Panel-ууд (vip-promo cards + movie-grid)
+  panelsContainer.innerHTML = CATEGORIES.map((c,idx)=>`
+    <div class="tab-panel${idx===0?' open':''}" id="panel-${c.id}">
+      <p class="panel-label">${c.label}</p>
+      <div class="vip-promo-row">
+        <div class="vip-promo" onclick="openBuyModal('GRP',${c.id})">
+          <div class="vip-promo-overlay"></div>
+          <div class="vip-promo-content">
+            <p class="vip-promo-title">${c.name} ГРУПП</p>
+            <p class="vip-promo-price" id="price-grp-${c.id}"></p>
+          </div>
+        </div>
+        <div class="vip-promo" onclick="openBuyModal('ALL',${c.id})">
+          <div class="vip-promo-overlay"></div>
+          <div class="vip-promo-content">
+            <p class="vip-promo-title">БҮХ VIP ГРУПП</p>
+            <p class="vip-promo-price" id="price-grp-all-${c.id}"></p>
+          </div>
+        </div>
+      </div>
+      <div class="movie-grid" id="grid-${c.id}"></div>
+    </div>
+  `).join('');
+}
+
 function renderGroupPrices(){
-  [0,1,2].forEach(cat=>{
+  CATEGORIES.forEach(c=>{
+    const cat = c.id;
     const g = GROUP_PRICES[cat];
     const elG = document.getElementById('price-grp-'+cat);
     if(elG && g) elG.textContent = `${g.price} / ${g.period}`;
@@ -1132,9 +1263,11 @@ function renderGroupPrices(){
 
 // ══ RENDER GRIDS ══
 function renderGrids(){
-  [0,1,2].forEach(cat=>{
+  CATEGORIES.forEach(c=>{
+    const cat = c.id;
     const items = MOVIES.filter(m=>m.cat===cat);
     const grid = document.getElementById('grid-'+cat);
+    if(!grid) return;
     if(items.length===0){
       grid.innerHTML = '<div class="empty-msg">Энэ ангилалд кино одоогоор байхгүй</div>';
       return;
@@ -1142,8 +1275,8 @@ function renderGrids(){
     grid.innerHTML = items.map(m=>{
       const imgSrc = m.cover || IMAGES[m.id] || '';
       const eps = m.eps || '1 анги';
-      // AI DRAMA (cat=0) дотор 1+1 badge харуулна
-      const badge11 = cat===0 ? '<div class="badge-11">1+1 — нэг кино үнэгүй!</div>' : '';
+      // 1+1 урамшуулалтай кинонд badge харуулна
+      const badge11 = m.promo11 ? `<div class="badge-11">1+${m.promo11Count||1} — урамшуулал!</div>` : '';
       return `
       <div class="movie-card" onclick="openBuyModal(${m.id},${m.cat})">
         <div class="poster">
@@ -1169,14 +1302,15 @@ function renderGrids(){
 function openTab(i, btn){
   document.querySelectorAll('.tab-chip').forEach(c=>c.classList.remove('active'));
   btn.classList.add('active');
-  document.querySelectorAll('.tab-panel').forEach((p,idx)=>{
-    if(idx===i) p.classList.add('open');
+  document.querySelectorAll('.tab-panel').forEach(p=>{
+    if(p.id === 'panel-'+i) p.classList.add('open');
     else p.classList.remove('open');
   });
   // Tab дарахад hero cover солигдоно
   updateHeroCover(i);
 }
 
+renderTabsAndPanels();
 renderGrids();
 renderGroupPrices();
 setRandomCovers();
@@ -1188,15 +1322,31 @@ applyHeroText(HERO_TITLE, HERO_SUBTITLE);
 
 // ══ ADMIN STATE — MOVIES/TAB_COVERS/GROUP_PRICES нь prototype-ийн global variable ══
 let nextId = MOVIES.length ? Math.max(...MOVIES.map(m=>m.id))+1 : 1;
-let selectedCat = 0;
+let selectedCat = CATEGORIES.length ? CATEGORIES[0].id : 0;
 let editingId = null;
 let pendingDeleteId = null;
 
-const CAT_NAMES = {0:'AI Drama', 1:'Action', 2:'+18 Erotic'};
-const CAT_TAGCLASS = {0:'ai', 1:'action', 2:'erotic'};
-const CAT_KEY = {0:'ai', 1:'action', 2:'erotic'}; // GROUP_PRICES, TAB_COVERS key mapping
+// Dynamic категорийн нэр/tag classes — CATEGORIES массиваас тооцоологдоно
+function getCatName(catId){
+  const c = CATEGORIES.find(x=>x.id===catId);
+  return c ? c.label : 'Тодорхойгүй';
+}
+function getCatTagClass(catId){
+  // Эхний 3 категорид өнгөтэй tag, цаашид neutral
+  const colors = ['ai','action','erotic'];
+  const idx = CATEGORIES.findIndex(c=>c.id===catId);
+  return colors[idx % colors.length] || 'ai';
+}
 
-// ══ TAB SELECT ══
+// ══ TAB SELECT — admin кино нэмэх форм дотор, CATEGORIES-аас dynamic ══
+function renderAdminTabSelect(){
+  const container = document.getElementById('tab-select');
+  if(!container) return;
+  container.innerHTML = CATEGORIES.map((c,idx)=>
+    `<div class="tab-opt${c.id===selectedCat?' active':''}" data-cat="${c.id}" onclick="selectTab(${c.id},this)">${c.name}</div>`
+  ).join('');
+}
+
 function selectTab(cat, el){
   selectedCat = cat;
   document.querySelectorAll('#tab-select .tab-opt').forEach(o=>o.classList.remove('active'));
@@ -1204,18 +1354,25 @@ function selectTab(cat, el){
 }
 
 // ══ SUBMIT (нэмэх эсвэл засах) ══
+function togglePromo11Input(){
+  const checked = document.getElementById('f-promo11').checked;
+  document.getElementById('promo11-count-wrap').style.display = checked ? '' : 'none';
+}
+
 function submitMovie(){
   const name = document.getElementById('f-name').value.trim();
   const cover = normalizeImageUrl(document.getElementById('f-cover').value);
   const trailer = normalizeTrailerUrl(document.getElementById('f-trailer').value);
   const price = document.getElementById('f-price').value.trim();
   const eps = document.getElementById('f-eps').value.trim() || '1 анги';
+  const promo11 = document.getElementById('f-promo11').checked;
+  const promo11Count = promo11 ? (parseInt(document.getElementById('f-promo11-count').value) || 1) : 0;
 
   if(!name){ alert('Кино нэрийг оруулна уу!'); return; }
 
   if(editingId === null){
     // ─ ШИНЭ КИНО НЭМЭХ ─
-    const movie = {id: nextId++, name, cover, trailer, cat: selectedCat, price, eps};
+    const movie = {id: nextId++, name, cover, trailer, cat: selectedCat, price, eps, promo11, promo11Count};
     MOVIES.unshift(movie); // шинэ кино хамгийн түрүүнд
     saveData();
     renderGrids();
@@ -1224,7 +1381,7 @@ function submitMovie(){
     showToast(`"${name}" нэмэгдлээ`);
   } else {
     // ─ ЗАСАХ — байрлалын сонголт асуух ─
-    window._editData = {name, cover, trailer, cat: selectedCat, price, eps};
+    window._editData = {name, cover, trailer, cat: selectedCat, price, eps, promo11, promo11Count};
     document.getElementById('saveOverlay').classList.add('open');
   }
 }
@@ -1264,6 +1421,9 @@ function editMovie(id){
   document.getElementById('f-trailer').value = m.trailer;
   document.getElementById('f-price').value = m.price;
   document.getElementById('f-eps').value = m.eps || '1 анги';
+  document.getElementById('f-promo11').checked = !!m.promo11;
+  document.getElementById('f-promo11-count').value = m.promo11Count || 1;
+  togglePromo11Input();
 
   document.querySelectorAll('#tab-select .tab-opt').forEach(o=>{
     o.classList.toggle('active', parseInt(o.dataset.cat)===m.cat);
@@ -1281,10 +1441,13 @@ function clearForm(){
   document.getElementById('f-trailer').value='';
   document.getElementById('f-price').value='';
   document.getElementById('f-eps').value='';
+  document.getElementById('f-promo11').checked = false;
+  document.getElementById('f-promo11-count').value = 1;
+  togglePromo11Input();
   document.getElementById('submitBtn').textContent='➕ Кино нэмэх';
   editingId = null;
-  selectedCat = 0;
-  document.querySelectorAll('#tab-select .tab-opt').forEach((o,i)=>o.classList.toggle('active', i===0));
+  selectedCat = CATEGORIES.length ? CATEGORIES[0].id : 0;
+  renderAdminTabSelect();
 }
 
 // ══ УСТГАХ ══
@@ -1309,16 +1472,30 @@ function confirmDelete(yes){
   pendingDeleteId = null;
 }
 
-// ══ RENDER MOVIE LIST ══
-let activeMovieListTab = 0;
+// ══ RENDER MOVIE LIST — CATEGORIES-аас dynamic tab ══
+let activeMovieListTab = CATEGORIES.length ? CATEGORIES[0].id : 0;
+
+function renderMlTabRow(){
+  const row = document.getElementById('mltab-row');
+  if(!row) return;
+  row.innerHTML = CATEGORIES.map(c=>
+    `<button id="mltab-${c.id}" onclick="setMovieListTab(${c.id})" style="flex:1;flex-shrink:0;min-width:90px;padding:8px 4px;border-radius:8px;border:1.5px solid ${c.id===activeMovieListTab?'var(--accent2)':'var(--border2)'};background:${c.id===activeMovieListTab?'linear-gradient(135deg,var(--accent),var(--accent2))':'var(--card2)'};color:${c.id===activeMovieListTab?'#fff':'var(--muted)'};font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">${c.name}</button>`
+  ).join('');
+
+  const container = document.getElementById('movieList-container');
+  if(container){
+    container.innerHTML = CATEGORIES.map(c=>
+      `<div id="movieList-${c.id}" style="display:${c.id===activeMovieListTab?'':'none'};"></div>`
+    ).join('');
+  }
+}
 
 function setMovieListTab(cat){
   activeMovieListTab = cat;
-  // Tab buttons
-  [0,1,2].forEach(i=>{
-    const btn = document.getElementById('mltab-'+i);
+  CATEGORIES.forEach(c=>{
+    const btn = document.getElementById('mltab-'+c.id);
     if(!btn) return;
-    if(i===cat){
+    if(c.id===cat){
       btn.style.background='linear-gradient(135deg,var(--accent),var(--accent2))';
       btn.style.borderColor='var(--accent2)';
       btn.style.color='#fff';
@@ -1327,9 +1504,8 @@ function setMovieListTab(cat){
       btn.style.borderColor='var(--border2)';
       btn.style.color='var(--muted)';
     }
-    // Show/hide panels
-    const panel = document.getElementById('movieList-'+i);
-    if(panel) panel.style.display = i===cat ? '' : 'none';
+    const panel = document.getElementById('movieList-'+c.id);
+    if(panel) panel.style.display = c.id===cat ? '' : 'none';
   });
 }
 
@@ -1338,7 +1514,10 @@ function renderMovieList(){
   const countEl = document.getElementById('movieCount');
   if(countEl) countEl.textContent = `(${total})`;
 
-  [0,1,2].forEach(cat=>{
+  renderMlTabRow();
+
+  CATEGORIES.forEach(c=>{
+    const cat = c.id;
     const list = document.getElementById('movieList-'+cat);
     if(!list) return;
     const items = MOVIES.filter(m=>m.cat===cat);
@@ -1619,17 +1798,110 @@ function saveHeroText(){
   showToast('Гарчиг хадгалагдлаа');
 }
 
-// ══ ҺROUP PRICE EDIT TOGGLE ══
-// admin-ийн key (ai/action/erotic/all) -> GROUP_PRICES key (0/1/2/all)
-const PRICE_KEY_MAP = {ai:0, action:1, erotic:2, all:'all'};
+// ══ ТАБ ҮНЭ + НЭР ЗАСВАРЛАХ МӨР-үүд — CATEGORIES-аас dynamic ══
+function renderTabPriceRows(){
+  const container = document.getElementById('dynamic-tab-price-rows');
+  if(!container) return;
+  container.innerHTML = CATEGORIES.map(c=>{
+    const gp = GROUP_PRICES[c.id] || {price:'', period:''};
+    return `
+    <div class="price-row">
+      <div class="price-row-top">
+        <span class="price-row-label" id="catlabel-${c.id}">${c.name} ГРУПП</span>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-sm btn-edit" onclick="toggleRenameCategory(${c.id})">✏ Нэр</button>
+          <button class="btn-sm btn-edit" onclick="toggleEdit(${c.id})">💰 Үнэ</button>
+        </div>
+      </div>
 
+      <!-- НЭР ЗАСВАРЛАХ -->
+      <div class="price-edit-fields" id="rename-${c.id}">
+        <input type="text" id="catname-input-${c.id}" value="${c.name}" placeholder="Жишээ: AI DRAMA" style="grid-column:span 2;">
+        <button class="btn btn-green" style="grid-column:span 2;" onclick="saveCategoryName(${c.id})">💾 Нэр хадгалах</button>
+      </div>
+
+      <p class="price-row-current" id="cur-${c.id}">${gp.price} / ${gp.period}</p>
+
+      <!-- ҮНЭ ЗАСВАРЛАХ -->
+      <div class="price-edit-fields" id="edit-${c.id}">
+        <input type="text" id="price-${c.id}" placeholder="13,000 ₮">
+        <input type="text" id="period-${c.id}" placeholder="3 сар">
+        <button class="btn btn-green" style="grid-column:span 2;" onclick="savePrice(${c.id},'${c.name} ГРУПП')">💾 Хадгалах</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══ ШИНЭ ТАБ ҮҮСГЭХ ══
+function addNewCategory(){
+  const newId = NEXT_CAT_ID++;
+  const newName = 'ШИНЭ ТАБ ' + newId;
+  CATEGORIES.push({id:newId, name:newName, label:newName});
+  GROUP_PRICES[newId] = {price:'10,000 ₮', period:'3 сар'};
+  saveData();
+
+  // Бүх холбогдох UI-г дахин render хийнэ
+  renderTabsAndPanels();
+  renderGrids();
+  renderGroupPrices();
+  setRandomCovers();
+  renderAdminTabSelect();
+  renderTabPriceRows();
+  renderMlTabRow();
+  renderMovieList();
+  renderLinkTabRow();
+  renderMovieLinkList();
+  renderPageTokenList();
+
+  showToast(`"${newName}" таб нэмэгдлээ — нэрийг засварлаарай`);
+}
+
+// ══ ТАБЫН НЭР ЗАСВАРЛАХ ══
+function toggleRenameCategory(catId){
+  const el = document.getElementById('rename-'+catId);
+  if(el) el.classList.toggle('on');
+}
+
+function saveCategoryName(catId){
+  const input = document.getElementById('catname-input-'+catId);
+  const newName = input.value.trim();
+  if(!newName) return;
+
+  const cat = CATEGORIES.find(c=>c.id===catId);
+  if(!cat) return;
+  cat.name = newName;
+  cat.label = newName;
+  saveData();
+
+  // Бүх холбогдох UI-г дахин render хийнэ — нэр өөрчлөгдөхөд
+  // нүүр хуудас (tab chip, panel label, vip-promo title), admin-ийн
+  // tab-select, кино жагсаалтын tab, групп үнийн мөр бүгд шинэчлэгдэнэ
+  renderTabsAndPanels();
+  renderGrids();
+  renderGroupPrices();
+  setRandomCovers();
+  renderAdminTabSelect();
+  renderTabPriceRows();
+  renderMlTabRow();
+  renderMovieList();
+  renderLinkTabRow();
+  renderMovieLinkList();
+  renderPageTokenList();
+
+  document.getElementById('rename-'+catId).classList.remove('on');
+  showToast(`Табын нэр "${newName}" болж хадгалагдлаа`);
+}
+
+// ══ ГРУПП ҮНЭ EDIT TOGGLE ══
 function toggleEdit(key){
   const el = document.getElementById('edit-'+key);
   el.classList.toggle('on');
   if(el.classList.contains('on')){
-    const gp = GROUP_PRICES[PRICE_KEY_MAP[key]];
-    document.getElementById('price-'+key).value = gp.price;
-    document.getElementById('period-'+key).value = gp.period;
+    const gp = GROUP_PRICES[key];
+    if(gp){
+      document.getElementById('price-'+key).value = gp.price;
+      document.getElementById('period-'+key).value = gp.period;
+    }
   }
 }
 
@@ -1637,8 +1909,9 @@ function savePrice(key, label){
   const price = document.getElementById('price-'+key).value.trim();
   const period = document.getElementById('period-'+key).value.trim();
   if(!price || !period) return;
-  GROUP_PRICES[PRICE_KEY_MAP[key]] = {price, period};
-  document.getElementById('cur-'+key).textContent = `${price} / ${period}`;
+  GROUP_PRICES[key] = {price, period};
+  const curEl = document.getElementById('cur-'+key);
+  if(curEl) curEl.textContent = `${price} / ${period}`;
   document.getElementById('edit-'+key).classList.remove('on');
   saveData();
   renderGroupPrices();
@@ -1649,11 +1922,11 @@ function savePrice(key, label){
 let toastTimer=null;
 function showToast(msg){
   const t=document.getElementById('toast');
-  t.textContent = msg + ' — хадгалагдлаа ✓';
+  t.textContent = msg + ' ✓';
   t.classList.remove('toast-error');
   t.classList.add('show');
   if(toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=>t.classList.remove('show'), 5000);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 3000);
 }
 
 function showError(msg){
@@ -1662,7 +1935,7 @@ function showError(msg){
   t.classList.add('toast-error');
   t.classList.add('show');
   if(toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=>{t.classList.remove('show');t.classList.remove('toast-error');}, 5000);
+  toastTimer = setTimeout(()=>{t.classList.remove('show');t.classList.remove('toast-error');}, 3000);
 }
 
 // ══ ФАЙЛ ТАТАХ — бүхэл HTML-г шинэчилсэн DEFAULT_* утгуудтай файл болгож татна ══
@@ -1714,46 +1987,70 @@ function downloadUpdatedHtml(){
   let html = clone.outerHTML;
 
   // DEFAULT_MOVIES-ийг шинэ MOVIES-аар солих
-  const moviesStr = 'const DEFAULT_MOVIES=[\n' + MOVIES.map(m=>
-    `  {id:${m.id},name:${JSON.stringify(m.name)},price:${JSON.stringify(m.price)},cat:${m.cat},cover:${JSON.stringify(m.cover||'')},trailer:${JSON.stringify(m.trailer||'')}}`
-  ).join(',\n') + '\n];';
+  // ── MOVIES (eps, promo11, promo11Count бүгдийг хамт embed) ──
+  const moviesStr = 'const DEFAULT_MOVIES=[\n' + MOVIES.map(m=>{
+    const base = `  {id:${m.id},name:${JSON.stringify(m.name)},price:${JSON.stringify(m.price)},cat:${m.cat},cover:${JSON.stringify(m.cover||'')},trailer:${JSON.stringify(m.trailer||'')},eps:${JSON.stringify(m.eps||'1 анги')}`;
+    const promo = m.promo11 ? `,promo11:true,promo11Count:${m.promo11Count||1}` : '';
+    return base + promo + '}';
+  }).join(',\n') + '\n];';
 
-  const tabCoversStr = `const DEFAULT_TAB_COVER_POS = {
-  0:{x:42.33121618442719, y:39.046427578537674, scale:0.5},
-  1:{x:50.60137834160045, y:49.815728146141005, scale:0.76},
-  2:{x:53.136290243362225, y:51.35588012198487, scale:0.7}
-};
+  // ── CATEGORIES ──
+  const categoriesStr = 'const DEFAULT_CATEGORIES = ' + JSON.stringify(CATEGORIES, null, 2) + ';';
 
-const DEFAULT_TAB_COVERS = {0:"https://drive.google.com/thumbnail?id=1hmVacMoedAUMRdnprgd-ajPTeMCbnKbo&sz=w1000", 1:"https://drive.google.com/thumbnail?id=1ZFRnE6VGX8r5LbFH47vGqEDRT_Pts8pd&sz=w1000", 2:"https://drive.google.com/thumbnail?id=1eMQDyHgjcVRuJvWPBz5Y93AwFzD50FDf&sz=w1000"};`;
+  // ── TAB_COVER_POS + TAB_COVERS (CATEGORIES-аас dynamic) ──
+  const posParts = CATEGORIES.map(c=>{
+    const pos = (TAB_COVER_POS && TAB_COVER_POS[c.id]) || {x:50,y:50,scale:1};
+    return `  ${c.id}:{x:${pos.x}, y:${pos.y}, scale:${pos.scale}}`;
+  }).join(',\n');
+  const coverParts = CATEGORIES.map(c=>`${c.id}:${JSON.stringify(TAB_COVERS[c.id]||'')}`).join(', ');
+  const tabCoversStr = `var DEFAULT_TAB_COVER_POS = {\n${posParts}\n};\n\nconst DEFAULT_TAB_COVERS = {${coverParts}};`;
 
-  const groupPricesStr = `const DEFAULT_GROUP_PRICES = {
-  0: {price:${JSON.stringify(GROUP_PRICES[0].price)}, period:${JSON.stringify(GROUP_PRICES[0].period)}},
-  1: {price:${JSON.stringify(GROUP_PRICES[1].price)}, period:${JSON.stringify(GROUP_PRICES[1].period)}},
-  2: {price:${JSON.stringify(GROUP_PRICES[2].price)}, period:${JSON.stringify(GROUP_PRICES[2].period)}},
-  all: {price:${JSON.stringify(GROUP_PRICES.all.price)}, period:${JSON.stringify(GROUP_PRICES.all.period)}}
-};`;
+  // ── GROUP_PRICES (CATEGORIES-аас dynamic + all) ──
+  const gpParts = CATEGORIES.map(c=>{
+    const gp = GROUP_PRICES[c.id] || {price:'10,000 ₮', period:'3 сар'};
+    return `  ${c.id}: {price:${JSON.stringify(gp.price)}, period:${JSON.stringify(gp.period)}}`;
+  }).join(',\n');
+  const gpAll = GROUP_PRICES.all || {price:'25,000 ₮', period:'3 сар'};
+  const groupPricesStr = `const DEFAULT_GROUP_PRICES = {\n${gpParts},\n  all: {price:${JSON.stringify(gpAll.price)}, period:${JSON.stringify(gpAll.period)}}\n};`;
 
-  // Regex-ээр хуучин DEFAULT_* блокуудыг шинэ утгаар солих
+  // ── BANK_INFO ──
+  const bankInfoStr = 'const DEFAULT_BANK_INFO = ' + JSON.stringify(BANK_INFO, null, 2) + ';';
+
+  // ── NEXT_CAT_ID ──
+  const nextCatIdStr = 'NEXT_CAT_ID = ' + NEXT_CAT_ID + ';';
+
+  // ── Replace: DEFAULT_MOVIES ──
   html = html.replace(/const DEFAULT_MOVIES=\[[\s\S]*?\];/, moviesStr);
-  // DEFAULT_TAB_COVER_POS бүгдийг устгаад tabCoversStr-ээр (POS+COVERS хамт) орлуулна
-  // DEFAULT_TAB_COVER_POS + DEFAULT_TAB_COVERS — split/join аргаар давхардлыг арилгана
-  // 1. Хуучин POS+COVERS блокийг олж нэг удаа tabCoversStr-ээр солино
-  const _posStart = 'const DEFAULT_TAB_COVER_POS';
-  const _coversEnd = '};';
-  if(html.includes(_posStart)){
-    const _pi = html.indexOf(_posStart);
-    // POS блокийн эхнээс COVERS блокийн төгсгөл хүртэлх хэсгийг олно
-    // COVERS блок нь POS-ийн дараа байдаг тул 2-р '};' хүртэл авна
-    let _pe = html.indexOf(_coversEnd, _pi);
-    _pe = html.indexOf(_coversEnd, _pe + 2); // 2-р '};'
-    if(_pe > -1){
-      html = html.slice(0, _pi) + tabCoversStr + html.slice(_pe + 2);
+
+  // ── Replace: DEFAULT_CATEGORIES ──
+  html = html.replace(/const DEFAULT_CATEGORIES = \[[\s\S]*?\];/, categoriesStr);
+
+  // ── Replace: DEFAULT_BANK_INFO ──
+  html = html.replace(/const DEFAULT_BANK_INFO = \{[\s\S]*?\};/, bankInfoStr);
+
+  // ── TAB_COVER_POS + TAB_COVERS ──
+  const _posKeys = ['var DEFAULT_TAB_COVER_POS', 'const DEFAULT_TAB_COVER_POS'];
+  for(const pk of _posKeys){
+    if(html.includes(pk)){
+      const _pi = html.indexOf(pk);
+      let _pe = html.indexOf('};', _pi);
+      _pe = html.indexOf('};', _pe + 2);
+      if(_pe > -1){
+        html = html.slice(0, _pi) + tabCoversStr + html.slice(_pe + 2);
+        break;
+      }
     }
   }
+
+  // ── Replace: DEFAULT_GROUP_PRICES ──
   html = html.replace(/const DEFAULT_GROUP_PRICES = \{[\s\S]*?\};/, groupPricesStr);
+
+  // ── Replace: NEXT_CAT_ID ──
+  html = html.replace(/NEXT_CAT_ID = \d+;/, nextCatIdStr);
 
   // DOCTYPE нэмэх (outerHTML-д байхгүй)
   html = '<!DOCTYPE html>\n' + html;
+
 
   const blob = new Blob([html], {type:'text/html'});
   const url = URL.createObjectURL(blob);
@@ -1844,7 +2141,9 @@ function setTopTab(tab){
     cfBtn.style.borderColor = 'var(--ad-accent2)'; cfBtn.style.color = '#fff';
     catBtn.style.background = 'var(--ad-card2)'; catBtn.style.borderColor = 'var(--ad-border2)'; catBtn.style.color = 'var(--ad-muted)';
     cfPanel.style.display = ''; catPanel.style.display = 'none';
+    renderLinkTabRow();
     renderMovieLinkList(); // Cloudflare tab руу орох бүрд кино жагсаалт шинэчилнэ
+    renderPageTokenList();
   }
 }
 
@@ -1886,50 +2185,375 @@ function saveCfConfigToStorage(cfg){
 let CF_CONFIG = loadCfConfig();
 
 // ══ A. CREDENTIAL хадгалах ══
-function saveCfCredentials(){
-  CF_CONFIG.geminiKey     = document.getElementById('cf-gemini-key').value.trim();
-  CF_CONFIG.workerUrl     = document.getElementById('cf-worker-url').value.trim();
-  CF_CONFIG.refreshSecret = document.getElementById('cf-refresh-secret').value.trim();
-  CF_CONFIG.tokenAi       = document.getElementById('cf-token-ai').value.trim();
-  CF_CONFIG.tokenAction   = document.getElementById('cf-token-action').value.trim();
-  CF_CONFIG.tokenErotic   = document.getElementById('cf-token-erotic').value.trim();
-  saveCfConfigToStorage(CF_CONFIG);
-  showToast('Credential локал хадгалагдлаа');
+// ══ ДАНС / QPAY ХАДГАЛАХ ══
+function saveBankInfo(){
+  BANK_INFO.bankName      = document.getElementById('bank-name').value.trim();
+  BANK_INFO.accountNumber = document.getElementById('bank-account-number').value.trim();
+  BANK_INFO.accountHolder = document.getElementById('bank-account-holder').value.trim();
+  BANK_INFO.qpayMerchant  = document.getElementById('qpay-merchant').value.trim();
+  localStorage.setItem('toorxon_bank_info', JSON.stringify(BANK_INFO));
+  showToast('Банкны мэдээлэл хадгалагдлаа');
 }
 
-// ══ B. КИНО ЛИНК жагсаалт автоматаар MOVIES-аас үүсгэх ══
-function renderMovieLinkList(){
-  const container = document.getElementById('movie-link-list');
+// ══ ACCORDION TOGGLE ══
+function toggleAccordion(id){
+  const body = document.getElementById(id);
+  if(!body) return;
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : '';
+  const arrow = document.getElementById('arr-' + id);
+  if(arrow) arrow.textContent = isOpen ? '▼' : '▲';
+}
+
+// ══ PAGE TOKEN ЖАГСААЛТ — CATEGORIES-аас dynamic ══
+// ══════════════════════════════════════════════════════
+// FACEBOOK PAGE TOKEN систем
+// Бүтэц: CF_CONFIG.pageTokens = {
+//   cat_0: [{name:'Open Zone', token:'EAA...', id:'uuid'}, ...],
+//   cat_1: [...],
+//   cat_2: [...]
+// }
+// ══════════════════════════════════════════════════════
+
+let activeTokenTab = CATEGORIES.length ? CATEGORIES[0].id : 0;
+
+function renderPageTokenList(){
+  const container = document.getElementById('page-token-list');
   if(!container) return;
-  if(MOVIES.length === 0){
-    container.innerHTML = '<p class="cf-hint">Кино байхгүй байна.</p>';
-    return;
+  if(!CF_CONFIG.pageTokens) CF_CONFIG.pageTokens = {};
+
+  // CATEGORIES-аас tab row үүсгэх
+  const tabRow = CATEGORIES.map(c=>`
+    <button class="cf-subtab${c.id===activeTokenTab?' active':''}"
+      style="flex-shrink:0;"
+      onclick="setTokenTab(${c.id})">${c.name}</button>
+  `).join('');
+
+  // Идэвхтэй tab-ийн пэйжүүдийг харуулах
+  const pages = CF_CONFIG.pageTokens['cat_'+activeTokenTab] || [];
+
+  const pageRows = pages.length === 0
+    ? `<p class="cf-hint" style="padding:10px 0;">Пэйж байхгүй байна. "➕ Пэйж нэмэх" дарна уу.</p>`
+    : pages.map((p,idx)=>`
+    <div class="token-row" id="token-row-${activeTokenTab}-${idx}">
+      <div class="token-row-header">
+        <span class="token-row-name" id="token-name-display-${activeTokenTab}-${idx}">${p.name||'Нэргүй пэйж'}</span>
+        <div style="display:flex;gap:5px;">
+          <button class="btn-sm btn-edit" onclick="editPageToken(${activeTokenTab},${idx})">✏</button>
+          <button class="btn-sm btn-danger" onclick="confirmDeleteToken(${activeTokenTab},${idx})">🗑</button>
+        </div>
+      </div>
+      <div class="token-row-fields" id="token-edit-${activeTokenTab}-${idx}" style="display:none;">
+        <input type="text" id="token-name-${activeTokenTab}-${idx}"
+          value="${(p.name||'').replace(/"/g,'&quot;')}"
+          placeholder="Пэйжийн нэр (жишээ: Open Zone AI Drama)">
+        <input type="password" id="token-val-${activeTokenTab}-${idx}"
+          value="${(p.token||'').replace(/"/g,'&quot;')}"
+          placeholder="EAAxxxxxxxxxxxxx">
+        <div style="display:flex;gap:6px;margin-top:4px;">
+          <button class="btn-sm btn-edit" onclick="savePageToken(${activeTokenTab},${idx})">💾 Хадгалах</button>
+          <button class="btn-sm" style="background:var(--ad-card2);color:var(--ad-muted);border:1px solid var(--ad-border);" onclick="cancelEditToken(${activeTokenTab},${idx})">Цуцлах</button>
+        </div>
+      </div>
+      <div class="token-row-preview" id="token-preview-${activeTokenTab}-${idx}">
+        <span style="font-size:10px;color:var(--ad-muted);font-family:monospace;">
+          ${p.token ? p.token.substring(0,12)+'••••••••••' : '— токен байхгүй —'}
+        </span>
+      </div>
+    </div>`).join('');
+
+  container.innerHTML = `
+    <div style="display:flex;gap:5px;overflow-x:auto;margin-bottom:12px;-webkit-overflow-scrolling:touch;">
+      ${tabRow}
+    </div>
+    <div id="token-page-list">${pageRows}</div>
+    <button class="btn-sm btn-edit" onclick="addNewPageToken(${activeTokenTab})"
+      style="margin-top:10px;width:100%;justify-content:center;">
+      ➕ Пэйж нэмэх
+    </button>
+  `;
+
+  // Устгах баталгаажуулалтын modal
+  if(!document.getElementById('token-confirm-overlay')){
+    const overlay = document.createElement('div');
+    overlay.id = 'token-confirm-overlay';
+    overlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:3000;align-items:center;justify-content:center;';
+    overlay.innerHTML = `
+      <div style="background:var(--ad-card);border-radius:14px;padding:20px 18px;max-width:300px;width:90%;text-align:center;">
+        <p style="font-size:14px;color:#fff;font-weight:700;margin-bottom:8px;">🗑 Токен устгах</p>
+        <p style="font-size:12px;color:var(--ad-muted);margin-bottom:18px;" id="token-confirm-msg">Энэ пэйжийн токеныг устгах уу?</p>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-danger" onclick="executeDeleteToken()" style="flex:1;">Тийм, устгах</button>
+          <button class="btn" style="flex:1;background:var(--ad-card2);color:var(--ad-muted);" onclick="cancelDeleteToken()">Үгүй</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
   }
-  const catNames = {0:'AI Drama', 1:'Action', 2:'+18 Erotic'};
-  container.innerHTML = MOVIES.map(m=>{
+}
+
+function setTokenTab(catId){
+  activeTokenTab = catId;
+  renderPageTokenList();
+}
+
+function addNewPageToken(catId){
+  if(!CF_CONFIG.pageTokens) CF_CONFIG.pageTokens = {};
+  if(!CF_CONFIG.pageTokens['cat_'+catId]) CF_CONFIG.pageTokens['cat_'+catId] = [];
+  CF_CONFIG.pageTokens['cat_'+catId].push({name:'', token:''});
+  saveCfConfigToStorage(CF_CONFIG);
+  renderPageTokenList();
+  // Шинэ нэмсэн мөрийн edit горим нээх
+  const idx = CF_CONFIG.pageTokens['cat_'+catId].length - 1;
+  setTimeout(()=>editPageToken(catId, idx), 50);
+}
+
+function editPageToken(catId, idx){
+  const editEl = document.getElementById(`token-edit-${catId}-${idx}`);
+  const prevEl = document.getElementById(`token-preview-${catId}-${idx}`);
+  if(editEl) editEl.style.display = '';
+  if(prevEl) prevEl.style.display = 'none';
+}
+
+function cancelEditToken(catId, idx){
+  const editEl = document.getElementById(`token-edit-${catId}-${idx}`);
+  const prevEl = document.getElementById(`token-preview-${catId}-${idx}`);
+  if(editEl) editEl.style.display = 'none';
+  if(prevEl) prevEl.style.display = '';
+}
+
+function savePageToken(catId, idx){
+  const nameEl = document.getElementById(`token-name-${catId}-${idx}`);
+  const valEl  = document.getElementById(`token-val-${catId}-${idx}`);
+  if(!nameEl || !valEl) return;
+
+  const name  = nameEl.value.trim();
+  const token = valEl.value.trim();
+  if(!name){ showError('Пэйжийн нэр оруулна уу'); return; }
+  if(!token){ showError('Токен оруулна уу'); return; }
+
+  if(!CF_CONFIG.pageTokens) CF_CONFIG.pageTokens = {};
+  if(!CF_CONFIG.pageTokens['cat_'+catId]) CF_CONFIG.pageTokens['cat_'+catId] = [];
+  CF_CONFIG.pageTokens['cat_'+catId][idx] = {name, token};
+  saveCfConfigToStorage(CF_CONFIG);
+
+  // Display шинэчлэх
+  const nameDisp = document.getElementById(`token-name-display-${catId}-${idx}`);
+  const prevEl   = document.getElementById(`token-preview-${catId}-${idx}`);
+  const editEl   = document.getElementById(`token-edit-${catId}-${idx}`);
+  if(nameDisp) nameDisp.textContent = name;
+  if(prevEl)   prevEl.innerHTML = `<span style="font-size:10px;color:var(--ad-muted);font-family:monospace;">${token.substring(0,12)}••••••••••</span>`;
+  if(prevEl)   prevEl.style.display = '';
+  if(editEl)   editEl.style.display = 'none';
+
+  showToast(`"${name}" токен хадгалагдлаа`);
+}
+
+let _pendingDeleteCat = null;
+let _pendingDeleteIdx = null;
+
+function confirmDeleteToken(catId, idx){
+  _pendingDeleteCat = catId;
+  _pendingDeleteIdx = idx;
+  const pages = CF_CONFIG.pageTokens?.['cat_'+catId] || [];
+  const name = pages[idx]?.name || 'энэ пэйж';
+  const msgEl = document.getElementById('token-confirm-msg');
+  if(msgEl) msgEl.textContent = `"${name}" пэйжийн токеныг устгах уу?`;
+  const overlay = document.getElementById('token-confirm-overlay');
+  if(overlay){ overlay.style.display = 'flex'; }
+}
+
+function cancelDeleteToken(){
+  _pendingDeleteCat = null;
+  _pendingDeleteIdx = null;
+  const overlay = document.getElementById('token-confirm-overlay');
+  if(overlay) overlay.style.display = 'none';
+}
+
+function executeDeleteToken(){
+  const overlay = document.getElementById('token-confirm-overlay');
+  if(overlay) overlay.style.display = 'none';
+  if(_pendingDeleteCat === null) return;
+
+  const list = CF_CONFIG.pageTokens?.['cat_'+_pendingDeleteCat];
+  if(!list) return;
+  const name = list[_pendingDeleteIdx]?.name || '';
+  list.splice(_pendingDeleteIdx, 1);
+  saveCfConfigToStorage(CF_CONFIG);
+  renderPageTokenList();
+  showToast(name ? `"${name}" токен устгагдлаа` : 'Токен устгагдлаа');
+  _pendingDeleteCat = null;
+  _pendingDeleteIdx = null;
+}
+
+// Хуучин функц — backward compat
+function addPageToken(){
+  addNewPageToken(activeTokenTab);
+}
+function clearPageToken(catId){
+  confirmDeleteToken(catId, 0);
+}
+
+
+// ══ БҮГДИЙГ ЛОКАЛ ХАДГАЛАХ ══
+function saveAllCfCredentials(){
+  CF_CONFIG.geminiKey     = document.getElementById('cf-gemini-key')?.value.trim() || '';
+  CF_CONFIG.workerUrl     = document.getElementById('cf-worker-url')?.value.trim() || '';
+  CF_CONFIG.refreshSecret = document.getElementById('cf-refresh-secret')?.value.trim() || '';
+
+  // Page tokens — CF_CONFIG.pageTokens аль хэдийн savePageToken()-аар шинэчлэгддэг
+  // saveAllCfCredentials дотор дахин уншихгүй — аль хэдийн зөв байна
+
+  // Кино линкүүд
+  MOVIES.forEach(m=>{
     const code = 'M'+String(m.id).padStart(2,'0');
-    const savedLink = (CF_CONFIG.movieLinks && CF_CONFIG.movieLinks[code]) || '';
-    return `
-    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">${m.name} <span style="color:var(--ad-muted);font-weight:400;">(${code} · ${catNames[m.cat]})</span></p>
-      <input type="text" id="movielink-${code}" value="${savedLink.replace(/"/g,'&quot;')}" placeholder="https://... контент линк" style="margin-top:0;">
-    </div>`;
-  }).join('');
+    const el = document.getElementById('movielink-'+code);
+    if(el && el.value.trim()) CF_CONFIG.movieLinks[code] = el.value.trim();
+  });
+
+  // Групп линкүүд
+  if(!CF_CONFIG.groupLinks) CF_CONFIG.groupLinks = {};
+  CATEGORIES.forEach(c=>{
+    const el = document.getElementById('cf-link-grp-'+c.id);
+    if(el) CF_CONFIG.groupLinks['cat_'+c.id] = el.value.trim();
+  });
+  const allEl = document.getElementById('cf-link-grp-all');
+  if(allEl) CF_CONFIG.groupLinks.all = allEl.value.trim();
+
+  // Промпт
+  const pc = document.getElementById('cf-prompt-chat');
+  if(pc) CF_CONFIG.promptChat = pc.value;
+  const pv = document.getElementById('cf-prompt-vision');
+  if(pv) CF_CONFIG.promptVision = pv.value;
+
+  saveCfConfigToStorage(CF_CONFIG);
+  showToast('Бүх тохиргоо локал хадгалагдлаа');
+}
+
+// ══ БҮГДИЙГ CLOUDFLARE-РУУ НЭГТ PUSH ══
+async function pushAllCfConfig(){
+  saveAllCfCredentials();
+
+  const workerUrl = CF_CONFIG.workerUrl;
+  const secret    = CF_CONFIG.refreshSecret;
+
+  if(!workerUrl){ showError('Worker URL оруулаагүй байна (A хэсэг → Gemini + Worker URL)'); return; }
+  if(!secret){    showError('Refresh Secret оруулаагүй байна');  return; }
+
+  showToast('Cloudflare-д илгээж байна...');
+
+  const payload = {
+    section:       'all',
+    geminiKey:     CF_CONFIG.geminiKey,
+    pageTokens:    CF_CONFIG.pageTokens,
+    movieLinks:    CF_CONFIG.movieLinks,
+    groupLinks:    CF_CONFIG.groupLinks,
+    promptChat:    CF_CONFIG.promptChat,
+    promptVision:  CF_CONFIG.promptVision,
+  };
+
+  try{
+    const res = await fetch(`${workerUrl}/config?secret=${encodeURIComponent(secret)}`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if(data.success){
+      showToast('✅ Cloudflare амжилттай шинэчлэгдлээ');
+    } else {
+      showError('Cloudflare алдаа: ' + (data.error || res.status));
+    }
+  } catch(e){
+    showError('Холболтын алдаа: ' + e.message);
+  }
+}
+
+// ══ ХУУЧИН saveCfCredentials — backward compat ══
+function saveCfCredentials(){
+  saveAllCfCredentials();
+}
+
+
+// ══ B. КИНО ЛИНК — CATEGORIES-аар tab болгож, MOVIES-аас автоматаар үүсгэх ══
+let activeLinkTab = CATEGORIES.length ? CATEGORIES[0].id : 0;
+
+function renderLinkTabRow(){
+  const row = document.getElementById('linktab-row');
+  if(!row) return;
+  row.innerHTML = CATEGORIES.map(c=>
+    `<button class="cf-subtab${c.id===activeLinkTab?' active':''}" style="flex-shrink:0;" onclick="setLinkTab(${c.id})">${c.name}</button>`
+  ).join('');
+}
+
+function setLinkTab(catId){
+  activeLinkTab = catId;
+  renderLinkTabRow();
+  renderMovieLinkList();
+}
+
+function renderMovieLinkList(){
+  const container = document.getElementById('movie-link-container');
+  if(!container) return;
+
+  const cat = CATEGORIES.find(c=>c.id===activeLinkTab);
+  const catLabel = cat ? cat.name : '';
+  const items = MOVIES.filter(m=>m.cat===activeLinkTab);
+
+  if(!CF_CONFIG.groupLinks) CF_CONFIG.groupLinks = {};
+  const groupKey = 'cat_'+activeLinkTab;
+  const savedGroupLink = CF_CONFIG.groupLinks[groupKey] || '';
+  const savedAllLink   = CF_CONFIG.groupLinks.all || '';
+
+  let html = '';
+
+  if(items.length === 0){
+    html += `<p class="cf-hint" style="margin-bottom:14px;">"${catLabel}" ангилалд кино байхгүй байна. Эхлээд "1. Кино каталог" tab-аас кино нэмнэ үү.</p>`;
+  } else {
+    html += items.map(m=>{
+      const code = 'M'+String(m.id).padStart(2,'0');
+      const savedLink = (CF_CONFIG.movieLinks && CF_CONFIG.movieLinks[code]) || '';
+      return `
+      <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
+        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">${m.name} <span style="color:var(--ad-muted);font-weight:400;">(${code})</span></p>
+        <input type="text" id="movielink-${code}" value="${savedLink.replace(/"/g,'&quot;')}" placeholder="https://... контент линк" style="margin-top:0;">
+      </div>`;
+    }).join('');
+  }
+
+  html += `
+    <div class="cf-divider">"${catLabel}" групп линк</div>
+    <input type="text" id="cf-link-grp-${activeLinkTab}" value="${savedGroupLink.replace(/"/g,'&quot;')}" placeholder="https://t.me/joinchat/... эсвэл fb групп линк">
+
+    <div class="cf-divider">БҮХ VIP групп линк (бүх таб дунд нийтлэг)</div>
+    <input type="text" id="cf-link-grp-all" value="${savedAllLink.replace(/"/g,'&quot;')}" placeholder="https://...">
+
+    <button class="btn btn-primary" onclick="saveMovieLinks()" style="margin-top:14px;">💾 Линкүүд хадгалах (локал)</button>
+
+  `;
+
+  container.innerHTML = html;
 }
 
 function saveMovieLinks(){
   if(!CF_CONFIG.movieLinks) CF_CONFIG.movieLinks = {};
-  MOVIES.forEach(m=>{
+  if(!CF_CONFIG.groupLinks) CF_CONFIG.groupLinks = {};
+
+  // Идэвхтэй tab-ийн кино линкүүдийг хадгална
+  const items = MOVIES.filter(m=>m.cat===activeLinkTab);
+  items.forEach(m=>{
     const code = 'M'+String(m.id).padStart(2,'0');
     const el = document.getElementById('movielink-'+code);
     if(el) CF_CONFIG.movieLinks[code] = el.value.trim();
   });
-  CF_CONFIG.groupLinks = {
-    ai:      document.getElementById('cf-link-grp-ai').value.trim(),
-    action:  document.getElementById('cf-link-grp-action').value.trim(),
-    erotic:  document.getElementById('cf-link-grp-erotic').value.trim(),
-    all:     document.getElementById('cf-link-grp-all').value.trim(),
-  };
+
+  // Идэвхтэй tab-ийн групп линк
+  const groupEl = document.getElementById('cf-link-grp-'+activeLinkTab);
+  if(groupEl) CF_CONFIG.groupLinks['cat_'+activeLinkTab] = groupEl.value.trim();
+
+  // Бүх VIP линк (нийтлэг)
+  const allEl = document.getElementById('cf-link-grp-all');
+  if(allEl) CF_CONFIG.groupLinks.all = allEl.value.trim();
+
   saveCfConfigToStorage(CF_CONFIG);
   showToast('Кино/групп линкүүд локал хадгалагдлаа');
 }
@@ -2086,6 +2710,164 @@ function copyDiagnostics(){
   });
 }
 
+// ══════════════════════════════════════════════════════
+// SYSTEM BACKUP EXPORT / IMPORT
+// ══════════════════════════════════════════════════════
+function exportSystemBackup(){
+  const workerJs = document.getElementById('backup-worker-js')?.value.trim() || '';
+  const ghToken  = document.getElementById('gh-token-input')?.value.trim() || '';
+
+  const sections = [];
+
+  sections.push('════════════════════════════════════════');
+  sections.push('КИНО ҮЗВЭР — СИСТЕМИЙН BACKUP');
+  sections.push('Огноо: ' + new Date().toLocaleString('mn-MN'));
+  sections.push('════════════════════════════════════════');
+
+  sections.push('\n══ 1. CLOUDFLARE ══');
+  sections.push('Worker URL: ' + (CF_CONFIG.workerUrl || '—'));
+  sections.push('Refresh Secret: ' + (CF_CONFIG.refreshSecret || '—'));
+
+  sections.push('\n══ 2. GEMINI API ══');
+  sections.push('API Key: ' + (CF_CONFIG.geminiKey || '—'));
+
+  sections.push('\n══ 3. GITHUB ══');
+  sections.push('GitHub Token: ' + (ghToken || '— (хадгалагдахгүй)'));
+  sections.push('Repository: naraa333bb-a11y/kino_uzver');
+  sections.push('Pages URL: https://naraa333bb-a11y.github.io/kino_uzver/');
+
+  sections.push('\n══ 4. БАНКНЫ ДАНС ══');
+  sections.push('Банк: ' + (BANK_INFO.bankName || '—'));
+  sections.push('Дансны дугаар: ' + (BANK_INFO.accountNumber || '—'));
+  sections.push('Эзэмшигч: ' + (BANK_INFO.accountHolder || '—'));
+  sections.push('QPay Merchant: ' + (BANK_INFO.qpayMerchant || '—'));
+
+  sections.push('\n══ 5. FACEBOOK PAGE TOKEN-УУД ══');
+  if(CF_CONFIG.pageTokens){
+    CATEGORIES.forEach(c=>{
+      const pages = CF_CONFIG.pageTokens['cat_'+c.id] || [];
+      sections.push(`\n  [${c.name}]`);
+      if(pages.length === 0){
+        sections.push('  — токен байхгүй —');
+      } else {
+        pages.forEach((p,i)=>{
+          sections.push(`  Пэйж ${i+1}: ${p.name}`);
+          sections.push(`  Токен: ${p.token}`);
+        });
+      }
+    });
+  }
+
+  sections.push('\n══ 6. КИНО ЛИНКҮҮД ══');
+  if(CF_CONFIG.movieLinks && Object.keys(CF_CONFIG.movieLinks).length){
+    Object.entries(CF_CONFIG.movieLinks).forEach(([code,link])=>{
+      const m = MOVIES.find(mv=>'M'+String(mv.id).padStart(2,'0')===code);
+      sections.push(`${code} (${m?m.name:'?'}): ${link}`);
+    });
+  } else {
+    sections.push('— линк байхгүй —');
+  }
+
+  sections.push('\n══ 7. ГРУПП ЛИНКҮҮД ══');
+  if(CF_CONFIG.groupLinks){
+    Object.entries(CF_CONFIG.groupLinks).forEach(([key,link])=>{
+      const catId = key.replace('cat_','');
+      const cat = CATEGORIES.find(c=>String(c.id)===catId);
+      const label = cat ? cat.name : (key==='all' ? 'БҮХ VIP' : key);
+      sections.push(`${label}: ${link||'—'}`);
+    });
+  }
+
+  sections.push('\n══ 8. ХАРИЛЦААНЫ ПРОМПТ ══');
+  sections.push(CF_CONFIG.promptChat || '— хоосон —');
+
+  sections.push('\n══ 9. ГҮЙЛГЭЭ/ЗУРАГ ПРОМПТ ══');
+  sections.push(CF_CONFIG.promptVision || '— хоосон —');
+
+  sections.push('\n══ 10. CLOUDFLARE WORKER JS СКРИПТ ══');
+  sections.push(workerJs || '— Worker JS оруулаагүй байна (Cloudflare→Workers→kinobot→Edit дотроос хуулна уу) —');
+
+  sections.push('\n══ 11. КИНО КАТАЛОГ (JSON) ══');
+  sections.push(JSON.stringify(MOVIES, null, 2));
+
+  sections.push('\n══ 12. КАТЕГОРИ (JSON) ══');
+  sections.push(JSON.stringify(CATEGORIES, null, 2));
+
+  sections.push('\n══ 13. ГРУПП ҮНЭ (JSON) ══');
+  sections.push(JSON.stringify(GROUP_PRICES, null, 2));
+
+  sections.push('\n════════════════════════════════════════');
+  sections.push('BACKUP ДУУСАВ');
+  sections.push('════════════════════════════════════════');
+
+  const content = sections.join('\n');
+  const blob = new Blob([content], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'kino_uzver_backup_' + new Date().toISOString().slice(0,10) + '.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  showToast('Backup файл татагдлаа — аюулгүй газарт хадгална уу');
+}
+
+function importSystemBackup(input){
+  const file = input.files[0];
+  if(!file){ return; }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const text = e.target.result;
+
+    // Backup файлаас мэдээлэл задлах
+    const extract = (label) => {
+      const re = new RegExp(label + ': (.+)');
+      const m = text.match(re);
+      return m ? m[1].trim() : '';
+    };
+
+    const workerUrl     = extract('Worker URL');
+    const refreshSecret = extract('Refresh Secret');
+    const geminiKey     = extract('API Key');
+    const bankName      = extract('Банк');
+    const accountNumber = extract('Дансны дугаар');
+    const accountHolder = extract('Эзэмшигч');
+    const qpayMerchant  = extract('QPay Merchant');
+
+    if(workerUrl)     { CF_CONFIG.workerUrl = workerUrl; document.getElementById('cf-worker-url').value = workerUrl; }
+    if(refreshSecret) { CF_CONFIG.refreshSecret = refreshSecret; document.getElementById('cf-refresh-secret').value = refreshSecret; }
+    if(geminiKey)     { CF_CONFIG.geminiKey = geminiKey; document.getElementById('cf-gemini-key').value = geminiKey; }
+    if(bankName)      { BANK_INFO.bankName = bankName; document.getElementById('bank-name').value = bankName; }
+    if(accountNumber) { BANK_INFO.accountNumber = accountNumber; document.getElementById('bank-account-number').value = accountNumber; }
+    if(accountHolder) { BANK_INFO.accountHolder = accountHolder; document.getElementById('bank-account-holder').value = accountHolder; }
+    if(qpayMerchant)  { BANK_INFO.qpayMerchant = qpayMerchant; document.getElementById('qpay-merchant').value = qpayMerchant; }
+
+    // Worker JS скрипт
+    const wjsMatch = text.match(/══ 10\. CLOUDFLARE WORKER JS СКРИПТ ══\n([\s\S]*?)\n══ 11\./);
+    if(wjsMatch && wjsMatch[1].trim() !== '— Worker JS оруулаагүй байна (Cloudflare→Workers→kinobot→Edit дотроос хуулна уу) —'){
+      const workerJsEl = document.getElementById('backup-worker-js');
+      if(workerJsEl) workerJsEl.value = wjsMatch[1].trim();
+    }
+
+    // Промпт
+    const chatMatch = text.match(/══ 8\. ХАРИЛЦААНЫ ПРОМПТ ══\n([\s\S]*?)\n══ 9\./);
+    if(chatMatch){ CF_CONFIG.promptChat = chatMatch[1].trim(); document.getElementById('cf-prompt-chat').value = CF_CONFIG.promptChat; }
+
+    const visionMatch = text.match(/══ 9\. ГҮЙЛГЭЭ\/ЗУРАГ ПРОМПТ ══\n([\s\S]*?)\n══ 10\./);
+    if(visionMatch){ CF_CONFIG.promptVision = visionMatch[1].trim(); document.getElementById('cf-prompt-vision').value = CF_CONFIG.promptVision; }
+
+    // Хадгалах
+    saveCfConfigToStorage(CF_CONFIG);
+    localStorage.setItem('toorxon_bank_info', JSON.stringify(BANK_INFO));
+
+    showToast('Backup-аас амжилттай сэргэлээ — шалгаад "☁ Шинэчлэх" дарна уу');
+  };
+  reader.readAsText(file);
+}
+
+
 // Admin panel toggle
 function toggleAdminPanel(){
   document.getElementById('admin-panel').classList.toggle('show');
@@ -2093,41 +2875,53 @@ function toggleAdminPanel(){
 
 // #admin-panel нь script-ийн дараа байрладаг тул DOM бүрэн ачаалсны дараа ажиллана
 window.addEventListener('DOMContentLoaded', function(){
-  // URL ?admin=1 байвал admin товч харуулна, gate-г алгасна
+  // URL ?admin=1 байвал admin panel-г DOM-д нэмж, харин ?admin=1 үгүй бол
+  // template нь render хийгдэхгүй — Ctrl+U-д admin код харагдахгүй
   const params = new URLSearchParams(window.location.search);
   if(params.get('admin')==='1'){
+    const dataEl = document.getElementById('admin-panel-data');
+    if(dataEl){
+      // Base64 decode хийж admin HTML-г DOM-д нэмнэ
+      const decoded = decodeURIComponent(escape(atob(dataEl.dataset.v)));
+      const tmp = document.createElement('div');
+      tmp.innerHTML = decoded;
+      const adminToggleBtn = document.getElementById('adminToggleBtn');
+      // Бүх children-г нэг бүрчлэн нэмэх (firstElementChild биш)
+      while(tmp.firstChild){
+        document.body.insertBefore(tmp.firstChild, adminToggleBtn);
+      }
+      dataEl.remove();
+    }
     document.getElementById('adminToggleBtn').classList.add('show');
     document.getElementById('welcomeGate').classList.add('hidden');
+
+    // ── Admin input-уудыг одоогийн утгуудаар бөглөх ──
+    openCoverEditor(CATEGORIES.length ? CATEGORIES[0].id : 0);
+    const hti = document.getElementById('hero-title-input');
+    const hsi = document.getElementById('hero-sub-input');
+    if(hti) hti.value = HERO_TITLE||'';
+    if(hsi) hsi.value = HERO_SUBTITLE||'';
+    renderTabPriceRows();
+    const curAll = document.getElementById('cur-all');
+    if(curAll) curAll.textContent = `${GROUP_PRICES.all.price} / ${GROUP_PRICES.all.period}`;
+    renderMovieList();
+    renderAdminTabSelect();
+
+    // ── Cloudflare config inputs ──
+    document.getElementById('cf-gemini-key').value     = CF_CONFIG.geminiKey || '';
+    document.getElementById('cf-worker-url').value     = CF_CONFIG.workerUrl || '';
+    document.getElementById('cf-refresh-secret').value = CF_CONFIG.refreshSecret || '';
+    document.getElementById('cf-prompt-chat').value   = CF_CONFIG.promptChat || '';
+    document.getElementById('cf-prompt-vision').value = CF_CONFIG.promptVision || '';
+    // Данс/QPay inputs
+    document.getElementById('bank-name').value           = BANK_INFO.bankName || '';
+    document.getElementById('bank-account-number').value = BANK_INFO.accountNumber || '';
+    document.getElementById('bank-account-holder').value = BANK_INFO.accountHolder || '';
+    document.getElementById('qpay-merchant').value        = BANK_INFO.qpayMerchant || '';
+    renderLinkTabRow();
+    renderMovieLinkList();
+    renderPageTokenList();
   }
-
-  // Admin input-уудыг одоогийн утгуудаар бөглөх
-  // Cover editor-ийг AI DRAMA tab-аар нээх
-  openCoverEditor(0);
-  // Hero text inputs
-  const hti = document.getElementById('hero-title-input');
-  const hsi = document.getElementById('hero-sub-input');
-  if(hti) hti.value = HERO_TITLE||'';
-  if(hsi) hsi.value = HERO_SUBTITLE||'';
-  document.getElementById('cur-ai').textContent = `${GROUP_PRICES[0].price} / ${GROUP_PRICES[0].period}`;
-  document.getElementById('cur-action').textContent = `${GROUP_PRICES[1].price} / ${GROUP_PRICES[1].period}`;
-  document.getElementById('cur-erotic').textContent = `${GROUP_PRICES[2].price} / ${GROUP_PRICES[2].period}`;
-  document.getElementById('cur-all').textContent = `${GROUP_PRICES.all.price} / ${GROUP_PRICES.all.period}`;
-  renderMovieList();
-
-  // ══ Cloudflare config inputs бөглөх (localStorage-аас) ══
-  document.getElementById('cf-gemini-key').value     = CF_CONFIG.geminiKey || '';
-  document.getElementById('cf-worker-url').value     = CF_CONFIG.workerUrl || '';
-  document.getElementById('cf-refresh-secret').value = CF_CONFIG.refreshSecret || '';
-  document.getElementById('cf-token-ai').value       = CF_CONFIG.tokenAi || '';
-  document.getElementById('cf-token-action').value   = CF_CONFIG.tokenAction || '';
-  document.getElementById('cf-token-erotic').value   = CF_CONFIG.tokenErotic || '';
-  document.getElementById('cf-link-grp-ai').value     = (CF_CONFIG.groupLinks && CF_CONFIG.groupLinks.ai) || '';
-  document.getElementById('cf-link-grp-action').value = (CF_CONFIG.groupLinks && CF_CONFIG.groupLinks.action) || '';
-  document.getElementById('cf-link-grp-erotic').value = (CF_CONFIG.groupLinks && CF_CONFIG.groupLinks.erotic) || '';
-  document.getElementById('cf-link-grp-all').value     = (CF_CONFIG.groupLinks && CF_CONFIG.groupLinks.all) || '';
-  document.getElementById('cf-prompt-chat').value   = CF_CONFIG.promptChat || '';
-  document.getElementById('cf-prompt-vision').value = CF_CONFIG.promptVision || '';
-  renderMovieLinkList();
 });
 
 
@@ -2149,20 +2943,16 @@ window.addEventListener('DOMContentLoaded', function(){
       <p class="modal-movie-name" id="modalMovieName">АЛТАН НҮДЭТ ХҮҮ</p>
       <p class="modal-price" id="modalPrice">1500</p>
 
-      <!-- 1+1 SECTION: зөвхөн AI DRAMA кино дарахад харагдана -->
-      <!-- 1+1 УРАМШУУЛАЛ: зөвхөн AI DRAMA дэх кино дарахад харагдана -->
+      <!-- УРАМШУУЛЛЫН СЕКЦ: кино тус бүрийн promo11 талбараас тодорхойлогдоно -->
       <div id="section-11" style="margin-bottom: 14px;">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
-          <span style="background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;font-size:10px;font-weight:900;padding:3px 10px;border-radius:100px;letter-spacing:.05em;">🎁 1+1</span>
-          <span style="font-size:12px;color:#fff;font-weight:700;">Нэг кино үнэгүй сонгох</span>
+          <span style="background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;font-size:10px;font-weight:900;padding:3px 10px;border-radius:100px;letter-spacing:.05em;">🎁 УРАМШУУЛАЛ</span>
         </div>
-        <p style="font-size:11px;color:var(--muted);margin-bottom:8px;">AI DRAMA-ийн дурын нэг киног үнэгүй авах боломжтой. Доороос сонгоно уу:</p>
+        <p id="free-movie-label" style="font-size:11px;color:var(--muted);margin-bottom:8px;">Дурын нэг киног үнэгүй сонгоно уу:</p>
         <!-- Horizontal scroll card list -->
         <div id="free-movie-cards" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none;"></div>
-        <!-- Hidden select for value tracking -->
-        <select id="free-movie-select" style="display:none;"><option value="">—</option></select>
         <p id="free-movie-hint" style="font-size:10px;color:var(--muted);margin-top:6px;display:none;">
-          ✓ Гүйлгээний утганд хоёр киноны код нэмэгдлээ
+          ✓ Гүйлгээний утганд сонгосон киноны код нэмэгдлээ
         </p>
       </div>
 
@@ -2220,6 +3010,12 @@ window.addEventListener('DOMContentLoaded', function(){
 </div>
 
 
+<!-- Admin panel (encoded) -->
+
+
+
+
+
 <!-- ══════════════════ ADMIN PANEL (?admin=1) ══════════════════ -->
 <div id="admin-panel" class="">
 
@@ -2255,11 +3051,7 @@ window.addEventListener('DOMContentLoaded', function(){
     <input type="text" id="f-trailer" placeholder="https://...">
 
     <label>Аль таб руу орох</label>
-    <div class="tab-select" id="tab-select">
-      <div class="tab-opt active" data-cat="0" onclick="selectTab(0,this)">AI DRAMA</div>
-      <div class="tab-opt" data-cat="1" onclick="selectTab(1,this)">ACTION</div>
-      <div class="tab-opt" data-cat="2" onclick="selectTab(2,this)">+18 EROTIC</div>
-    </div>
+    <div class="tab-select" id="tab-select"><div class="tab-opt active" data-cat="0" onclick="selectTab(0,this)">AI DRAMA</div><div class="tab-opt" data-cat="1" onclick="selectTab(1,this)">ACTION</div><div class="tab-opt" data-cat="2" onclick="selectTab(2,this)">+18 EROTIC</div></div>
 
     <label>Үнийн дүн</label>
     <input type="text" id="f-price" placeholder="Жишээ: 5,000 ₮">
@@ -2267,22 +3059,28 @@ window.addEventListener('DOMContentLoaded', function(){
     <label>Ангийн тоо (кино зүүн дээд буланд харагдана)</label>
     <input type="text" id="f-eps" placeholder="Жишээ: 1 анги / 12 анги / 24 анги">
 
+    <div style="margin-top:14px;padding:12px;background:rgba(255,56,96,.06);border:1px solid rgba(255,56,96,.2);border-radius:8px;">
+      <label style="display:flex;align-items:center;gap:8px;margin-top:0;cursor:pointer;">
+        <input type="checkbox" id="f-promo11" onchange="togglePromo11Input()" style="width:16px;height:16px;margin:0;">
+        <span style="font-size:12px;color:#fff;font-weight:700;">🎁 Энэ кино урамшуулалтай (X авахад Y үнэгүй)</span>
+      </label>
+      <div id="promo11-count-wrap" style="display:none;margin-top:10px;">
+        <label>Хэдэн кино үнэгүй өгөх вэ?</label>
+        <input type="number" id="f-promo11-count" min="1" max="5" value="1" placeholder="1">
+        <p class="cf-hint">Жишээ: 1 гэвэл "1+1" (нэг кино авахад нэг үнэгүй), 2 гэвэл "1+2" гэх мэт.</p>
+      </div>
+    </div>
+
     <button class="btn btn-primary" id="submitBtn" onclick="submitMovie()">➕ Кино нэмэх</button>
   </div>
 
-  <!-- MOVIE LIST — 3 tab -->
+  <!-- MOVIE LIST — CATEGORIES-аас dynamic tab -->
   <p class="sec-title">🎬 Кино жагсаалт <span style="color:var(--muted);font-size:11px;font-weight:400;text-transform:none;letter-spacing:0;" id="movieCount">(10)</span></p>
 
-  <!-- Tab buttons -->
-  <div style="display:flex;gap:6px;margin-bottom:10px;">
-    <button id="mltab-0" onclick="setMovieListTab(0)" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid var(--accent2);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">AI DRAMA</button>
-    <button id="mltab-1" onclick="setMovieListTab(1)" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border2);background:var(--card2);color:var(--muted);font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">ACTION</button>
-    <button id="mltab-2" onclick="setMovieListTab(2)" style="flex:1;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border2);background:var(--card2);color:var(--muted);font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">+18</button>
-  </div>
+  <!-- Tab buttons — JS render -->
+  <div style="display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;" id="mltab-row"><button id="mltab-0" onclick="setMovieListTab(0)" style="flex:1;flex-shrink:0;min-width:90px;padding:8px 4px;border-radius:8px;border:1.5px solid var(--accent2);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">AI DRAMA</button><button id="mltab-1" onclick="setMovieListTab(1)" style="flex:1;flex-shrink:0;min-width:90px;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border2);background:var(--card2);color:var(--muted);font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">ACTION</button><button id="mltab-2" onclick="setMovieListTab(2)" style="flex:1;flex-shrink:0;min-width:90px;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border2);background:var(--card2);color:var(--muted);font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">+18 EROTIC</button></div>
 
-  <div id="movieList-0"></div>
-  <div id="movieList-1" style="display:none;"></div>
-  <div id="movieList-2" style="display:none;"></div>
+  <div id="movieList-container"><div id="movieList-0" style="display:;"></div><div id="movieList-1" style="display:none;"></div><div id="movieList-2" style="display:none;"></div></div>
 </div>
 
 <!-- ══ БУСАД ТОХИРГОО ══ -->
@@ -2343,52 +3141,87 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
 
   <div class="card">
-    <p style="font-size:12px;font-weight:700;color:#fff;margin-bottom:10px;">💎 Групп худалдан авах үнэ</p>
+    <p style="font-size:12px;font-weight:700;color:#fff;margin-bottom:10px;">💎 Групп худалдан авах үнэ ба табын нэр</p>
+    <p style="font-size:10px;color:var(--muted);margin-bottom:10px;">Таб бүрийн нэрийг энд засварлахад нүүр хуудасны таб, кино нэмэх форм, кино жагсаалт зэрэг бүх холбоотой газар автоматаар шинэчлэгдэнэ.</p>
 
-    <!-- AI Drama group -->
+    <div id="dynamic-tab-price-rows">
     <div class="price-row">
       <div class="price-row-top">
-        <span class="price-row-label">AI DRAMA ГРУПП</span>
-        <button class="btn-sm btn-edit" onclick="toggleEdit('ai')">✏ Засах</button>
+        <span class="price-row-label" id="catlabel-0">AI DRAMA ГРУПП</span>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-sm btn-edit" onclick="toggleRenameCategory(0)">✏ Нэр</button>
+          <button class="btn-sm btn-edit" onclick="toggleEdit(0)">💰 Үнэ</button>
+        </div>
       </div>
-      <p class="price-row-current" id="cur-ai">13,000 ₮ / 3 сар</p>
-      <div class="price-edit-fields" id="edit-ai">
-        <input type="text" id="price-ai" placeholder="13,000 ₮">
-        <input type="text" id="period-ai" placeholder="3 сар">
-        <button class="btn btn-green" style="grid-column:span 2;" onclick="savePrice('ai','AI DRAMA ГРУПП')">💾 Хадгалах</button>
+
+      <!-- НЭР ЗАСВАРЛАХ -->
+      <div class="price-edit-fields" id="rename-0">
+        <input type="text" id="catname-input-0" value="AI DRAMA" placeholder="Жишээ: AI DRAMA" style="grid-column:span 2;">
+        <button class="btn btn-green" style="grid-column:span 2;" onclick="saveCategoryName(0)">💾 Нэр хадгалах</button>
+      </div>
+
+      <p class="price-row-current" id="cur-0">13,000 ₮ / 3 сар</p>
+
+      <!-- ҮНЭ ЗАСВАРЛАХ -->
+      <div class="price-edit-fields" id="edit-0">
+        <input type="text" id="price-0" placeholder="13,000 ₮">
+        <input type="text" id="period-0" placeholder="3 сар">
+        <button class="btn btn-green" style="grid-column:span 2;" onclick="savePrice(0,'AI DRAMA ГРУПП')">💾 Хадгалах</button>
       </div>
     </div>
-
-    <!-- Action group -->
     <div class="price-row">
       <div class="price-row-top">
-        <span class="price-row-label">ACTION ГРУПП</span>
-        <button class="btn-sm btn-edit" onclick="toggleEdit('action')">✏ Засах</button>
+        <span class="price-row-label" id="catlabel-1">ACTION ГРУПП</span>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-sm btn-edit" onclick="toggleRenameCategory(1)">✏ Нэр</button>
+          <button class="btn-sm btn-edit" onclick="toggleEdit(1)">💰 Үнэ</button>
+        </div>
       </div>
-      <p class="price-row-current" id="cur-action">13,500 ₮ / 3 сар</p>
-      <div class="price-edit-fields" id="edit-action">
-        <input type="text" id="price-action" placeholder="13,500 ₮">
-        <input type="text" id="period-action" placeholder="3 сар">
-        <button class="btn btn-green" style="grid-column:span 2;" onclick="savePrice('action','ACTION ГРУПП')">💾 Хадгалах</button>
+
+      <!-- НЭР ЗАСВАРЛАХ -->
+      <div class="price-edit-fields" id="rename-1">
+        <input type="text" id="catname-input-1" value="ACTION" placeholder="Жишээ: AI DRAMA" style="grid-column:span 2;">
+        <button class="btn btn-green" style="grid-column:span 2;" onclick="saveCategoryName(1)">💾 Нэр хадгалах</button>
+      </div>
+
+      <p class="price-row-current" id="cur-1">13,500 ₮ / 3 сар</p>
+
+      <!-- ҮНЭ ЗАСВАРЛАХ -->
+      <div class="price-edit-fields" id="edit-1">
+        <input type="text" id="price-1" placeholder="13,000 ₮">
+        <input type="text" id="period-1" placeholder="3 сар">
+        <button class="btn btn-green" style="grid-column:span 2;" onclick="savePrice(1,'ACTION ГРУПП')">💾 Хадгалах</button>
       </div>
     </div>
-
-    <!-- +18 group -->
     <div class="price-row">
       <div class="price-row-top">
-        <span class="price-row-label">+18 ГРУПП</span>
-        <button class="btn-sm btn-edit" onclick="toggleEdit('erotic')">✏ Засах</button>
+        <span class="price-row-label" id="catlabel-2">+18 EROTIC ГРУПП</span>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-sm btn-edit" onclick="toggleRenameCategory(2)">✏ Нэр</button>
+          <button class="btn-sm btn-edit" onclick="toggleEdit(2)">💰 Үнэ</button>
+        </div>
       </div>
-      <p class="price-row-current" id="cur-erotic">15,000 ₮ / 3 сар</p>
-      <div class="price-edit-fields" id="edit-erotic">
-        <input type="text" id="price-erotic" placeholder="15,000 ₮">
-        <input type="text" id="period-erotic" placeholder="3 сар">
-        <button class="btn btn-green" style="grid-column:span 2;" onclick="savePrice('erotic','+18 ГРУПП')">💾 Хадгалах</button>
-      </div>
-    </div>
 
-    <!-- ALL VIP group -->
-    <div class="price-row">
+      <!-- НЭР ЗАСВАРЛАХ -->
+      <div class="price-edit-fields" id="rename-2">
+        <input type="text" id="catname-input-2" value="+18 EROTIC" placeholder="Жишээ: AI DRAMA" style="grid-column:span 2;">
+        <button class="btn btn-green" style="grid-column:span 2;" onclick="saveCategoryName(2)">💾 Нэр хадгалах</button>
+      </div>
+
+      <p class="price-row-current" id="cur-2">15,000 ₮ / 3 сар</p>
+
+      <!-- ҮНЭ ЗАСВАРЛАХ -->
+      <div class="price-edit-fields" id="edit-2">
+        <input type="text" id="price-2" placeholder="13,000 ₮">
+        <input type="text" id="period-2" placeholder="3 сар">
+        <button class="btn btn-green" style="grid-column:span 2;" onclick="savePrice(2,'+18 EROTIC ГРУПП')">💾 Хадгалах</button>
+      </div>
+    </div></div>
+
+    <button class="btn btn-primary" onclick="addNewCategory()" style="margin-top:6px;">➕ ШИНЭ ТАБ ҮҮСГЭХ</button>
+
+    <!-- БҮХ VIP ГРУПП — тогтмол, таб биш -->
+    <div class="price-row" style="margin-top:18px;border-top:1px solid var(--ad-border);padding-top:14px;">
       <div class="price-row-top">
         <span class="price-row-label">БҮХ VIP ГРУПП</span>
         <button class="btn-sm btn-edit" onclick="toggleEdit('all')">✏ Засах</button>
@@ -2440,39 +3273,100 @@ window.addEventListener('DOMContentLoaded', function(){
   <!-- ══ A. CREDENTIAL САН ══ -->
   <div id="cfpanel-a" class="cf-panel" style="display: none;">
     <div class="section">
-      <p class="sec-title">🔑 Bot credential-ууд</p>
-      <div class="card">
-        <div class="info-box">
-          ⚙ Эдгээр утгууд Cloudflare KV-д хадгалагдана. Worker код дотор шууд бичигдэхгүй тул асуудал гарвал энд солиод "ШИНЭЧЛЭХ" дарахад л шууд шинэчлэгдэнэ — Worker дахин deploy хийх шаардлагагүй.
+
+      <!-- ══ ACCORDION: ДАНС/QPAY ══ -->
+      <div class="cf-accordion">
+        <button class="cf-accordion-btn" onclick="toggleAccordion('acc-bank')">
+          🏦 Хүлээн авагчийн данс / QPay <span class="cf-acc-arrow" id="arr-acc-bank">▼</span>
+        </button>
+        <div class="cf-accordion-body" id="acc-bank">
+          <div class="info-box">⚙ Энд оруулсан данс/QPay мэдээлэл "Худалдан авах" modal дотор шууд харагдана. Солигдоход "Файл татах" хийгээрэй.</div>
+          <label>Банкны нэр</label>
+          <input type="text" id="bank-name" placeholder="Жишээ: Хаан Банк">
+          <label>Дансны дугаар</label>
+          <input type="text" id="bank-account-number" placeholder="5XXXXXXXXXXXXXXXXX">
+          <label>Данс эзэмшигчийн нэр</label>
+          <input type="text" id="bank-account-holder" placeholder="ОВОГ НЭР">
+          <div class="cf-divider">QPay (удахгүй)</div>
+          <label>QPay Merchant ID</label>
+          <input type="text" id="qpay-merchant" placeholder="QPay холбогдсоны дараа бөглөнө">
+          <button class="btn btn-green" onclick="saveBankInfo()" style="margin-top:12px;">💾 Данс/QPay хадгалах</button>
         </div>
-
-        <label>Gemini API Key</label>
-        <input type="password" id="cf-gemini-key" placeholder="AIzaSy...">
-        <p class="cf-hint">Авах: <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey →</a></p>
-
-        <label>Cloudflare Worker URL</label>
-        <input type="text" id="cf-worker-url" placeholder="https://kinobot.xxx.workers.dev">
-
-        <label>Cloudflare Worker шинэчлэх Secret түлхүүр</label>
-        <input type="password" id="cf-refresh-secret" placeholder="kino-refresh-2026">
-        <p class="cf-hint">Worker дотрох REFRESH_SECRET-тэй яг адил байх ёстой</p>
-
-        <div class="cf-divider">Facebook Page Token-ууд (пэйж тус бүрт тусдаа)</div>
-
-        <label>AI DRAMA пэйж (Open Zone) — Page Access Token</label>
-        <input type="password" id="cf-token-ai" placeholder="EAAxxxxxxxxxxxxx">
-
-        <label>ACTION пэйж — Page Access Token</label>
-        <input type="password" id="cf-token-action" placeholder="EAAxxxxxxxxxxxxx (хоосон бол ашиглахгүй)">
-
-        <label>+18 EROTIC пэйж — Page Access Token</label>
-        <input type="password" id="cf-token-erotic" placeholder="EAAxxxxxxxxxxxxx (хоосон бол ашиглахгүй)">
-
-        <p class="cf-hint">Авах: Facebook Developer → App → Messenger → API Settings → Generate access tokens</p>
-
-        <button class="btn btn-primary" onclick="saveCfCredentials()" style="margin-top:14px;">💾 Credential хадгалах (локал)</button>
-        <button class="btn btn-green" onclick="pushCfConfig('credentials')" style="margin-top:8px;">☁ CLOUDFLARE-РУУ ШИНЭЧЛЭХ</button>
       </div>
+
+      <!-- ══ ACCORDION: GEMINI + WORKER ══ -->
+      <div class="cf-accordion">
+        <button class="cf-accordion-btn" onclick="toggleAccordion('acc-api')">
+          🤖 Gemini API + Worker URL <span class="cf-acc-arrow" id="arr-acc-api">▲</span>
+        </button>
+        <div class="cf-accordion-body" id="acc-api" style="">
+          <div class="info-box">⚙ Эдгээр утгуудыг Cloudflare KV-д push хийснээр Worker дахин deploy хийхгүйгээр шинэчлэгдэнэ.</div>
+          <label>Gemini API Key</label>
+          <input type="password" id="cf-gemini-key" placeholder="AIzaSy...">
+          <p class="cf-hint">Авах: <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey →</a></p>
+          <label>Cloudflare Worker URL <span style="font-weight:400;font-size:10px;color:var(--ad-muted);">(зөвхөн "☁ Шинэчлэх" товчид хэрэглэгдэнэ)</span></label>
+          <input type="text" id="cf-worker-url" placeholder="https://kinobot.xxx.workers.dev">
+          <label>Worker Refresh Secret</label>
+          <input type="password" id="cf-refresh-secret" placeholder="kino-refresh-2026">
+          <p class="cf-hint">Worker дотрох REFRESH_SECRET-тэй яг адил байх ёстой</p>
+        </div>
+      </div>
+
+      <!-- ══ ACCORDION: FACEBOOK PAGE TOKEN-ууд ══ -->
+      <div class="cf-accordion">
+        <button class="cf-accordion-btn" onclick="toggleAccordion('acc-tokens')">
+          📱 Facebook Page Token-ууд <span class="cf-acc-arrow" id="arr-acc-tokens">▲</span>
+        </button>
+        <div class="cf-accordion-body" id="acc-tokens" style="">
+          <div class="info-box">⚙ Пэйж тус бүрийн Page Access Token — Cloudflare Worker мессеж илгээхэд ашиглана. Токен дуусвал эсвэл алдаа гарвал эндээс шинэчилнэ.</div>
+          <div id="page-token-list">
+    <div style="display:flex;gap:5px;overflow-x:auto;margin-bottom:12px;-webkit-overflow-scrolling:touch;">
+      
+    <button class="cf-subtab active" style="flex-shrink:0;" onclick="setTokenTab(0)">AI DRAMA</button>
+  
+    <button class="cf-subtab" style="flex-shrink:0;" onclick="setTokenTab(1)">ACTION</button>
+  
+    <button class="cf-subtab" style="flex-shrink:0;" onclick="setTokenTab(2)">+18 EROTIC</button>
+  
+    </div>
+    <div id="token-page-list">
+    <div class="token-row" id="token-row-0-0">
+      <div class="token-row-header">
+        <span class="token-row-name" id="token-name-display-0-0">Open zone</span>
+        <div style="display:flex;gap:5px;">
+          <button class="btn-sm btn-edit" onclick="editPageToken(0,0)">✏</button>
+          <button class="btn-sm btn-danger" onclick="confirmDeleteToken(0,0)">🗑</button>
+        </div>
+      </div>
+      <div class="token-row-fields" id="token-edit-0-0" style="display:none;">
+        <input type="text" id="token-name-0-0" value="Open zone" placeholder="Пэйжийн нэр (жишээ: Open Zone AI Drama)">
+        <input type="password" id="token-val-0-0" value="EAAYlbc4COwEBR6zPNRtBXqTGYBfEI3qfsMoeFmwV6vnP1ChGZC8RAX4CUS8IwCTPuZCuLJ7W3ALiqd15f0e0ZAoXS4nI17Hpb0vVA8zUxhVjY0U5FxKzgoxWCiOZC3nd4q28j2kVKW18BaXlaZCNb88FdPujaYHgkJwlVvzZBJRJg9tuDsfnb3XOZCvQhoID1d91DPwiNTA3QZDZD" placeholder="EAAxxxxxxxxxxxxx">
+        <div style="display:flex;gap:6px;margin-top:4px;">
+          <button class="btn-sm btn-edit" onclick="savePageToken(0,0)">💾 Хадгалах</button>
+          <button class="btn-sm" style="background:var(--ad-card2);color:var(--ad-muted);border:1px solid var(--ad-border);" onclick="cancelEditToken(0,0)">Цуцлах</button>
+        </div>
+      </div>
+      <div class="token-row-preview" id="token-preview-0-0">
+        <span style="font-size:10px;color:var(--ad-muted);font-family:monospace;">
+          EAAYlbc4COwE••••••••••
+        </span>
+      </div>
+    </div></div>
+    <button class="btn-sm btn-edit" onclick="addNewPageToken(0)" style="margin-top:10px;width:100%;justify-content:center;">
+      ➕ Пэйж нэмэх
+    </button>
+  </div>
+          <p class="cf-hint">Авах: Facebook Developer → App → Messenger → API Settings → Generate access tokens</p>
+          <button class="btn-sm btn-edit" onclick="addPageToken()" style="margin-top:8px;">➕ Шинэ токен нэмэх</button>
+        </div>
+      </div>
+
+      <!-- ══ ЛОКАЛ ХАДГАЛАХ ══ -->
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--ad-border);">
+        <button class="btn btn-primary" onclick="saveAllCfCredentials()" style="width:100%;">💾 Бүгдийг локал хадгалах</button>
+        <p class="cf-hint" style="margin-top:6px;text-align:center;">Cloudflare-руу илгээхийн өмнө эхлээд локал хадгална уу. Доорх sticky товч "☁ ШИНЭЧЛЭХ"-ийг дарна.</p>
+      </div>
+
     </div>
   </div>
 
@@ -2482,63 +3376,34 @@ window.addEventListener('DOMContentLoaded', function(){
       <p class="sec-title">🎬 Кино/групп контент линк</p>
       <div class="card">
         <div class="info-box">
-          ⚙ Энд оруулсан линкийг хэрэглэгч төлбөр баталгаажуулсны дараа Gemini bot автоматаар Messenger-ээр илгээнэ. Кино каталогт нэмсэн кино бүр энд автоматаар жагсаалт болж гарч ирнэ.
+          ⚙ Энд оруулсан линкийг хэрэглэгч төлбөр баталгаажуулсны дараа Gemini bot автоматаар Messenger-ээр илгээнэ. Кино каталогт нэмсэн кино бүр энд автоматаар жагсаалт болж гарч ирнэ. Таб бүр өөрийн ангиллын кино/групп линкийг агуулна.
         </div>
-        <div id="movie-link-list">
-    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">АЛТАН НҮДЭТ ХҮҮ <span style="color:var(--ad-muted);font-weight:400;">(M11 · AI Drama)</span></p>
-      <input type="text" id="movielink-M11" value="" placeholder="https://... контент линк" style="margin-top:0;">
-    </div>
-    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Эмч Бүсгүй <span style="color:var(--ad-muted);font-weight:400;">(M06 · Action)</span></p>
-      <input type="text" id="movielink-M06" value="" placeholder="https://... контент линк" style="margin-top:0;">
-    </div>
-    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Номын Санч <span style="color:var(--ad-muted);font-weight:400;">(M02 · AI Drama)</span></p>
-      <input type="text" id="movielink-M02" value="" placeholder="https://... контент линк" style="margin-top:0;">
-    </div>
-    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Өндөр Эмэгтэй <span style="color:var(--ad-muted);font-weight:400;">(M03 · AI Drama)</span></p>
-      <input type="text" id="movielink-M03" value="" placeholder="https://... контент линк" style="margin-top:0;">
-    </div>
-    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Тосгоны Охинтой Учирсан Нь <span style="color:var(--ad-muted);font-weight:400;">(M04 · Action)</span></p>
-      <input type="text" id="movielink-M04" value="" placeholder="https://... контент линк" style="margin-top:0;">
-    </div>
-    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Хойд Ээж <span style="color:var(--ad-muted);font-weight:400;">(M05 · Action)</span></p>
-      <input type="text" id="movielink-M05" value="" placeholder="https://... контент линк" style="margin-top:0;">
-    </div>
-    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Гудамжинд Таарсан Эмэгтэй <span style="color:var(--ad-muted);font-weight:400;">(M07 · +18 Erotic)</span></p>
-      <input type="text" id="movielink-M07" value="" placeholder="https://... контент линк" style="margin-top:0;">
-    </div>
-    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Эхнэрийн Эмч Найз <span style="color:var(--ad-muted);font-weight:400;">(M08 · +18 Erotic)</span></p>
-      <input type="text" id="movielink-M08" value="" placeholder="https://... контент линк" style="margin-top:0;">
-    </div>
-    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Гадуурхагдсан Эмэгтэй <span style="color:var(--ad-muted);font-weight:400;">(M09 · +18 Erotic)</span></p>
-      <input type="text" id="movielink-M09" value="" placeholder="https://... контент линк" style="margin-top:0;">
-    </div>
-    <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-      <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Босс Эмэгтэй <span style="color:var(--ad-muted);font-weight:400;">(M10 · +18 Erotic)</span></p>
-      <input type="text" id="movielink-M10" value="" placeholder="https://... контент линк" style="margin-top:0;">
-    </div></div>
-        <p class="cf-hint" style="margin-top:10px;">Дээрх жагсаалт хоосон бол эхлээд "1. Кино каталог" tab-аас кино нэмнэ үү.</p>
 
-        <div class="cf-divider">Групп линкүүд</div>
-        <label>AI DRAMA групп линк</label>
-        <input type="text" id="cf-link-grp-ai" placeholder="https://t.me/joinchat/... эсвэл fb групп линк">
-        <label>ACTION групп линк</label>
-        <input type="text" id="cf-link-grp-action" placeholder="https://...">
-        <label>+18 EROTIC групп линк</label>
-        <input type="text" id="cf-link-grp-erotic" placeholder="https://...">
-        <label>БҮХ VIP групп линк</label>
-        <input type="text" id="cf-link-grp-all" placeholder="https://...">
+        <!-- Таб тус бүрийн дотоод сэлгүүр -->
+        <div style="display:flex;gap:5px;overflow-x:auto;margin-bottom:14px;-webkit-overflow-scrolling:touch;" id="linktab-row"><button class="cf-subtab active" style="flex-shrink:0;" onclick="setLinkTab(0)">AI DRAMA</button><button class="cf-subtab" style="flex-shrink:0;" onclick="setLinkTab(1)">ACTION</button><button class="cf-subtab" style="flex-shrink:0;" onclick="setLinkTab(2)">+18 EROTIC</button></div>
 
-        <button class="btn btn-primary" onclick="saveMovieLinks()" style="margin-top:14px;">💾 Линкүүд хадгалах (локал)</button>
-        <button class="btn btn-green" onclick="pushCfConfig('links')" style="margin-top:8px;">☁ CLOUDFLARE-РУУ ШИНЭЧЛЭХ</button>
+        <div id="movie-link-container">
+      <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
+        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">АЛТАН НҮДЭТ ХҮҮ <span style="color:var(--ad-muted);font-weight:400;">(M11)</span></p>
+        <input type="text" id="movielink-M11" value="" placeholder="https://... контент линк" style="margin-top:0;">
+      </div>
+      <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
+        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Номын Санч <span style="color:var(--ad-muted);font-weight:400;">(M02)</span></p>
+        <input type="text" id="movielink-M02" value="" placeholder="https://... контент линк" style="margin-top:0;">
+      </div>
+      <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
+        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Өндөр Эмэгтэй <span style="color:var(--ad-muted);font-weight:400;">(M03)</span></p>
+        <input type="text" id="movielink-M03" value="" placeholder="https://... контент линк" style="margin-top:0;">
+      </div>
+    <div class="cf-divider">"AI DRAMA" групп линк</div>
+    <input type="text" id="cf-link-grp-0" value="" placeholder="https://t.me/joinchat/... эсвэл fb групп линк">
+
+    <div class="cf-divider">БҮХ VIP групп линк (бүх таб дунд нийтлэг)</div>
+    <input type="text" id="cf-link-grp-all" value="" placeholder="https://...">
+
+    <button class="btn btn-primary" onclick="saveMovieLinks()" style="margin-top:14px;">💾 Линкүүд хадгалах (локал)</button>
+
+  </div>
       </div>
     </div>
   </div>
@@ -2559,7 +3424,6 @@ window.addEventListener('DOMContentLoaded', function(){
 3. Мэдэхгүй зүйл дээр &quot;Менежертэй холбогдоно уу&quot; гэнэ
 ..."></textarea>
         <button class="btn btn-primary" onclick="savePrompt('chat')" style="margin-top:14px;">💾 Промпт хадгалах (локал)</button>
-        <button class="btn btn-green" onclick="pushCfConfig('prompt_chat')" style="margin-top:8px;">☁ CLOUDFLARE-РУУ ШИНЭЧЛЭХ</button>
       </div>
     </div>
   </div>
@@ -2578,12 +3442,11 @@ window.addEventListener('DOMContentLoaded', function(){
 3. Гүйлгээний утга/тайлбар
 Монгол хэлээр хариул."></textarea>
         <button class="btn btn-primary" onclick="savePrompt('vision')" style="margin-top:14px;">💾 Промпт хадгалах (локал)</button>
-        <button class="btn btn-green" onclick="pushCfConfig('prompt_vision')" style="margin-top:8px;">☁ CLOUDFLARE-РУУ ШИНЭЧЛЭХ</button>
       </div>
     </div>
   </div>
 
-  <!-- ══ E. АЛДАА ШАЛГАХ САМБАР ══ -->
+  <!-- ══ E. АЛДАА ШАЛГАХ + BACKUP ══ -->
   <div id="cfpanel-e" class="cf-panel" style="">
     <div class="section">
       <p class="sec-title">🩺 Системийн алдаа шалгах</p>
@@ -2593,19 +3456,65 @@ window.addEventListener('DOMContentLoaded', function(){
         </div>
         <button class="btn btn-primary" onclick="runDiagnostics()">🩺 СИСТЕМ ШАЛГАХ</button>
 
-        <div id="diagnostics-results" style="margin-top:14px;"></div>
+        <div id="diagnostics-results" style="margin-top:14px;">
+    <div class="diag-row">
+      <span class="diag-icon">❌</span>
+      <span class="diag-text"><b>Worker холболт:</b> Холбогдох боломжгүй: Failed to fetch</span>
+    </div>
+  </div>
 
-        <div id="diagnostics-copy-section" style="display:none;margin-top:14px;">
+        <div id="diagnostics-copy-section" style="margin-top: 14px;">
           <p class="cf-hint" style="margin-bottom:6px;">Алдаа гарсан бол доорх товчийг дарж Claude-д хуулж өгөөрэй:</p>
           <button class="btn-sm btn-edit" onclick="copyDiagnostics()">📋 Алдааны тайланг хуулах</button>
+        </div>
+      </div>
+
+      <p class="sec-title">💾 Системийн нөөцлөлт (Backup)</p>
+      <div class="card">
+        <div class="info-box" style="color:var(--ad-muted);">
+          ⚙ Энэ хэсэг нь вирус, форматлалт, Cloudflare аккаунт устсан зэрэг гамшгийн үед системийг бүхэлд нь сэргээхэд шаардлагатай <b style="color:#f59e0b;">бүх мэдээллийг</b> нэг файлд татна. Аюулгүй газарт хадгална уу.
+        </div>
+
+        <p style="font-size:11px;color:#fff;font-weight:700;margin-bottom:8px;">Backup файл агуулах зүйлс:</p>
+        <div style="font-size:10px;color:var(--ad-muted);line-height:1.8;margin-bottom:14px;">
+          ✓ Gemini API Key<br>
+          ✓ Cloudflare Worker URL + Secret<br>
+          ✓ Facebook Page Token бүгд<br>
+          ✓ Cloudflare Worker JS скрипт<br>
+          ✓ Кино каталогийн линкүүд<br>
+          ✓ Харилцааны промпт (C хэсэг)<br>
+          ✓ Гүйлгээ/Зураг промпт (D хэсэг)<br>
+          ✓ Банкны данс мэдээлэл<br>
+          ✓ GitHub Token (оруулсан бол)
+        </div>
+
+        <label>Cloudflare Worker JS скрипт (доор буулгана уу)</label>
+        <textarea id="backup-worker-js" rows="5" placeholder="Cloudflare дашбоард → Workers → kinobot → Edit → бүх кодыг хуулж энд буулгана уу..." style="font-family:monospace;font-size:10px;"></textarea>
+        <p class="cf-hint">Энэ нь backup-д хадгалагдаад дараа нь сэргэлтэнд ашиглагдана</p>
+
+        <button class="btn btn-primary" onclick="exportSystemBackup()" style="margin-top:14px;width:100%;">
+          📥 БҮТЭН СИСТЕМИЙН BACKUP ТАТАХ (.txt)
+        </button>
+
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--ad-border);">
+          <p style="font-size:11px;color:#fff;font-weight:700;margin-bottom:8px;">🔄 Backup-аас сэргээх</p>
+          <p class="cf-hint" style="margin-bottom:8px;">Хадгалсан backup.txt файлыг сонгоход бүх мэдээлэл автоматаар орж ирнэ</p>
+          <input type="file" id="backup-import-file" accept=".txt" onchange="importSystemBackup(this)" style="font-size:11px;">
         </div>
       </div>
     </div>
   </div>
 
+  <!-- ══ STICKY: БҮГДИЙГ CLOUDFLARE-РУУ ШИНЭЧЛЭХ ══ -->
+  <div style="position:sticky;bottom:0;z-index:100;background:linear-gradient(to top,var(--ad-bg) 80%,transparent);padding:12px 16px 16px;">
+    <button class="btn btn-green" onclick="pushAllCfConfig()" style="width:100%;padding:14px;">
+      ☁ БҮГДИЙГ CLOUDFLARE-РУУ ШИНЭЧЛЭХ
+    </button>
+    <p class="cf-hint" style="text-align:center;margin-top:6px;">A/B/C/D хэсгийн бүх мэдээллийг нэг дор push хийнэ</p>
+  </div>
+
 </div>
 <!-- ══ /TOP TAB 2: CLOUDFLARE ДАМЖУУЛАЛТ ══ -->
-
 <!-- ══ CONFIRM DELETE MODAL ══ -->
 <div class="confirm-overlay" id="confirmOverlay">
   <div class="confirm-box">
@@ -2626,15 +3535,19 @@ window.addEventListener('DOMContentLoaded', function(){
       <button class="btn btn-primary" onclick="confirmSavePosition('top')">Жагсаалтын эхэнд авчрах</button>
     </div>
   </div>
-</div>
-
-
-</div>
-<button class="admin-toggle-btn" id="adminToggleBtn" onclick="toggleAdminPanel()" title="Admin">⚙</button>
+</div></div><button class="admin-toggle-btn" id="adminToggleBtn" onclick="toggleAdminPanel()" title="Admin">⚙</button>
 
 <!-- ══ TOAST (admin-panel-ийн гадна — CSS specificity зөрчлөөс сэргийлнэ) ══ -->
 <div class="toast" id="toast"></div>
 
 
 
-</body></html>
+<div id="token-confirm-overlay" style="display: none; position: fixed; inset: 0px; background: rgba(0, 0, 0, 0.7); z-index: 3000; align-items: center; justify-content: center;">
+      <div style="background:var(--ad-card);border-radius:14px;padding:20px 18px;max-width:300px;width:90%;text-align:center;">
+        <p style="font-size:14px;color:#fff;font-weight:700;margin-bottom:8px;">🗑 Токен устгах</p>
+        <p style="font-size:12px;color:var(--ad-muted);margin-bottom:18px;" id="token-confirm-msg">Энэ пэйжийн токеныг устгах уу?</p>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-danger" onclick="executeDeleteToken()" style="flex:1;">Тийм, устгах</button>
+          <button class="btn" style="flex:1;background:var(--ad-card2);color:var(--ad-muted);" onclick="cancelDeleteToken()">Үгүй</button>
+        </div>
+      </div></div></body></html>
