@@ -519,8 +519,8 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
   <img class="hero-img" id="hero-cover-img" src="https://drive.google.com/thumbnail?id=1hmVacMoedAUMRdnprgd-ajPTeMCbnKbo&amp;sz=w1000" alt="" onerror="this.style.opacity='0'" style="width: 100%; height: 100%; object-fit: cover; object-position: 42.3312% 39.0464%; transform: scale(0.5); transform-origin: 42.3312% 39.0464%; opacity: 0.65;">
   <div class="hero-overlay"></div>
   <div class="hero-text">
-    <div class="hero-title" id="hero-title-el">ЧАНАРТАЙ МОНГОЛ ХАДМАЛ КИНОНУУД</div>
-    <p class="hero-sub" id="hero-sub-el">ЖАРГАЛТАЙ МӨЧИЙГ ӨӨРТӨӨ ЗОРИУЛ</p>
+    <div class="hero-title" id="hero-title-el">Кино сонгоод шууд авах</div>
+    <p class="hero-sub" id="hero-sub-el">Ангилал сонгож кинонуудаа үзээрэй</p>
   </div>
 </div>
 
@@ -675,16 +675,16 @@ const IMAGES={
 };
 
 const DEFAULT_MOVIES=[
-  {id:11,name:"АЛТАН НҮДЭТ ХҮҮ",price:"1500",cat:0,cover:"https://drive.google.com/thumbnail?id=1Rj4yl2WbEK2CUvZa7WNmK9O3nbwm38t4&sz=w1000",trailer:"https://archive.org/embed/1_20260615_20260615_1636",eps:"1 анги"},
-  {id:6,name:"Эмч Бүсгүй",price:"2500",cat:1,cover:"",trailer:"",eps:"1 анги"},
-  {id:2,name:"Номын Санч",price:"5,000 ₮",cat:0,cover:"",trailer:"",eps:"1 анги"},
-  {id:3,name:"Өндөр Эмэгтэй",price:"5,000 ₮",cat:0,cover:"",trailer:"",eps:"1 анги"},
-  {id:4,name:"Тосгоны Охинтой Учирсан Нь",price:"5,000 ₮",cat:1,cover:"",trailer:"",eps:"1 анги"},
-  {id:5,name:"Хойд Ээж",price:"5,000 ₮",cat:1,cover:"",trailer:"",eps:"1 анги"},
-  {id:7,name:"Гудамжинд Таарсан Эмэгтэй",price:"5,000 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"},
-  {id:8,name:"Эхнэрийн Эмч Найз",price:"5,000 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"},
-  {id:9,name:"Гадуурхагдсан Эмэгтэй",price:"5,000 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"},
-  {id:10,name:"Босс Эмэгтэй",price:"5,000 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"}
+  {id:11,name:"АЛТАН НҮДЭТ ХҮҮ",price:"15",cat:0,cover:"https://drive.google.com/thumbnail?id=1Rj4yl2WbEK2CUvZa7WNmK9O3nbwm38t4&sz=w1000",trailer:"https://archive.org/embed/1_20260615_20260615_1636",eps:"1 анги",promo11:true,promo11Count:1},
+  {id:6,name:"Эмч Бүсгүй",price:"25",cat:1,cover:"",trailer:"",eps:"1 анги"},
+  {id:2,name:"Номын Санч",price:"13₮",cat:0,cover:"",trailer:"",eps:"1 анги"},
+  {id:3,name:"Өндөр Эмэгтэй",price:"13₮",cat:0,cover:"",trailer:"",eps:"1 анги",promo11:true,promo11Count:2},
+  {id:4,name:"Тосгоны Охинтой Учирсан Нь",price:"5 ₮",cat:1,cover:"",trailer:"",eps:"1 анги"},
+  {id:5,name:"Хойд Ээж",price:"6 ₮",cat:1,cover:"",trailer:"",eps:"1 анги"},
+  {id:7,name:"Гудамжинд Таарсан Эмэгтэй",price:"4 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"},
+  {id:8,name:"Эхнэрийн Эмч Найз",price:"8 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"},
+  {id:9,name:"Гадуурхагдсан Эмэгтэй",price:"2 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"},
+  {id:10,name:"Босс Эмэгтэй",price:"9 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"}
 ];
 
 var DEFAULT_TAB_COVER_POS = {
@@ -798,8 +798,8 @@ const VIDEOS={
 // ══ БАНКНЫ ДАНС / QPAY МЭДЭЭЛЭЛ — admin panel-аас засварлагдана ══
 const DEFAULT_BANK_INFO = {
   "bankName": "Хаан Банк",
-  "accountNumber": "5XXXXXXXXXXXXXXXXX",
-  "accountHolder": "ОВОГ НЭР",
+  "accountNumber": "5111467939",
+  "accountHolder": "Болд Өлзийбат",
   "qpayMerchant": ""
 };
 
@@ -3027,8 +3027,8 @@ window.addEventListener('DOMContentLoaded', function(){
 
 <!-- ══ ТОП-LEVEL TAB: Кино каталог / Cloudflare дамжуулалт ══ -->
 <div style="display:flex;gap:6px;padding:14px 16px 0;">
-  <button id="toptab-catalog" onclick="setTopTab('catalog')" style="flex: 1 1 0%; padding: 12px 8px; border-radius: 10px; border-color: var(--ad-accent2); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: linear-gradient(135deg,var(--ad-accent),var(--ad-accent2)); color: rgb(255, 255, 255); font-size: 12px; font-weight: 700; font-family: &quot;Times New Roman&quot;, Times, serif; cursor: pointer;">🎬 1. Кино каталог</button>
-  <button id="toptab-cloudflare" onclick="setTopTab('cloudflare')" style="flex: 1 1 0%; padding: 12px 8px; border-radius: 10px; border-color: var(--ad-border2); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--ad-card2); color: var(--ad-muted); font-size: 12px; font-weight: 700; font-family: &quot;Times New Roman&quot;, Times, serif; cursor: pointer;">☁ 2. Cloudflare дамжуулалт</button>
+  <button id="toptab-catalog" onclick="setTopTab('catalog')" style="flex: 1 1 0%; padding: 12px 8px; border-radius: 10px; border-color: var(--ad-accent2); background: linear-gradient(135deg,var(--ad-accent),var(--ad-accent2)); color: rgb(255, 255, 255); font-size: 12px; font-weight: 700; font-family: &quot;Times New Roman&quot;, Times, serif; cursor: pointer;">🎬 1. Кино каталог</button>
+  <button id="toptab-cloudflare" onclick="setTopTab('cloudflare')" style="flex: 1 1 0%; padding: 12px 8px; border-radius: 10px; border-color: var(--ad-border2); background: var(--ad-card2); color: var(--ad-muted); font-size: 12px; font-weight: 700; font-family: &quot;Times New Roman&quot;, Times, serif; cursor: pointer;">☁ 2. Cloudflare дамжуулалт</button>
 </div>
 
 <!-- ══════════════════════════════════ -->
@@ -3064,7 +3064,7 @@ window.addEventListener('DOMContentLoaded', function(){
         <input type="checkbox" id="f-promo11" onchange="togglePromo11Input()" style="width:16px;height:16px;margin:0;">
         <span style="font-size:12px;color:#fff;font-weight:700;">🎁 Энэ кино урамшуулалтай (X авахад Y үнэгүй)</span>
       </label>
-      <div id="promo11-count-wrap" style="display:none;margin-top:10px;">
+      <div id="promo11-count-wrap" style="margin-top: 10px; display: none;">
         <label>Хэдэн кино үнэгүй өгөх вэ?</label>
         <input type="number" id="f-promo11-count" min="1" max="5" value="1" placeholder="1">
         <p class="cf-hint">Жишээ: 1 гэвэл "1+1" (нэг кино авахад нэг үнэгүй), 2 гэвэл "1+2" гэх мэт.</p>
@@ -3262,16 +3262,16 @@ window.addEventListener('DOMContentLoaded', function(){
   <!-- ══ САБ-TAB СЭЛГҮҮР ══ -->
   <div class="section" style="padding-bottom:0;">
     <div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
-      <button id="cftab-a" onclick="setCfTab('a')" class="cf-subtab" style="flex-shrink:0;">🔑 A. Credential</button>
+      <button id="cftab-a" onclick="setCfTab('a')" class="cf-subtab active" style="flex-shrink:0;">🔑 A. Credential</button>
       <button id="cftab-b" onclick="setCfTab('b')" class="cf-subtab" style="flex-shrink:0;">🎬 B. Кино линк</button>
       <button id="cftab-c" onclick="setCfTab('c')" class="cf-subtab" style="flex-shrink:0;">💬 C. Харилцаа</button>
       <button id="cftab-d" onclick="setCfTab('d')" class="cf-subtab" style="flex-shrink:0;">🧾 D. Гүйлгээ/Зураг</button>
-      <button id="cftab-e" onclick="setCfTab('e')" class="cf-subtab active" style="flex-shrink:0;">🩺 E. Алдаа шалгах</button>
+      <button id="cftab-e" onclick="setCfTab('e')" class="cf-subtab" style="flex-shrink:0;">🩺 E. Алдаа шалгах</button>
     </div>
   </div>
 
   <!-- ══ A. CREDENTIAL САН ══ -->
-  <div id="cfpanel-a" class="cf-panel" style="display: none;">
+  <div id="cfpanel-a" class="cf-panel" style="">
     <div class="section">
 
       <!-- ══ ACCORDION: ДАНС/QPAY ══ -->
@@ -3322,37 +3322,37 @@ window.addEventListener('DOMContentLoaded', function(){
           <div id="page-token-list">
     <div style="display:flex;gap:5px;overflow-x:auto;margin-bottom:12px;-webkit-overflow-scrolling:touch;">
       
-    <button class="cf-subtab active" style="flex-shrink:0;" onclick="setTokenTab(0)">AI DRAMA</button>
+    <button class="cf-subtab" style="flex-shrink:0;" onclick="setTokenTab(0)">AI DRAMA</button>
   
     <button class="cf-subtab" style="flex-shrink:0;" onclick="setTokenTab(1)">ACTION</button>
   
-    <button class="cf-subtab" style="flex-shrink:0;" onclick="setTokenTab(2)">+18 EROTIC</button>
+    <button class="cf-subtab active" style="flex-shrink:0;" onclick="setTokenTab(2)">+18 EROTIC</button>
   
     </div>
     <div id="token-page-list">
-    <div class="token-row" id="token-row-0-0">
+    <div class="token-row" id="token-row-2-0">
       <div class="token-row-header">
-        <span class="token-row-name" id="token-name-display-0-0">Open zone</span>
+        <span class="token-row-name" id="token-name-display-2-0">Open zone</span>
         <div style="display:flex;gap:5px;">
-          <button class="btn-sm btn-edit" onclick="editPageToken(0,0)">✏</button>
-          <button class="btn-sm btn-danger" onclick="confirmDeleteToken(0,0)">🗑</button>
+          <button class="btn-sm btn-edit" onclick="editPageToken(2,0)">✏</button>
+          <button class="btn-sm btn-danger" onclick="confirmDeleteToken(2,0)">🗑</button>
         </div>
       </div>
-      <div class="token-row-fields" id="token-edit-0-0" style="display:none;">
-        <input type="text" id="token-name-0-0" value="Open zone" placeholder="Пэйжийн нэр (жишээ: Open Zone AI Drama)">
-        <input type="password" id="token-val-0-0" value="EAAYlbc4COwEBR6zPNRtBXqTGYBfEI3qfsMoeFmwV6vnP1ChGZC8RAX4CUS8IwCTPuZCuLJ7W3ALiqd15f0e0ZAoXS4nI17Hpb0vVA8zUxhVjY0U5FxKzgoxWCiOZC3nd4q28j2kVKW18BaXlaZCNb88FdPujaYHgkJwlVvzZBJRJg9tuDsfnb3XOZCvQhoID1d91DPwiNTA3QZDZD" placeholder="EAAxxxxxxxxxxxxx">
+      <div class="token-row-fields" id="token-edit-2-0" style="display:none;">
+        <input type="text" id="token-name-2-0" value="Open zone" placeholder="Пэйжийн нэр (жишээ: Open Zone AI Drama)">
+        <input type="password" id="token-val-2-0" value="EAAYlbc4COwEBRyZBL0U4gvmP0lTPdMN9Ujb3TAtHoDUSWzvA1TLGOSZBLqonNW9yE2yZCUKRPwvGkEVRcplPR0CASCaYQLMw4ENGOeyQIVl5QzuCrMRfgOvOgbXpTitTWcrB3Y51MjBXobIEq2buOusRviaSpz6Q1CEpknIgA9Bj6nYz9GD8ZAF0CFgBjEpVzgk6ZACZBGEwZDZD" placeholder="EAAxxxxxxxxxxxxx">
         <div style="display:flex;gap:6px;margin-top:4px;">
-          <button class="btn-sm btn-edit" onclick="savePageToken(0,0)">💾 Хадгалах</button>
-          <button class="btn-sm" style="background:var(--ad-card2);color:var(--ad-muted);border:1px solid var(--ad-border);" onclick="cancelEditToken(0,0)">Цуцлах</button>
+          <button class="btn-sm btn-edit" onclick="savePageToken(2,0)">💾 Хадгалах</button>
+          <button class="btn-sm" style="background:var(--ad-card2);color:var(--ad-muted);border:1px solid var(--ad-border);" onclick="cancelEditToken(2,0)">Цуцлах</button>
         </div>
       </div>
-      <div class="token-row-preview" id="token-preview-0-0">
+      <div class="token-row-preview" id="token-preview-2-0">
         <span style="font-size:10px;color:var(--ad-muted);font-family:monospace;">
           EAAYlbc4COwE••••••••••
         </span>
       </div>
     </div></div>
-    <button class="btn-sm btn-edit" onclick="addNewPageToken(0)" style="margin-top:10px;width:100%;justify-content:center;">
+    <button class="btn-sm btn-edit" onclick="addNewPageToken(2)" style="margin-top:10px;width:100%;justify-content:center;">
       ➕ Пэйж нэмэх
     </button>
   </div>
@@ -3380,26 +3380,30 @@ window.addEventListener('DOMContentLoaded', function(){
         </div>
 
         <!-- Таб тус бүрийн дотоод сэлгүүр -->
-        <div style="display:flex;gap:5px;overflow-x:auto;margin-bottom:14px;-webkit-overflow-scrolling:touch;" id="linktab-row"><button class="cf-subtab active" style="flex-shrink:0;" onclick="setLinkTab(0)">AI DRAMA</button><button class="cf-subtab" style="flex-shrink:0;" onclick="setLinkTab(1)">ACTION</button><button class="cf-subtab" style="flex-shrink:0;" onclick="setLinkTab(2)">+18 EROTIC</button></div>
+        <div style="display:flex;gap:5px;overflow-x:auto;margin-bottom:14px;-webkit-overflow-scrolling:touch;" id="linktab-row"><button class="cf-subtab" style="flex-shrink:0;" onclick="setLinkTab(0)">AI DRAMA</button><button class="cf-subtab" style="flex-shrink:0;" onclick="setLinkTab(1)">ACTION</button><button class="cf-subtab active" style="flex-shrink:0;" onclick="setLinkTab(2)">+18 EROTIC</button></div>
 
         <div id="movie-link-container">
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">АЛТАН НҮДЭТ ХҮҮ <span style="color:var(--ad-muted);font-weight:400;">(M11)</span></p>
-        <input type="text" id="movielink-M11" value="" placeholder="https://... контент линк" style="margin-top:0;">
+        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Гудамжинд Таарсан Эмэгтэй <span style="color:var(--ad-muted);font-weight:400;">(M07)</span></p>
+        <input type="text" id="movielink-M07" value="https://iframe.mediadelivery.net/play/567730/3e1f57e5-1426-4437-8472-5ce0df819519" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Номын Санч <span style="color:var(--ad-muted);font-weight:400;">(M02)</span></p>
-        <input type="text" id="movielink-M02" value="" placeholder="https://... контент линк" style="margin-top:0;">
+        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Эхнэрийн Эмч Найз <span style="color:var(--ad-muted);font-weight:400;">(M08)</span></p>
+        <input type="text" id="movielink-M08" value="https://iframe.mediadelivery.net/play/567730/cf7b83e6-5625-4fca-b06b-b480cacead76" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Өндөр Эмэгтэй <span style="color:var(--ad-muted);font-weight:400;">(M03)</span></p>
-        <input type="text" id="movielink-M03" value="" placeholder="https://... контент линк" style="margin-top:0;">
+        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Гадуурхагдсан Эмэгтэй <span style="color:var(--ad-muted);font-weight:400;">(M09)</span></p>
+        <input type="text" id="movielink-M09" value="https://iframe.mediadelivery.net/play/567730/8e9e5176-fe7a-4568-80e9-1e85bf5bbf09" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
-    <div class="cf-divider">"AI DRAMA" групп линк</div>
-    <input type="text" id="cf-link-grp-0" value="" placeholder="https://t.me/joinchat/... эсвэл fb групп линк">
+      <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
+        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Босс Эмэгтэй <span style="color:var(--ad-muted);font-weight:400;">(M10)</span></p>
+        <input type="text" id="movielink-M10" value="https://iframe.mediadelivery.net/play/567730/3000dc34-90e2-4bb9-98ff-50381c98776b" placeholder="https://... контент линк" style="margin-top:0;">
+      </div>
+    <div class="cf-divider">"+18 EROTIC" групп линк</div>
+    <input type="text" id="cf-link-grp-2" value="https://www.facebook.com/groups/1084450000435909/" placeholder="https://t.me/joinchat/... эсвэл fb групп линк">
 
     <div class="cf-divider">БҮХ VIP групп линк (бүх таб дунд нийтлэг)</div>
-    <input type="text" id="cf-link-grp-all" value="" placeholder="https://...">
+    <input type="text" id="cf-link-grp-all" value="https://www.facebook.com/groups/934843989294547/  https://www.facebook.com/groups/1482374652823993/  https://www.facebook.com/groups/1084450000435909/" placeholder="https://...">
 
     <button class="btn btn-primary" onclick="saveMovieLinks()" style="margin-top:14px;">💾 Линкүүд хадгалах (локал)</button>
 
@@ -3447,7 +3451,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
 
   <!-- ══ E. АЛДАА ШАЛГАХ + BACKUP ══ -->
-  <div id="cfpanel-e" class="cf-panel" style="">
+  <div id="cfpanel-e" class="cf-panel" style="display: none;">
     <div class="section">
       <p class="sec-title">🩺 Системийн алдаа шалгах</p>
       <div class="card">
@@ -3459,7 +3463,7 @@ window.addEventListener('DOMContentLoaded', function(){
         <div id="diagnostics-results" style="margin-top:14px;">
     <div class="diag-row">
       <span class="diag-icon">❌</span>
-      <span class="diag-text"><b>Worker холболт:</b> Холбогдох боломжгүй: Failed to fetch</span>
+      <span class="diag-text"><b>Worker холболт:</b> HTTP 403 — Worker ажиллахгүй байна эсвэл /diagnostics endpoint байхгүй</span>
     </div>
   </div>
 
