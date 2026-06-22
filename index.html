@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="mn"><head>
+<html lang="mn"><head><style>body {transition: opacity ease-in 0.2s; } 
+body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relative; } 
+</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>КИНО ҮЗВЭР — Prototype</title>
@@ -516,7 +518,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
 <!-- HERO -->
 <!-- HERO — tab-ийн cover зураг ард нь, текст урд нь харагдана -->
 <div class="hero" id="hero-banner" style="height: 280px;">
-  <img class="hero-img" id="hero-cover-img" src="гадуурхагдсан эмэгтэй.jpg" alt="" onerror="this.style.opacity='0'" style="width: 100%; height: 100%; object-fit: cover; object-position: 53.1363% 51.3559%; transform: scale(0.7); transform-origin: 53.1363% 51.3559%; opacity: 0;">
+  <img class="hero-img" id="hero-cover-img" src="босс эмэгтэй.jpg" alt="" onerror="this.style.opacity='0'" style="width: 100%; height: 100%; object-fit: cover; object-position: 53.1363% 51.3559%; transform: scale(0.7); transform-origin: 53.1363% 51.3559%; opacity: 0;">
   <div class="hero-overlay"></div>
   <div class="hero-text">
     <div class="hero-title" id="hero-title-el">Кино сонгоод шууд авах</div>
@@ -3098,9 +3100,9 @@ window.addEventListener('DOMContentLoaded', function(){
   <p class="sec-title">🎬 Кино жагсаалт <span style="color:var(--muted);font-size:11px;font-weight:400;text-transform:none;letter-spacing:0;" id="movieCount">(10)</span></p>
 
   <!-- Tab buttons — JS render -->
-  <div style="display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;" id="mltab-row"><button id="mltab-0" onclick="setMovieListTab(0)" style="flex:1;flex-shrink:0;min-width:90px;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border2);background:var(--card2);color:var(--muted);font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">AI DRAMA</button><button id="mltab-1" onclick="setMovieListTab(1)" style="flex:1;flex-shrink:0;min-width:90px;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border2);background:var(--card2);color:var(--muted);font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">ACTION</button><button id="mltab-2" onclick="setMovieListTab(2)" style="flex:1;flex-shrink:0;min-width:90px;padding:8px 4px;border-radius:8px;border:1.5px solid var(--accent2);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">+18 EROTIC</button></div>
+  <div style="display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;" id="mltab-row"><button id="mltab-0" onclick="setMovieListTab(0)" style="flex:1;flex-shrink:0;min-width:90px;padding:8px 4px;border-radius:8px;border:1.5px solid var(--accent2);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">AI DRAMA</button><button id="mltab-1" onclick="setMovieListTab(1)" style="flex:1;flex-shrink:0;min-width:90px;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border2);background:var(--card2);color:var(--muted);font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">ACTION</button><button id="mltab-2" onclick="setMovieListTab(2)" style="flex:1;flex-shrink:0;min-width:90px;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border2);background:var(--card2);color:var(--muted);font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">+18 EROTIC</button></div>
 
-  <div id="movieList-container"><div id="movieList-0" style="display:none;"></div><div id="movieList-1" style="display:none;"></div><div id="movieList-2" style="display:;"></div></div>
+  <div id="movieList-container"><div id="movieList-0" style="display:;"></div><div id="movieList-1" style="display:none;"></div><div id="movieList-2" style="display:none;"></div></div>
 </div>
 
 <!-- ══ БУСАД ТОХИРГОО ══ -->
@@ -3282,16 +3284,16 @@ window.addEventListener('DOMContentLoaded', function(){
   <!-- ══ САБ-TAB СЭЛГҮҮР ══ -->
   <div class="section" style="padding-bottom:0;">
     <div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
-      <button id="cftab-a" onclick="setCfTab('a')" class="cf-subtab" style="flex-shrink:0;">🔑 A. Credential</button>
+      <button id="cftab-a" onclick="setCfTab('a')" class="cf-subtab active" style="flex-shrink:0;">🔑 A. Credential</button>
       <button id="cftab-b" onclick="setCfTab('b')" class="cf-subtab" style="flex-shrink:0;">🎬 B. Кино линк</button>
       <button id="cftab-c" onclick="setCfTab('c')" class="cf-subtab" style="flex-shrink:0;">💬 C. Харилцаа</button>
       <button id="cftab-d" onclick="setCfTab('d')" class="cf-subtab" style="flex-shrink:0;">🧾 D. Гүйлгээ/Зураг</button>
-      <button id="cftab-e" onclick="setCfTab('e')" class="cf-subtab active" style="flex-shrink:0;">🩺 E. Алдаа шалгах</button>
+      <button id="cftab-e" onclick="setCfTab('e')" class="cf-subtab" style="flex-shrink:0;">🩺 E. Алдаа шалгах</button>
     </div>
   </div>
 
   <!-- ══ A. CREDENTIAL САН ══ -->
-  <div id="cfpanel-a" class="cf-panel" style="display: none;">
+  <div id="cfpanel-a" class="cf-panel" style="">
     <div class="section">
 
       <!-- ══ ACCORDION: ДАНС/QPAY ══ -->
@@ -3342,15 +3344,15 @@ window.addEventListener('DOMContentLoaded', function(){
           <div id="page-token-list">
     <div style="display:flex;gap:5px;overflow-x:auto;margin-bottom:12px;-webkit-overflow-scrolling:touch;">
       
-    <button class="cf-subtab" style="flex-shrink:0;" onclick="setTokenTab(0)">AI DRAMA</button>
+    <button class="cf-subtab active" style="flex-shrink:0;" onclick="setTokenTab(0)">AI DRAMA</button>
   
-    <button class="cf-subtab active" style="flex-shrink:0;" onclick="setTokenTab(1)">ACTION</button>
+    <button class="cf-subtab" style="flex-shrink:0;" onclick="setTokenTab(1)">ACTION</button>
   
     <button class="cf-subtab" style="flex-shrink:0;" onclick="setTokenTab(2)">+18 EROTIC</button>
   
     </div>
     <div id="token-page-list"><p class="cf-hint" style="padding:10px 0;">Пэйж байхгүй байна. "➕ Пэйж нэмэх" дарна уу.</p></div>
-    <button class="btn-sm btn-edit" onclick="addNewPageToken(1)" style="margin-top:10px;width:100%;justify-content:center;">
+    <button class="btn-sm btn-edit" onclick="addNewPageToken(0)" style="margin-top:10px;width:100%;justify-content:center;">
       ➕ Пэйж нэмэх
     </button>
   </div>
@@ -3445,7 +3447,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
 
   <!-- ══ E. АЛДАА ШАЛГАХ + BACKUP ══ -->
-  <div id="cfpanel-e" class="cf-panel" style="">
+  <div id="cfpanel-e" class="cf-panel" style="display: none;">
     <div class="section">
       <p class="sec-title">🩺 Системийн алдаа шалгах</p>
       <div class="card">
@@ -3548,4 +3550,4 @@ window.addEventListener('DOMContentLoaded', function(){
           <button class="btn btn-danger" onclick="executeDeleteToken()" style="flex:1;">Тийм, устгах</button>
           <button class="btn" style="flex:1;background:var(--ad-card2);color:var(--ad-muted);" onclick="cancelDeleteToken()">Үгүй</button>
         </div>
-      </div></div></body></html>
+      </div></div><veepn-lock-screen><style>@font-face{font-family:FigtreeVF;src:url(chrome-extension://majdfhpaihoncoakbjgbdhglocklcgno/fonts/FigtreeVF.woff2) format("woff2 supports variations"),url(chrome-extension://majdfhpaihoncoakbjgbdhglocklcgno/fonts/FigtreeVF.woff2) format("woff2-variations");font-weight:100 1000;font-display:swap}</style></veepn-lock-screen></body></html>
