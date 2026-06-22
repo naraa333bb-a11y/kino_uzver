@@ -517,8 +517,8 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
 
 <!-- HERO -->
 <!-- HERO — tab-ийн cover зураг ард нь, текст урд нь харагдана -->
-<div class="hero" id="hero-banner" style="height: 280px;">
-  <img class="hero-img" id="hero-cover-img" src="https://drive.google.com/thumbnail?id=1ZFRnE6VGX8r5LbFH47vGqEDRT_Pts8pd&amp;sz=w1000" alt="" onerror="this.style.opacity='0'" style="width: 100%; height: 100%; object-fit: cover; object-position: 50.6014% 49.8157%; transform: scale(0.76); transform-origin: 50.6014% 49.8157%; opacity: 0.65;">
+<div class="hero" id="hero-banner" style="height: 213px;">
+  <img class="hero-img" id="hero-cover-img" src="https://drive.google.com/thumbnail?id=1hmVacMoedAUMRdnprgd-ajPTeMCbnKbo&amp;sz=w1000" alt="" onerror="this.style.opacity='0'" style="width: 100%; height: 100%; object-fit: cover; object-position: 42.3312% 39.0464%; transform: scale(0.5); transform-origin: 42.3312% 39.0464%; opacity: 0.65;">
   <div class="hero-overlay"></div>
   <div class="hero-text">
     <div class="hero-title" id="hero-title-el">Кино сонгоод шууд авах</div>
@@ -528,9 +528,9 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
 
 <!-- TABS — JS-аар CATEGORIES массиваас dynamic render хийгдэнэ -->
 <div class="tabs-wrap">
-  <div class="tab-row" id="tab-row-container"><button class="tab-chip" onclick="openTab(0,this)">AI DRAMA</button><button class="tab-chip active" onclick="openTab(1,this)">ACTION</button><button class="tab-chip" onclick="openTab(2,this)">+18 EROTIC</button></div>
+  <div class="tab-row" id="tab-row-container"><button class="tab-chip active" onclick="openTab(0,this)">AI DRAMA</button><button class="tab-chip" onclick="openTab(1,this)">ACTION</button><button class="tab-chip" onclick="openTab(2,this)">+18 EROTIC</button></div>
   <div id="tab-panels-container">
-    <div class="tab-panel" id="panel-0">
+    <div class="tab-panel open" id="panel-0">
       <p class="panel-label">AI Drama</p>
       <div class="vip-promo-row">
         <div class="vip-promo" onclick="openBuyModal('GRP',0)">
@@ -551,7 +551,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
       <div class="movie-grid" id="grid-0"></div>
     </div>
   
-    <div class="tab-panel open" id="panel-1">
+    <div class="tab-panel" id="panel-1">
       <p class="panel-label">Action</p>
       <div class="vip-promo-row">
         <div class="vip-promo" onclick="openBuyModal('GRP',1)">
@@ -3106,9 +3106,9 @@ window.addEventListener('DOMContentLoaded', function(){
   <p class="sec-title">🎬 Кино жагсаалт <span style="color:var(--muted);font-size:11px;font-weight:400;text-transform:none;letter-spacing:0;" id="movieCount">(1)</span></p>
 
   <!-- Tab buttons — JS render -->
-  <div style="display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;" id="mltab-row"><button id="mltab-0" onclick="setMovieListTab(0)" style="flex: 1 0 0%; min-width: 90px; padding: 8px 4px; border-radius: 8px; border-color: var(--accent2); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: linear-gradient(135deg,var(--accent),var(--accent2)); color: rgb(255, 255, 255); font-size: 11px; font-weight: 700; font-family: &quot;Times New Roman&quot;, Times, serif; cursor: pointer;">AI DRAMA</button><button id="mltab-1" onclick="setMovieListTab(1)" style="flex: 1 0 0%; min-width: 90px; padding: 8px 4px; border-radius: 8px; border-color: var(--border2); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--card2); color: var(--muted); font-size: 11px; font-weight: 700; font-family: &quot;Times New Roman&quot;, Times, serif; cursor: pointer;">ACTION</button><button id="mltab-2" onclick="setMovieListTab(2)" style="flex: 1 0 0%; min-width: 90px; padding: 8px 4px; border-radius: 8px; border-color: var(--border2); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--card2); color: var(--muted); font-size: 11px; font-weight: 700; font-family: &quot;Times New Roman&quot;, Times, serif; cursor: pointer;">+18 EROTIC</button></div>
+  <div style="display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;" id="mltab-row"><button id="mltab-0" onclick="setMovieListTab(0)" style="flex:1;flex-shrink:0;min-width:90px;padding:8px 4px;border-radius:8px;border:1.5px solid var(--accent2);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">AI DRAMA</button><button id="mltab-1" onclick="setMovieListTab(1)" style="flex:1;flex-shrink:0;min-width:90px;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border2);background:var(--card2);color:var(--muted);font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">ACTION</button><button id="mltab-2" onclick="setMovieListTab(2)" style="flex:1;flex-shrink:0;min-width:90px;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border2);background:var(--card2);color:var(--muted);font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">+18 EROTIC</button></div>
 
-  <div id="movieList-container"><div id="movieList-0" style=""></div><div id="movieList-1" style="display: none;"></div><div id="movieList-2" style="display: none;"></div></div>
+  <div id="movieList-container"><div id="movieList-0" style="display:;"></div><div id="movieList-1" style="display:none;"></div><div id="movieList-2" style="display:none;"></div></div>
 </div>
 
 <!-- ══ БУСАД ТОХИРГОО ══ -->
@@ -3357,29 +3357,7 @@ window.addEventListener('DOMContentLoaded', function(){
     <button class="cf-subtab" style="flex-shrink:0;" onclick="setTokenTab(2)">+18 EROTIC</button>
   
     </div>
-    <div id="token-page-list">
-    <div class="token-row" id="token-row-0-0">
-      <div class="token-row-header">
-        <span class="token-row-name" id="token-name-display-0-0">Open zone</span>
-        <div style="display:flex;gap:5px;">
-          <button class="btn-sm btn-edit" onclick="editPageToken(0,0)">✏</button>
-          <button class="btn-sm btn-danger" onclick="confirmDeleteToken(0,0)">🗑</button>
-        </div>
-      </div>
-      <div class="token-row-fields" id="token-edit-0-0" style="display:none;">
-        <input type="text" id="token-name-0-0" value="Open zone" placeholder="Пэйжийн нэр (жишээ: Open Zone AI Drama)">
-        <input type="password" id="token-val-0-0" value="EAAYlbc4COwEBRyZBL0U4gvmP0lTPdMN9Ujb3TAtHoDUSWzvA1TLGOSZBLqonNW9yE2yZCUKRPwvGkEVRcplPR0CASCaYQLMw4ENGOeyQIVl5QzuCrMRfgOvOgbXpTitTWcrB3Y51MjBXobIEq2buOusRviaSpz6Q1CEpknIgA9Bj6nYz9GD8ZAF0CFgBjEpVzgk6ZACZBGEwZDZD" placeholder="EAAxxxxxxxxxxxxx">
-        <div style="display:flex;gap:6px;margin-top:4px;">
-          <button class="btn-sm btn-edit" onclick="savePageToken(0,0)">💾 Хадгалах</button>
-          <button class="btn-sm" style="background:var(--ad-card2);color:var(--ad-muted);border:1px solid var(--ad-border);" onclick="cancelEditToken(0,0)">Цуцлах</button>
-        </div>
-      </div>
-      <div class="token-row-preview" id="token-preview-0-0">
-        <span style="font-size:10px;color:var(--ad-muted);font-family:monospace;">
-          EAAYlbc4COwE••••••••••
-        </span>
-      </div>
-    </div></div>
+    <div id="token-page-list"><p class="cf-hint" style="padding:10px 0;">Пэйж байхгүй байна. "➕ Пэйж нэмэх" дарна уу.</p></div>
     <button class="btn-sm btn-edit" onclick="addNewPageToken(0)" style="margin-top:10px;width:100%;justify-content:center;">
       ➕ Пэйж нэмэх
     </button>
@@ -3413,21 +3391,13 @@ window.addEventListener('DOMContentLoaded', function(){
         <div id="movie-link-container">
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
         <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">АЛТАН НҮДЭТ ХҮҮ <span style="color:var(--ad-muted);font-weight:400;">(M11)</span></p>
-        <input type="text" id="movielink-M11" value="https://quiet-cloud-4be2.naraa333bb.workers.dev/?fbclid=IwZXh0bgNhZW0CMTAAYnJpZBExQ1hRZUhtQnVtOFhEb2FRZHNydGMGYXBwX2lkEDIyMjAzOTE3ODgyMDA4OTIAAR6j123FDIey7nEos3IVzPeqGhCq5oKRjRBQCcMbOhHK84icH-ynYhB5BDMVYQ_aem_kbllF1gRGiiTPh4qbsDfxA" placeholder="https://... контент линк" style="margin-top:0;">
-      </div>
-      <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Номын Санч <span style="color:var(--ad-muted);font-weight:400;">(M02)</span></p>
-        <input type="text" id="movielink-M02" value="https://wild-voice-f381.naraa333bb.workers.dev/" placeholder="https://... контент линк" style="margin-top:0;">
-      </div>
-      <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Өндөр Эмэгтэй <span style="color:var(--ad-muted);font-weight:400;">(M03)</span></p>
-        <input type="text" id="movielink-M03" value="https://crimson-brook-7760.naraa333bb.workers.dev/" placeholder="https://... контент линк" style="margin-top:0;">
+        <input type="text" id="movielink-M11" value="" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
     <div class="cf-divider">"AI DRAMA" групп линк</div>
-    <input type="text" id="cf-link-grp-0" value="https://www.facebook.com/groups/934843989294547/" placeholder="https://t.me/joinchat/... эсвэл fb групп линк">
+    <input type="text" id="cf-link-grp-0" value="" placeholder="https://t.me/joinchat/... эсвэл fb групп линк">
 
     <div class="cf-divider">БҮХ VIP групп линк (бүх таб дунд нийтлэг)</div>
-    <input type="text" id="cf-link-grp-all" value="https://www.facebook.com/groups/934843989294547/  https://www.facebook.com/groups/1482374652823993/  https://www.facebook.com/groups/1084450000435909/" placeholder="https://...">
+    <input type="text" id="cf-link-grp-all" value="" placeholder="https://...">
 
     <button class="btn btn-primary" onclick="saveMovieLinks()" style="margin-top:14px;">💾 Линкүүд хадгалах (локал)</button>
 
