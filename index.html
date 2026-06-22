@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="mn"><head>
+<html lang="mn"><head><style>body {transition: opacity ease-in 0.2s; } 
+body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relative; } 
+</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>КИНО ҮЗВЭР — Prototype</title>
@@ -519,7 +521,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
   <img class="hero-img" id="hero-cover-img" src="https://drive.google.com/thumbnail?id=1hmVacMoedAUMRdnprgd-ajPTeMCbnKbo&amp;sz=w1000" alt="" onerror="this.style.opacity='0'" style="width: 100%; height: 100%; object-fit: cover; object-position: 42.3312% 39.0464%; transform: scale(0.5); transform-origin: 42.3312% 39.0464%; opacity: 0.65;">
   <div class="hero-overlay"></div>
   <div class="hero-text">
-    <div class="hero-title" id="hero-title-el">ЧАНАРТАЙ МОНГОЛ ХАДМАЛ</div>
+    <div class="hero-title" id="hero-title-el">Кино сонгоод шууд авах</div>
     <p class="hero-sub" id="hero-sub-el">Ангилал сонгож кинонуудаа үзээрэй</p>
   </div>
 </div>
@@ -675,19 +677,19 @@ const IMAGES={
 };
 
 const DEFAULT_MOVIES=[
-  {id:16,name:"НУУЦ ТОХИРОЛЦОО",price:"12",cat:0,cover:"https://drive.google.com/thumbnail?id=1GL0b_dP6I7sQtCz3KZft4EytEgqae4rC&sz=w1000",trailer:"",eps:"1"},
+  {id:16,name:"НУУЦ ТОХИРОЛЦОО",price:"12 ₮",cat:0,cover:"https://drive.google.com/thumbnail?id=1GL0b_dP6I7sQtCz3KZft4EytEgqae4rC&sz=w1000",trailer:"",eps:"1"},
   {id:15,name:"ЦАГИЙН БАГШ",price:"11",cat:0,cover:"https://drive.google.com/thumbnail?id=1-5428tJ-q2vFATtCZSv0D5dy_B5OKN7X&sz=w1000",trailer:"https://archive.org/embed/2_20260616_20260616",eps:"1"},
   {id:14,name:"ИХЭРҮҮДИЙН БОСС ААВ",price:"10",cat:0,cover:"https://drive.google.com/thumbnail?id=1qnYYkyCe2kNn3Dz7J-1Yfm4MlPJhqHbx&sz=w1000",trailer:"https://archive.org/embed/5_20260616_20260616",eps:"10"},
   {id:13,name:"ТУСГАЙ ДААЛГАВАР",price:"10",cat:0,cover:"https://drive.google.com/thumbnail?id=1n64qbYIAy3oSezfYj5RDs9nm2kgTMcix&sz=w1000",trailer:"https://archive.org/embed/1_20260616_20260616_1221",eps:"1"},
   {id:12,name:"ЛУУГИЙН УДАМ",price:"10 ₮",cat:0,cover:"https://drive.google.com/thumbnail?id=1CvtzjCyLqtpDHyhI44Dptib4HqvvPCjy&sz=w1000",trailer:"https://archive.org/embed/1_20260616_20260616_1208",eps:"1"},
   {id:11,name:"АЛТАН НҮДЭТ ХҮҮ",price:"10",cat:0,cover:"https://drive.google.com/thumbnail?id=1Rj4yl2WbEK2CUvZa7WNmK9O3nbwm38t4&sz=w1000",trailer:"https://archive.org/embed/1_20260615_20260615_1636",eps:"1 анги"},
-  {id:6,name:"Эмч Бүсгүй",price:"2500",cat:1,cover:"",trailer:"",eps:"1 анги"},
-  {id:4,name:"Тосгоны Охинтой Учирсан Нь",price:"5,000 ₮",cat:1,cover:"",trailer:"",eps:"1 анги"},
-  {id:5,name:"Хойд Ээж",price:"5,000 ₮",cat:1,cover:"",trailer:"",eps:"1 анги"},
-  {id:7,name:"Гудамжинд Таарсан Эмэгтэй",price:"5,000 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"},
-  {id:8,name:"Эхнэрийн Эмч Найз",price:"5,000 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"},
-  {id:9,name:"Гадуурхагдсан Эмэгтэй",price:"5,000 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"},
-  {id:10,name:"Босс Эмэгтэй",price:"5,000 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"}
+  {id:6,name:"Эмч Бүсгүй",price:"55 ₮",cat:1,cover:"",trailer:"",eps:"1 анги"},
+  {id:4,name:"Тосгоны Охинтой Учирсан Нь",price:"56 ₮",cat:1,cover:"",trailer:"",eps:"1 анги"},
+  {id:5,name:"Хойд Ээж",price:"57 ₮",cat:1,cover:"",trailer:"",eps:"1 анги"},
+  {id:7,name:"Гудамжинд Таарсан Эмэгтэй",price:"58 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"},
+  {id:8,name:"Эхнэрийн Эмч Найз",price:"59 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"},
+  {id:9,name:"Гадуурхагдсан Эмэгтэй",price:"61 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"},
+  {id:10,name:"Босс Эмэгтэй",price:"60 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"}
 ];
 
 var DEFAULT_TAB_COVER_POS = {
@@ -2963,8 +2965,8 @@ window.addEventListener('DOMContentLoaded', function(){
     <div class="modal-trailer" id="modalTrailer"></div>
 
     <div class="modal-body">
-      <p class="modal-movie-name" id="modalMovieName">Номын Санч</p>
-      <p class="modal-price" id="modalPrice">5,000 ₮</p>
+      <p class="modal-movie-name" id="modalMovieName">Эмч Бүсгүй</p>
+      <p class="modal-price" id="modalPrice">2500</p>
 
       <!-- УРАМШУУЛЛЫН СЕКЦ: кино тус бүрийн promo11 талбараас тодорхойлогдоно -->
       <div id="section-11" style="margin-bottom: 14px; display: none;">
@@ -3006,14 +3008,14 @@ window.addEventListener('DOMContentLoaded', function(){
         <div class="acct-row">
           <div class="acct-info-box">
             <p class="acct-label">Дансны дугаар (Хаан Банк)</p>
-            <p class="acct-val" id="acctNumber">5111467939</p>
+            <p class="acct-val" id="acctNumber">5309433188</p>
           </div>
           <button class="acct-copy" id="copyAcctBtn" onclick="copyText('acctNumber','copyAcctBtn')">📋</button>
         </div>
         <div class="acct-row">
           <div class="acct-info-box">
             <p class="acct-label">Гүйлгээний утга — Үүнийг хуулна уу</p>
-            <p class="acct-val" id="txnCode">AI1-M02-HRCDV5YP</p>
+            <p class="acct-val" id="txnCode">ACT1-M06-C427G8QG</p>
           </div>
           <button class="acct-copy" id="copyTxnBtn" onclick="copyText('txnCode','copyTxnBtn')">📋</button>
         </div>
@@ -3563,4 +3565,4 @@ window.addEventListener('DOMContentLoaded', function(){
           <button class="btn btn-danger" onclick="executeDeleteToken()" style="flex:1;">Тийм, устгах</button>
           <button class="btn" style="flex:1;background:var(--ad-card2);color:var(--ad-muted);" onclick="cancelDeleteToken()">Үгүй</button>
         </div>
-      </div></div></body></html>
+      </div></div><veepn-lock-screen><style>@font-face{font-family:FigtreeVF;src:url(chrome-extension://majdfhpaihoncoakbjgbdhglocklcgno/fonts/FigtreeVF.woff2) format("woff2 supports variations"),url(chrome-extension://majdfhpaihoncoakbjgbdhglocklcgno/fonts/FigtreeVF.woff2) format("woff2-variations");font-weight:100 1000;font-display:swap}</style></veepn-lock-screen></body></html>
