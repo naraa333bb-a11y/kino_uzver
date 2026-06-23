@@ -2975,18 +2975,18 @@ window.addEventListener('DOMContentLoaded', function(){
   <div class="modal-box">
     <div class="modal-top">
       <button class="modal-nav-btn" onclick="closeModal()">←</button>
-      <span class="modal-title" id="modalTitle">Кино авах</span>
+      <span class="modal-title" id="modalTitle">Групп худалдан авах</span>
       <button class="modal-nav-btn" onclick="closeModal()">✕</button>
     </div>
 
     <div class="modal-trailer" id="modalTrailer"></div>
 
     <div class="modal-body">
-      <p class="modal-movie-name" id="modalMovieName">ЛУУГЫН УДАМ</p>
-      <p class="modal-price" id="modalPrice">14 ₮</p>
+      <p class="modal-movie-name" id="modalMovieName">+18 ГРУПП</p>
+      <p class="modal-price" id="modalPrice">150 ₮ / 3 сар</p>
 
       <!-- УРАМШУУЛЛЫН СЕКЦ: кино тус бүрийн promo11 талбараас тодорхойлогдоно -->
-      <div id="section-11" style="margin-bottom: 14px;">
+      <div id="section-11" style="margin-bottom: 14px; display: none;">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
           <span style="background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;font-size:10px;font-weight:900;padding:3px 10px;border-radius:100px;letter-spacing:.05em;">🎁 УРАМШУУЛАЛ</span>
         </div>
@@ -3025,7 +3025,7 @@ window.addEventListener('DOMContentLoaded', function(){
         <p style="font-size:9px;color:#fff;font-weight:700;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">АЛТАН НҮДЭТ ХҮҮ</p>
       </div>
     </div></div>
-        <p id="free-movie-hint" style="font-size: 10px; color: var(--muted); margin-top: 6px;">
+        <p id="free-movie-hint" style="font-size: 10px; color: var(--muted); margin-top: 6px; display: none;">
           ✓ Гүйлгээний утганд сонгосон киноны код нэмэгдлээ
         </p>
       </div>
@@ -3033,7 +3033,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <!-- TOGGLE BUTTONS -->
       <div class="pay-row">
         <button class="pay-btn" id="btnQpay" onclick="selectPay('qpay')">QPay төлөх</button>
-        <button class="pay-btn active" id="btnAcct" onclick="selectPay('acct')">Дансаар төлөх</button>
+        <button class="pay-btn" id="btnAcct" onclick="selectPay('acct')">Дансаар төлөх</button>
       </div>
 
       <!-- QPAY PANEL -->
@@ -3053,18 +3053,18 @@ window.addEventListener('DOMContentLoaded', function(){
       </div>
 
       <!-- ACCOUNT PANEL -->
-      <div class="pay-panel open" id="panelAcct">
+      <div class="pay-panel" id="panelAcct">
         <div class="acct-row">
           <div class="acct-info-box">
             <p class="acct-label">Дансны дугаар (Хаан Банк)</p>
-            <p class="acct-val" id="acctNumber">5111467939</p>
+            <p class="acct-val" id="acctNumber">5309433188</p>
           </div>
           <button class="acct-copy" id="copyAcctBtn" onclick="copyText('acctNumber','copyAcctBtn')">📋</button>
         </div>
         <div class="acct-row">
           <div class="acct-info-box">
             <p class="acct-label">Гүйлгээний утга — Үүнийг хуулна уу</p>
-            <p class="acct-val" id="txnCode">AI1-M12-M4JYUJV5+M13</p>
+            <p class="acct-val" id="txnCode">ERO1-GRP-M4JYUJV5</p>
           </div>
           <button class="acct-copy" id="copyTxnBtn" onclick="copyText('txnCode','copyTxnBtn')">📋</button>
         </div>
