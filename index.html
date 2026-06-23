@@ -3336,16 +3336,16 @@ window.addEventListener('DOMContentLoaded', function(){
   <!-- ══ САБ-TAB СЭЛГҮҮР ══ -->
   <div class="section" style="padding-bottom:0;">
     <div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
-      <button id="cftab-a" onclick="setCfTab('a')" class="cf-subtab active" style="flex-shrink:0;">🔑 A. Credential</button>
+      <button id="cftab-a" onclick="setCfTab('a')" class="cf-subtab" style="flex-shrink:0;">🔑 A. Credential</button>
       <button id="cftab-b" onclick="setCfTab('b')" class="cf-subtab" style="flex-shrink:0;">🎬 B. Кино линк</button>
       <button id="cftab-c" onclick="setCfTab('c')" class="cf-subtab" style="flex-shrink:0;">💬 C. Харилцаа</button>
       <button id="cftab-d" onclick="setCfTab('d')" class="cf-subtab" style="flex-shrink:0;">🧾 D. Гүйлгээ/Зураг</button>
-      <button id="cftab-e" onclick="setCfTab('e')" class="cf-subtab" style="flex-shrink:0;">🩺 E. Алдаа шалгах</button>
+      <button id="cftab-e" onclick="setCfTab('e')" class="cf-subtab active" style="flex-shrink:0;">🩺 E. Алдаа шалгах</button>
     </div>
   </div>
 
   <!-- ══ A. CREDENTIAL САН ══ -->
-  <div id="cfpanel-a" class="cf-panel" style="">
+  <div id="cfpanel-a" class="cf-panel" style="display: none;">
     <div class="section">
 
       <!-- ══ ACCORDION: ДАНС/QPAY ══ -->
@@ -3529,7 +3529,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
 
   <!-- ══ E. АЛДАА ШАЛГАХ + BACKUP ══ -->
-  <div id="cfpanel-e" class="cf-panel" style="display: none;">
+  <div id="cfpanel-e" class="cf-panel" style="">
     <div class="section">
       <p class="sec-title">🩺 Системийн алдаа шалгах</p>
       <div class="card">
