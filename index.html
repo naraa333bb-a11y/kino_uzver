@@ -518,7 +518,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
 <!-- HERO -->
 <!-- HERO — tab-ийн cover зураг ард нь, текст урд нь харагдана -->
 <div class="hero" id="hero-banner" style="height: 280px;">
-  <img class="hero-img" id="hero-cover-img" src="https://drive.google.com/thumbnail?id=1hmVacMoedAUMRdnprgd-ajPTeMCbnKbo&amp;sz=w1000" alt="" onerror="this.style.opacity='0'" style="width: 100%; height: 100%; object-fit: cover; object-position: 42.3312% 39.0464%; transform: scale(0.5); transform-origin: 42.3312% 39.0464%; opacity: 0.65;">
+  <img class="hero-img" id="hero-cover-img" src="https://drive.google.com/thumbnail?id=1eMQDyHgjcVRuJvWPBz5Y93AwFzD50FDf&amp;sz=w1000" alt="" onerror="this.style.opacity='0'" style="width: 100%; height: 100%; object-fit: cover; object-position: 53.1363% 51.3559%; transform: scale(0.7); transform-origin: 53.1363% 51.3559%; opacity: 0.65;">
   <div class="hero-overlay"></div>
   <div class="hero-text">
     <div class="hero-title" id="hero-title-el">Кино сонгоод шууд авах</div>
@@ -528,9 +528,9 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
 
 <!-- TABS — JS-аар CATEGORIES массиваас dynamic render хийгдэнэ -->
 <div class="tabs-wrap">
-  <div class="tab-row" id="tab-row-container"><button class="tab-chip active" onclick="openTab(0,this)">AI DRAMA</button><button class="tab-chip" onclick="openTab(1,this)">ACTION</button><button class="tab-chip" onclick="openTab(2,this)">ЭРОЧИК</button></div>
+  <div class="tab-row" id="tab-row-container"><button class="tab-chip" onclick="openTab(0,this)">AI DRAMA</button><button class="tab-chip" onclick="openTab(1,this)">ACTION</button><button class="tab-chip active" onclick="openTab(2,this)">ЭРОЧИК</button></div>
   <div id="tab-panels-container">
-    <div class="tab-panel open" id="panel-0">
+    <div class="tab-panel" id="panel-0">
       <p class="panel-label">AI Drama</p>
       <div class="vip-promo-row">
         <div class="vip-promo" onclick="openBuyModal('GRP',0)">
@@ -572,7 +572,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
       <div class="movie-grid" id="grid-1"></div>
     </div>
   
-    <div class="tab-panel" id="panel-2">
+    <div class="tab-panel open" id="panel-2">
       <p class="panel-label">ЭРОЧИК</p>
       <div class="vip-promo-row">
         <div class="vip-promo" onclick="openBuyModal('GRP',2)">
@@ -3152,9 +3152,9 @@ window.addEventListener('DOMContentLoaded', function(){
   <p class="sec-title">🎬 Кино жагсаалт <span style="color:var(--muted);font-size:11px;font-weight:400;text-transform:none;letter-spacing:0;" id="movieCount">(15)</span></p>
 
   <!-- Tab buttons — JS render -->
-  <div style="display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;" id="mltab-row"><button id="mltab-0" onclick="setMovieListTab(0)" style="flex:1;flex-shrink:0;min-width:90px;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border2);background:var(--card2);color:var(--muted);font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">AI DRAMA</button><button id="mltab-1" onclick="setMovieListTab(1)" style="flex:1;flex-shrink:0;min-width:90px;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border2);background:var(--card2);color:var(--muted);font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">ACTION</button><button id="mltab-2" onclick="setMovieListTab(2)" style="flex:1;flex-shrink:0;min-width:90px;padding:8px 4px;border-radius:8px;border:1.5px solid var(--accent2);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">ЭРОЧИК</button></div>
+  <div style="display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;" id="mltab-row"><button id="mltab-0" onclick="setMovieListTab(0)" style="flex: 1 0 0%; min-width: 90px; padding: 8px 4px; border-radius: 8px; border-color: var(--border2); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--card2); color: var(--muted); font-size: 11px; font-weight: 700; font-family: &quot;Times New Roman&quot;, Times, serif; cursor: pointer;">AI DRAMA</button><button id="mltab-1" onclick="setMovieListTab(1)" style="flex: 1 0 0%; min-width: 90px; padding: 8px 4px; border-radius: 8px; border-color: var(--border2); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--card2); color: var(--muted); font-size: 11px; font-weight: 700; font-family: &quot;Times New Roman&quot;, Times, serif; cursor: pointer;">ACTION</button><button id="mltab-2" onclick="setMovieListTab(2)" style="flex: 1 0 0%; min-width: 90px; padding: 8px 4px; border-radius: 8px; border-color: var(--accent2); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: linear-gradient(135deg,var(--accent),var(--accent2)); color: rgb(255, 255, 255); font-size: 11px; font-weight: 700; font-family: &quot;Times New Roman&quot;, Times, serif; cursor: pointer;">ЭРОЧИК</button></div>
 
-  <div id="movieList-container"><div id="movieList-0" style="display:none;"></div><div id="movieList-1" style="display:none;"></div><div id="movieList-2" style="display:;"></div></div>
+  <div id="movieList-container"><div id="movieList-0" style="display: none;"></div><div id="movieList-1" style="display: none;"></div><div id="movieList-2" style=""></div></div>
 </div>
 
 <!-- ══ БУСАД ТОХИРГОО ══ -->
