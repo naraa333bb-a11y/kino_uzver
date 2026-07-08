@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="mn"><head><style>body {transition: opacity ease-in 0.2s; } 
 body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relative; } 
+</style><style>body {transition: opacity ease-in 0.2s; } 
+body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relative; } 
 </style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -518,7 +520,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
 <!-- HERO -->
 <!-- HERO — tab-ийн cover зураг ард нь, текст урд нь харагдана -->
 <div class="hero" id="hero-banner" style="height: 280px;">
-  <img class="hero-img" id="hero-cover-img" src="https://drive.google.com/thumbnail?id=1eMQDyHgjcVRuJvWPBz5Y93AwFzD50FDf&amp;sz=w1000" alt="" onerror="this.style.opacity='0'" style="width: 100%; height: 100%; object-fit: cover; object-position: 53.1363% 51.3559%; transform: scale(0.7); transform-origin: 53.1363% 51.3559%; opacity: 0.65;">
+  <img class="hero-img" id="hero-cover-img" src="https://drive.google.com/thumbnail?id=1Rj4yl2WbEK2CUvZa7WNmK9O3nbwm38t4&amp;sz=w1000" alt="" onerror="this.style.opacity='0'" style="width: 100%; height: 100%; object-fit: cover; object-position: 42.3312% 39.0464%; transform: scale(0.5); transform-origin: 42.3312% 39.0464%; opacity: 0.65;">
   <div class="hero-overlay"></div>
   <div class="hero-text">
     <div class="hero-title" id="hero-title-el">Кино сонгоод шууд авах</div>
@@ -528,9 +530,9 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
 
 <!-- TABS — JS-аар CATEGORIES массиваас dynamic render хийгдэнэ -->
 <div class="tabs-wrap">
-  <div class="tab-row" id="tab-row-container"><button class="tab-chip" onclick="openTab(0,this)">AI DRAMA</button><button class="tab-chip" onclick="openTab(1,this)">ACTION</button><button class="tab-chip active" onclick="openTab(2,this)">ЭРОЧИК</button></div>
+  <div class="tab-row" id="tab-row-container"><button class="tab-chip active" onclick="openTab(0,this)">AI DRAMA</button><button class="tab-chip" onclick="openTab(1,this)">ACTION</button><button class="tab-chip" onclick="openTab(2,this)">+18 EROTIC</button></div>
   <div id="tab-panels-container">
-    <div class="tab-panel" id="panel-0">
+    <div class="tab-panel open" id="panel-0">
       <p class="panel-label">AI Drama</p>
       <div class="vip-promo-row">
         <div class="vip-promo" onclick="openBuyModal('GRP',0)">
@@ -572,13 +574,13 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
       <div class="movie-grid" id="grid-1"></div>
     </div>
   
-    <div class="tab-panel open" id="panel-2">
-      <p class="panel-label">ЭРОЧИК</p>
+    <div class="tab-panel" id="panel-2">
+      <p class="panel-label">+18 Erotic</p>
       <div class="vip-promo-row">
         <div class="vip-promo" onclick="openBuyModal('GRP',2)">
           <div class="vip-promo-overlay"></div>
           <div class="vip-promo-content">
-            <p class="vip-promo-title">ЭРОЧИК ГРУПП</p>
+            <p class="vip-promo-title">+18 EROTIC ГРУПП</p>
             <p class="vip-promo-price" id="price-grp-2"></p>
           </div>
         </div>
@@ -677,21 +679,16 @@ const IMAGES={
 };
 
 const DEFAULT_MOVIES=[
-  {id:24,name:"ЗОЖИГ ОХИН-1",price:"13 ₮",cat:2,cover:"https://drive.google.com/thumbnail?id=1W7isV9JsA5KInoG9YI62Q6ExwmSCYqv0&sz=w1000",trailer:"",eps:"1 анги"},
-  {id:25,name:"ЧӨЛӨӨТ ЯРИЛЦЛАГА",price:"11 ₮",cat:2,cover:"https://drive.google.com/thumbnail?id=1Fay-I2puxj-zkuPfIJ7_-7DzJCY-M7Yq&sz=w1000",trailer:"",eps:"1 анги"},
-  {id:23,name:"НОМЫН САНЧ",price:"11 ₮",cat:2,cover:"https://drive.google.com/thumbnail?id=1jY_E7nCcgn9ydItpac8XunBUvn3bKRNc&sz=w1000",trailer:"",eps:"1 анги"},
-  {id:22,name:"ХҮҮХЭД АСРАГЧ",price:"13 ₮",cat:2,cover:"https://drive.google.com/thumbnail?id=1iLByJop2i7ctqWx1JSzn1vDMyi0LTyWV&sz=w1000",trailer:"",eps:"1 анги",promo11:true,promo11Count:1},
-  {id:21,name:"ХОЙД ЭЭЖ",price:"19 ₮",cat:2,cover:"https://drive.google.com/thumbnail?id=1jIoRD6rOLuIKGw0QAntIBp6xhSQzRNpE&sz=w1000",trailer:"",eps:"1 анги"},
-  {id:20,name:"ТОРНАДО",price:"16 ₮",cat:1,cover:"https://drive.google.com/thumbnail?id=1yKfkxUlTPDe5xQGm-c7kapDt6QJvkRji&sz=w1000",trailer:"",eps:"1 анги"},
-  {id:19,name:"ШИЛДЭГ ТУЛААНЧ",price:"14 ₮",cat:1,cover:"https://drive.google.com/thumbnail?id=1nFqT7HLu-fppXZa5ZuETAd-G1G-kzMmx&sz=w1000",trailer:"",eps:"1 анги"},
-  {id:18,name:"АЛУУРЧИН ЭМЭГТЭЙ",price:"15 ₮",cat:1,cover:"https://drive.google.com/thumbnail?id=1gbfipeTRF5apJS8Arwp1D5BWXYSnjGVW&sz=w1000",trailer:"",eps:"1 анги"},
-  {id:17,name:"УСАН ДОТОРХ АН",price:"14 ₮",cat:1,cover:"https://drive.google.com/thumbnail?id=1vX91qN0r9FPNysa6b1jsNTMQ8apG9f2G&sz=w1000",trailer:"",eps:"1 анги"},
-  {id:16,name:"УСТГАЛЫН БҮС",price:"11 ₮",cat:1,cover:"https://drive.google.com/thumbnail?id=1EOHrynmphSjSOFrJiwgv7QSVkM-Gh3Pv&sz=w1000",trailer:"",eps:"1 анги"},
-  {id:15,name:"ЗҮРХ БУЛААСАН БАГШ",price:"17 ₮",cat:0,cover:"https://drive.google.com/thumbnail?id=1-5428tJ-q2vFATtCZSv0D5dy_B5OKN7X&sz=w1000",trailer:"",eps:"1 анги",promo11:true,promo11Count:1},
-  {id:14,name:"ИХЭРҮҮДИЙН БОСС ААВ",price:"16 ₮",cat:0,cover:"https://drive.google.com/thumbnail?id=1qnYYkyCe2kNn3Dz7J-1Yfm4MlPJhqHbx&sz=w1000",trailer:"",eps:"1 анги",promo11:true,promo11Count:2},
-  {id:13,name:"ТУСГАЙ ДААЛГАВАР",price:"14 ₮",cat:0,cover:"https://drive.google.com/thumbnail?id=1n64qbYIAy3oSezfYj5RDs9nm2kgTMcix&sz=w1000",trailer:"",eps:"1 анги",promo11:true,promo11Count:1},
-  {id:11,name:"АЛТАН НҮДЭТ ХҮҮ",price:"15 ₮",cat:0,cover:"https://drive.google.com/thumbnail?id=1Rj4yl2WbEK2CUvZa7WNmK9O3nbwm38t4&sz=w1000",trailer:"https://archive.org/embed/1_20260615_20260615_1636",eps:"1 анги",promo11:true,promo11Count:1},
-  {id:12,name:"ЛУУГЫН УДАМ",price:"14 ₮",cat:0,cover:"https://drive.google.com/thumbnail?id=1CvtzjCyLqtpDHyhI44Dptib4HqvvPCjy&sz=w1000",trailer:"https://archive.org/embed/1_20260616_20260616_1208",eps:"1",promo11:true,promo11Count:1}
+  {id:11,name:"АЛТАН НҮДЭТ ХҮҮ",price:"15 ₮",cat:0,cover:"https://drive.google.com/thumbnail?id=1Rj4yl2WbEK2CUvZa7WNmK9O3nbwm38t4&sz=w1000",trailer:"https://archive.org/embed/1_20260615_20260615_1636",eps:"1 анги"},
+  {id:6,name:"Эмч Бүсгүй",price:"25 ₮",cat:1,cover:"",trailer:"",eps:"1 анги"},
+  {id:2,name:"Номын Санч",price:"11 ₮",cat:0,cover:"",trailer:"",eps:"1 анги"},
+  {id:3,name:"Өндөр Эмэгтэй",price:"5 ₮",cat:0,cover:"",trailer:"",eps:"1 анги",promo11:true,promo11Count:2},
+  {id:4,name:"Тосгоны Охинтой Учирсан Нь",price:"55 ₮",cat:1,cover:"",trailer:"",eps:"1 анги"},
+  {id:5,name:"Хойд Ээж",price:"23 ₮",cat:1,cover:"",trailer:"",eps:"1 анги"},
+  {id:7,name:"Гудамжинд Таарсан Эмэгтэй",price:"10 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"},
+  {id:8,name:"Эхнэрийн Эмч Найз",price:"14 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"},
+  {id:9,name:"Гадуурхагдсан Эмэгтэй",price:"16 ₮",cat:2,cover:"",trailer:"",eps:"1 анги"},
+  {id:10,name:"Босс Эмэгтэй",price:"19 ₮",cat:2,cover:"",trailer:"",eps:"1 анги",promo11:true,promo11Count:1}
 ];
 
 var DEFAULT_TAB_COVER_POS = {
@@ -700,13 +697,13 @@ var DEFAULT_TAB_COVER_POS = {
   2:{x:53.136290243362225, y:51.35588012198487, scale:0.7}
 };
 
-const DEFAULT_TAB_COVERS = {0:"https://drive.google.com/thumbnail?id=1hmVacMoedAUMRdnprgd-ajPTeMCbnKbo&sz=w1000", 1:"https://drive.google.com/thumbnail?id=1ZFRnE6VGX8r5LbFH47vGqEDRT_Pts8pd&sz=w1000", 2:"https://drive.google.com/thumbnail?id=1eMQDyHgjcVRuJvWPBz5Y93AwFzD50FDf&sz=w1000"};
+const DEFAULT_TAB_COVERS = {0:"https://drive.google.com/thumbnail?id=1Rj4yl2WbEK2CUvZa7WNmK9O3nbwm38t4&sz=w1000", 1:"", 2:""};
 
 const DEFAULT_GROUP_PRICES = {
-  0: {price:"110 ₮", period:"3 сар"},
-  1: {price:"135 ₮", period:"3 сар"},
-  2: {price:"150 ₮", period:"3 сар"},
-  all: {price:"250 ₮", period:"3 сар"}
+  0: {price:"13,000 ₮", period:"3 сар"},
+  1: {price:"13,500 ₮", period:"3 сар"},
+  2: {price:"15,000 ₮", period:"3 сар"},
+  all: {price:"25,000 ₮", period:"3 сар"}
 };
 
 // ══ КАТЕГОРИ (TAB) ЖАГСААЛТ — динамик, admin-аар нэмэгдэж/нэр өөрчлөгдөнө ══
@@ -724,8 +721,8 @@ const DEFAULT_CATEGORIES = [
   },
   {
     "id": 2,
-    "name": "ЭРОЧИК",
-    "label": "ЭРОЧИК"
+    "name": "+18 EROTIC",
+    "label": "+18 Erotic"
   }
 ];
 
@@ -805,8 +802,8 @@ const VIDEOS={
 // ══ БАНКНЫ ДАНС / QPAY МЭДЭЭЛЭЛ — admin panel-аас засварлагдана ══
 const DEFAULT_BANK_INFO = {
   "bankName": "Хаан Банк",
-  "accountNumber": "5309433188",
-  "accountHolder": "Болд Өлзийбат",
+  "accountNumber": "5250643868",
+  "accountHolder": "БААСАНЖАВ УРАНТӨГС",
   "qpayMerchant": "—"
 };
 
@@ -2043,8 +2040,13 @@ function downloadUpdatedHtml(){
   // ── BANK_INFO ──
   const bankInfoStr = 'const DEFAULT_BANK_INFO = ' + JSON.stringify(BANK_INFO, null, 2) + ';';
 
+  // ── HERO TITLE + SUBTITLE ──
+  const heroTitleStr = 'const DEFAULT_HERO_TITLE = ' + JSON.stringify(HERO_TITLE) + ';';
+  const heroSubStr   = 'const DEFAULT_HERO_SUBTITLE = ' + JSON.stringify(HERO_SUBTITLE) + ';';
+
   // ── NEXT_CAT_ID ──
-  const nextCatIdStr = 'NEXT_CAT_ID = ' + NEXT_CAT_ID + ';';
+  // loadData()-ийн default дотор "nextCatId: N" гэж байгааг солино
+  const nextCatIdStr = 'nextCatId: ' + NEXT_CAT_ID + '}';
 
   // ── Replace: DEFAULT_MOVIES ──
   // MOVIES-г шинэ утгаар солих — marker ашиглана
@@ -2070,6 +2072,10 @@ function downloadUpdatedHtml(){
   // ── Replace: DEFAULT_BANK_INFO ──
   html = html.replace(/const DEFAULT_BANK_INFO = \{[\s\S]*?\};/, bankInfoStr);
 
+  // ── Replace: HERO TITLE + SUBTITLE ──
+  html = html.replace(/const DEFAULT_HERO_TITLE = "[^"]*";/, heroTitleStr);
+  html = html.replace(/const DEFAULT_HERO_SUBTITLE = "[^"]*";/, heroSubStr);
+
   // ── TAB_COVER_POS + TAB_COVERS ──
   const _posKeys = ['var DEFAULT_TAB_COVER_POS', 'const DEFAULT_TAB_COVER_POS'];
   for(const pk of _posKeys){
@@ -2087,8 +2093,8 @@ function downloadUpdatedHtml(){
   // ── Replace: DEFAULT_GROUP_PRICES ──
   html = html.replace(/const DEFAULT_GROUP_PRICES = \{[\s\S]*?\};/, groupPricesStr);
 
-  // ── Replace: NEXT_CAT_ID ──
-  html = html.replace(/NEXT_CAT_ID = \d+;/, nextCatIdStr);
+  // ── Replace: NEXT_CAT_ID (loadData default дотор) ──
+  html = html.replace(/nextCatId:\s*\d+\}/, nextCatIdStr);
 
   // DOCTYPE нэмэх (outerHTML-д байхгүй)
   html = '<!DOCTYPE html>\n' + html;
@@ -2232,9 +2238,110 @@ function saveBankInfo(){
   BANK_INFO.bankName      = document.getElementById('bank-name').value.trim();
   BANK_INFO.accountNumber = document.getElementById('bank-account-number').value.trim();
   BANK_INFO.accountHolder = document.getElementById('bank-account-holder').value.trim();
-  BANK_INFO.qpayMerchant  = document.getElementById('qpay-merchant').value.trim();
   localStorage.setItem('toorxon_bank_info', JSON.stringify(BANK_INFO));
   showToast('Банкны мэдээлэл хадгалагдлаа');
+}
+
+// ══════════════════════════════════════════
+// QPAY MERCHANT СИСТЕМ
+// ══════════════════════════════════════════
+function renderQpayMerchants(){
+  const container = document.getElementById('qpay-merchant-list');
+  if(!container) return;
+  if(!CF_CONFIG.qpayMerchants) CF_CONFIG.qpayMerchants = [];
+
+  if(CF_CONFIG.qpayMerchants.length === 0){
+    container.innerHTML = '<p class="cf-hint" style="padding:10px 0;">QPay merchant байхгүй. "➕ QPay Merchant нэмэх" дарна уу.</p>';
+    return;
+  }
+
+  container.innerHTML = CF_CONFIG.qpayMerchants.map((q, idx)=>`
+    <div class="token-row" style="margin-bottom:10px;">
+      <div class="token-row-header">
+        <span class="token-row-name">${q.active ? '🟢' : '⚪'} ${q.name || 'Нэргүй merchant'}</span>
+        <div style="display:flex;gap:5px;">
+          <button class="btn-sm btn-edit" onclick="editQpayMerchant(${idx})">✏</button>
+          <button class="btn-sm btn-danger" onclick="deleteQpayMerchant(${idx})">🗑</button>
+        </div>
+      </div>
+      <div class="token-row-fields" id="qpay-edit-${idx}" style="display:none;padding:0 12px 10px;">
+        <label style="font-size:10px;">Нэр (танихад)</label>
+        <input type="text" id="qpay-name-${idx}" value="${(q.name||'').replace(/"/g,'&quot;')}" placeholder="Жишээ: Open Zone QPay">
+        <label style="font-size:10px;">Username</label>
+        <input type="text" id="qpay-username-${idx}" value="${(q.username||'').replace(/"/g,'&quot;')}" placeholder="QPay username">
+        <label style="font-size:10px;">Password</label>
+        <input type="password" id="qpay-password-${idx}" value="${(q.password||'').replace(/"/g,'&quot;')}" placeholder="QPay password">
+        <label style="font-size:10px;">Invoice Code</label>
+        <input type="text" id="qpay-invoice-${idx}" value="${(q.invoiceCode||'').replace(/"/g,'&quot;')}" placeholder="TEST_INVOICE">
+        <label style="font-size:10px;">Merchant ID (заавал биш)</label>
+        <input type="text" id="qpay-mid-${idx}" value="${(q.merchantId||'').replace(/"/g,'&quot;')}" placeholder="Merchant ID">
+        <label style="display:flex;align-items:center;gap:8px;margin-top:10px;cursor:pointer;">
+          <input type="checkbox" id="qpay-active-${idx}" ${q.active?'checked':''} style="width:16px;height:16px;margin:0;">
+          <span style="font-size:11px;color:#fff;">Идэвхтэй (энэ merchant ашиглах)</span>
+        </label>
+        <div style="display:flex;gap:6px;margin-top:10px;">
+          <button class="btn-sm btn-edit" onclick="saveQpayMerchant(${idx})">💾 Хадгалах</button>
+          <button class="btn-sm" style="background:var(--ad-card2);color:var(--ad-muted);border:1px solid var(--ad-border);" onclick="cancelEditQpay(${idx})">Цуцлах</button>
+        </div>
+      </div>
+      <div class="token-row-preview" id="qpay-preview-${idx}" style="padding:0 12px 10px;">
+        <span style="font-size:10px;color:var(--ad-muted);font-family:monospace;">${q.username ? q.username + ' · ' + (q.invoiceCode||'invoice') : '— тохиргоо дутуу —'}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addNewQpayMerchant(){
+  if(!CF_CONFIG.qpayMerchants) CF_CONFIG.qpayMerchants = [];
+  const isFirst = CF_CONFIG.qpayMerchants.length === 0;
+  CF_CONFIG.qpayMerchants.push({name:'', username:'', password:'', invoiceCode:'', merchantId:'', active: isFirst});
+  saveCfConfigToStorage(CF_CONFIG);
+  renderQpayMerchants();
+  const idx = CF_CONFIG.qpayMerchants.length - 1;
+  setTimeout(()=>editQpayMerchant(idx), 50);
+}
+
+function editQpayMerchant(idx){
+  const editEl = document.getElementById(`qpay-edit-${idx}`);
+  const prevEl = document.getElementById(`qpay-preview-${idx}`);
+  if(editEl) editEl.style.display = '';
+  if(prevEl) prevEl.style.display = 'none';
+}
+
+function cancelEditQpay(idx){
+  const editEl = document.getElementById(`qpay-edit-${idx}`);
+  const prevEl = document.getElementById(`qpay-preview-${idx}`);
+  if(editEl) editEl.style.display = 'none';
+  if(prevEl) prevEl.style.display = '';
+}
+
+function saveQpayMerchant(idx){
+  const name     = document.getElementById(`qpay-name-${idx}`).value.trim();
+  const username = document.getElementById(`qpay-username-${idx}`).value.trim();
+  const password = document.getElementById(`qpay-password-${idx}`).value.trim();
+  const invoice  = document.getElementById(`qpay-invoice-${idx}`).value.trim();
+  const mid      = document.getElementById(`qpay-mid-${idx}`).value.trim();
+  const active   = document.getElementById(`qpay-active-${idx}`).checked;
+
+  if(!name){ showError('Merchant нэр оруулна уу'); return; }
+  if(!username || !password){ showError('Username, password оруулна уу'); return; }
+
+  if(active){
+    CF_CONFIG.qpayMerchants.forEach(q => q.active = false);
+  }
+  CF_CONFIG.qpayMerchants[idx] = {name, username, password, invoiceCode: invoice, merchantId: mid, active};
+  saveCfConfigToStorage(CF_CONFIG);
+  renderQpayMerchants();
+  showToast(`"${name}" QPay хадгалагдлаа`);
+}
+
+function deleteQpayMerchant(idx){
+  const q = CF_CONFIG.qpayMerchants[idx];
+  if(!confirm(`"${q.name||'энэ'}" QPay merchant устгах уу?`)) return;
+  CF_CONFIG.qpayMerchants.splice(idx, 1);
+  saveCfConfigToStorage(CF_CONFIG);
+  renderQpayMerchants();
+  showToast('QPay merchant устгагдлаа');
 }
 
 // ══ ACCORDION TOGGLE ══
@@ -2491,6 +2598,8 @@ async function pushAllCfConfig(){
     groupLinks:    CF_CONFIG.groupLinks,
     promptChat:    CF_CONFIG.promptChat,
     promptVision:  CF_CONFIG.promptVision,
+    qpayMerchants: CF_CONFIG.qpayMerchants || [],
+    bankInfo:      BANK_INFO,
   };
 
   try{
@@ -2782,7 +2891,6 @@ function exportSystemBackup(){
   sections.push('Банк: ' + (BANK_INFO.bankName || '—'));
   sections.push('Дансны дугаар: ' + (BANK_INFO.accountNumber || '—'));
   sections.push('Эзэмшигч: ' + (BANK_INFO.accountHolder || '—'));
-  sections.push('QPay Merchant: ' + (BANK_INFO.qpayMerchant || '—'));
 
   sections.push('\n══ 5. FACEBOOK PAGE TOKEN-УУД ══');
   if(CF_CONFIG.pageTokens){
@@ -2838,6 +2946,9 @@ function exportSystemBackup(){
   sections.push('\n══ 13. ГРУПП ҮНЭ (JSON) ══');
   sections.push(JSON.stringify(GROUP_PRICES, null, 2));
 
+  sections.push('\n══ 14. QPAY MERCHANT (JSON) ══');
+  sections.push(JSON.stringify(CF_CONFIG.qpayMerchants || [], null, 2));
+
   sections.push('\n════════════════════════════════════════');
   sections.push('BACKUP ДУУСАВ');
   sections.push('════════════════════════════════════════');
@@ -2876,7 +2987,6 @@ function importSystemBackup(input){
     const bankName      = extract('Банк');
     const accountNumber = extract('Дансны дугаар');
     const accountHolder = extract('Эзэмшигч');
-    const qpayMerchant  = extract('QPay Merchant');
 
     if(workerUrl)     { CF_CONFIG.workerUrl = workerUrl; document.getElementById('cf-worker-url').value = workerUrl; }
     if(refreshSecret) { CF_CONFIG.refreshSecret = refreshSecret; document.getElementById('cf-refresh-secret').value = refreshSecret; }
@@ -2884,7 +2994,6 @@ function importSystemBackup(input){
     if(bankName)      { BANK_INFO.bankName = bankName; document.getElementById('bank-name').value = bankName; }
     if(accountNumber) { BANK_INFO.accountNumber = accountNumber; document.getElementById('bank-account-number').value = accountNumber; }
     if(accountHolder) { BANK_INFO.accountHolder = accountHolder; document.getElementById('bank-account-holder').value = accountHolder; }
-    if(qpayMerchant)  { BANK_INFO.qpayMerchant = qpayMerchant; document.getElementById('qpay-merchant').value = qpayMerchant; }
 
     // Worker JS скрипт
     const wjsMatch = text.match(/══ 10\. CLOUDFLARE WORKER JS СКРИПТ ══\n([\s\S]*?)\n══ 11\./);
@@ -2900,10 +3009,61 @@ function importSystemBackup(input){
     const visionMatch = text.match(/══ 9\. ГҮЙЛГЭЭ\/ЗУРАГ ПРОМПТ ══\n([\s\S]*?)\n══ 10\./);
     if(visionMatch){ CF_CONFIG.promptVision = visionMatch[1].trim(); document.getElementById('cf-prompt-vision').value = CF_CONFIG.promptVision; }
 
+    // ── КИНО ЛИНКҮҮД сэргээх (6-р хэсэг) ──
+    const movieLinksMatch = text.match(/══ 6\. КИНО ЛИНКҮҮД ══\n([\s\S]*?)\n══ 7\./);
+    if(movieLinksMatch){
+      if(!CF_CONFIG.movieLinks) CF_CONFIG.movieLinks = {};
+      const lines = movieLinksMatch[1].split('\n');
+      lines.forEach(line=>{
+        // Формат: "M11 (Кино нэр): https://..." эсвэл "M11: https://..."
+        const m = line.match(/^(M\d+)[^:]*:\s*(https?:\/\/\S+)/);
+        if(m){ CF_CONFIG.movieLinks[m[1]] = m[2].trim(); }
+      });
+    }
+
+    // ── ГРУПП ЛИНКҮҮД сэргээх (7-р хэсэг) ──
+    const groupLinksMatch = text.match(/══ 7\. ГРУПП ЛИНКҮҮД ══\n([\s\S]*?)\n══ 8\./);
+    if(groupLinksMatch){
+      if(!CF_CONFIG.groupLinks) CF_CONFIG.groupLinks = {};
+      const lines = groupLinksMatch[1].split('\n');
+      lines.forEach(line=>{
+        // Формат: "AI DRAMA: https://..." эсвэл "БҮХ VIP: https://..."
+        const m = line.match(/^(.+?):\s*(https?:\/\/.+)$/);
+        if(m){
+          const label = m[1].trim();
+          const link = m[2].trim();
+          // Категори нэрээр cat_N олох
+          const cat = CATEGORIES.find(c=>c.name===label);
+          if(cat){
+            CF_CONFIG.groupLinks['cat_'+cat.id] = link;
+          } else if(label === 'БҮХ VIP' || label.toLowerCase()==='all'){
+            CF_CONFIG.groupLinks.all = link;
+          }
+        }
+      });
+    }
+
+    // ── QPAY MERCHANT сэргээх (14-р хэсэг) ──
+    const qpayMatch = text.match(/══ 14\. QPAY MERCHANT \(JSON\) ══\n([\s\S]*?)\n══/);
+    if(qpayMatch){
+      try {
+        const qpayJson = qpayMatch[1].trim();
+        if(qpayJson.startsWith('[')){
+          CF_CONFIG.qpayMerchants = JSON.parse(qpayJson);
+        }
+      } catch(e){}
+    }
+
     // Хадгалах
     saveCfConfigToStorage(CF_CONFIG);
     localStorage.setItem('toorxon_bank_info', JSON.stringify(BANK_INFO));
 
+    // UI шинэчлэх
+    if(typeof renderMovieLinkList === 'function') renderMovieLinkList();
+    if(typeof renderQpayMerchants === 'function') renderQpayMerchants();
+
+    const statusEl = document.getElementById('backup-import-status');
+    if(statusEl) statusEl.textContent = '✅ Backup амжилттай уншигдлаа — "☁ ШИНЭЧЛЭХ" дарна уу';
     showToast('Backup-аас амжилттай сэргэлээ — шалгаад "☁ Шинэчлэх" дарна уу');
   };
   reader.readAsText(file);
@@ -2959,7 +3119,7 @@ window.addEventListener('DOMContentLoaded', function(){
     document.getElementById('bank-name').value           = BANK_INFO.bankName || '';
     document.getElementById('bank-account-number').value = BANK_INFO.accountNumber || '';
     document.getElementById('bank-account-holder').value = BANK_INFO.accountHolder || '';
-    document.getElementById('qpay-merchant').value        = BANK_INFO.qpayMerchant || '';
+    renderQpayMerchants();
     renderLinkTabRow();
     renderMovieLinkList();
     renderPageTokenList();
@@ -2975,15 +3135,15 @@ window.addEventListener('DOMContentLoaded', function(){
   <div class="modal-box">
     <div class="modal-top">
       <button class="modal-nav-btn" onclick="closeModal()">←</button>
-      <span class="modal-title" id="modalTitle">Групп худалдан авах</span>
+      <span class="modal-title" id="modalTitle">Кино авах</span>
       <button class="modal-nav-btn" onclick="closeModal()">✕</button>
     </div>
 
     <div class="modal-trailer" id="modalTrailer"></div>
 
     <div class="modal-body">
-      <p class="modal-movie-name" id="modalMovieName">+18 ГРУПП</p>
-      <p class="modal-price" id="modalPrice">150 ₮ / 3 сар</p>
+      <p class="modal-movie-name" id="modalMovieName">АЛТАН НҮДЭТ ХҮҮ</p>
+      <p class="modal-price" id="modalPrice">15 ₮</p>
 
       <!-- УРАМШУУЛЛЫН СЕКЦ: кино тус бүрийн promo11 талбараас тодорхойлогдоно -->
       <div id="section-11" style="margin-bottom: 14px; display: none;">
@@ -3032,12 +3192,12 @@ window.addEventListener('DOMContentLoaded', function(){
 
       <!-- TOGGLE BUTTONS -->
       <div class="pay-row">
-        <button class="pay-btn" id="btnQpay" onclick="selectPay('qpay')">QPay төлөх</button>
+        <button class="pay-btn active" id="btnQpay" onclick="selectPay('qpay')">QPay төлөх</button>
         <button class="pay-btn" id="btnAcct" onclick="selectPay('acct')">Дансаар төлөх</button>
       </div>
 
       <!-- QPAY PANEL -->
-      <div class="pay-panel" id="panelQpay">
+      <div class="pay-panel open" id="panelQpay">
         <p style="font-size:12px;color:var(--muted);">QPay-ээр төлөхдөө банкны аппаараа доорх QR/линкийг уншуулна уу:</p>
         <div class="qpay-bank-list">
           <div class="qpay-bank" onclick="alert('Khan Bank QPay (placeholder)')"><div class="qpay-bank-icon">🏦</div><div class="qpay-bank-name">Khan Bank</div></div>
@@ -3057,14 +3217,14 @@ window.addEventListener('DOMContentLoaded', function(){
         <div class="acct-row">
           <div class="acct-info-box">
             <p class="acct-label">Дансны дугаар (Хаан Банк)</p>
-            <p class="acct-val" id="acctNumber">5309433188</p>
+            <p class="acct-val" id="acctNumber">5250643868</p>
           </div>
           <button class="acct-copy" id="copyAcctBtn" onclick="copyText('acctNumber','copyAcctBtn')">📋</button>
         </div>
         <div class="acct-row">
           <div class="acct-info-box">
             <p class="acct-label">Гүйлгээний утга — Үүнийг хуулна уу</p>
-            <p class="acct-val" id="txnCode">ERO1-GRP-M4JYUJV5</p>
+            <p class="acct-val" id="txnCode">AI1-M11-D6Z05D4M</p>
           </div>
           <button class="acct-copy" id="copyTxnBtn" onclick="copyText('txnCode','copyTxnBtn')">📋</button>
         </div>
@@ -3125,7 +3285,7 @@ window.addEventListener('DOMContentLoaded', function(){
     <input type="text" id="f-trailer" placeholder="https://...">
 
     <label>Аль таб руу орох</label>
-    <div class="tab-select" id="tab-select"><div class="tab-opt active" data-cat="0" onclick="selectTab(0,this)">AI DRAMA</div><div class="tab-opt" data-cat="1" onclick="selectTab(1,this)">ACTION</div><div class="tab-opt" data-cat="2" onclick="selectTab(2,this)">ЭРОЧИК</div></div>
+    <div class="tab-select" id="tab-select"><div class="tab-opt active" data-cat="0" onclick="selectTab(0,this)">AI DRAMA</div><div class="tab-opt" data-cat="1" onclick="selectTab(1,this)">ACTION</div><div class="tab-opt" data-cat="2" onclick="selectTab(2,this)">+18 EROTIC</div></div>
 
     <label>Үнийн дүн</label>
     <input type="text" id="f-price" placeholder="Жишээ: 5,000 ₮" oninput="onPriceInput(this)" onblur="onPriceBlur(this)">
@@ -3149,12 +3309,12 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
 
   <!-- MOVIE LIST — CATEGORIES-аас dynamic tab -->
-  <p class="sec-title">🎬 Кино жагсаалт <span style="color:var(--muted);font-size:11px;font-weight:400;text-transform:none;letter-spacing:0;" id="movieCount">(15)</span></p>
+  <p class="sec-title">🎬 Кино жагсаалт <span style="color:var(--muted);font-size:11px;font-weight:400;text-transform:none;letter-spacing:0;" id="movieCount">(10)</span></p>
 
   <!-- Tab buttons — JS render -->
-  <div style="display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;" id="mltab-row"><button id="mltab-0" onclick="setMovieListTab(0)" style="flex: 1 0 0%; min-width: 90px; padding: 8px 4px; border-radius: 8px; border-color: var(--border2); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--card2); color: var(--muted); font-size: 11px; font-weight: 700; font-family: &quot;Times New Roman&quot;, Times, serif; cursor: pointer;">AI DRAMA</button><button id="mltab-1" onclick="setMovieListTab(1)" style="flex: 1 0 0%; min-width: 90px; padding: 8px 4px; border-radius: 8px; border-color: var(--border2); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: var(--card2); color: var(--muted); font-size: 11px; font-weight: 700; font-family: &quot;Times New Roman&quot;, Times, serif; cursor: pointer;">ACTION</button><button id="mltab-2" onclick="setMovieListTab(2)" style="flex: 1 0 0%; min-width: 90px; padding: 8px 4px; border-radius: 8px; border-color: var(--accent2); border-top-style: ; border-top-width: ; border-right-style: ; border-right-width: ; border-bottom-style: ; border-bottom-width: ; border-left-style: ; border-left-width: ; border-image-source: ; border-image-slice: ; border-image-width: ; border-image-outset: ; border-image-repeat: ; background: linear-gradient(135deg,var(--accent),var(--accent2)); color: rgb(255, 255, 255); font-size: 11px; font-weight: 700; font-family: &quot;Times New Roman&quot;, Times, serif; cursor: pointer;">ЭРОЧИК</button></div>
+  <div style="display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;" id="mltab-row"><button id="mltab-0" onclick="setMovieListTab(0)" style="flex:1;flex-shrink:0;min-width:90px;padding:8px 4px;border-radius:8px;border:1.5px solid var(--accent2);background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">AI DRAMA</button><button id="mltab-1" onclick="setMovieListTab(1)" style="flex:1;flex-shrink:0;min-width:90px;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border2);background:var(--card2);color:var(--muted);font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">ACTION</button><button id="mltab-2" onclick="setMovieListTab(2)" style="flex:1;flex-shrink:0;min-width:90px;padding:8px 4px;border-radius:8px;border:1.5px solid var(--border2);background:var(--card2);color:var(--muted);font-size:11px;font-weight:700;font-family:'Times New Roman',Times,serif;cursor:pointer;">+18 EROTIC</button></div>
 
-  <div id="movieList-container"><div id="movieList-0" style="display: none;"></div><div id="movieList-1" style="display: none;"></div><div id="movieList-2" style=""></div></div>
+  <div id="movieList-container"><div id="movieList-0" style="display:;"></div><div id="movieList-1" style="display:none;"></div><div id="movieList-2" style="display:none;"></div></div>
 </div>
 
 <!-- ══ БУСАД ТОХИРГОО ══ -->
@@ -3181,7 +3341,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <p style="font-size:10px;color:var(--muted);margin-bottom:6px;">👆 Зургийг чирж байрлуулна уу &nbsp;·&nbsp; 🔍 Слайдер: томруулах / багасгах</p>
       <!-- Preview container -->
       <div id="cover-preview-box" style="width: 100%; height: 160px; border-radius: 10px; overflow: hidden; background: rgb(17, 17, 17); position: relative; cursor: grab; touch-action: none; user-select: none; border: 2px solid var(--accent2);">
-        <img id="cover-preview-img" style="position: absolute; transform-origin: center center; pointer-events: none; opacity: 0.85; width: 0px; height: 0px; left: 0px; top: 0px;" src="https://drive.google.com/thumbnail?id=1hmVacMoedAUMRdnprgd-ajPTeMCbnKbo&amp;sz=w1000" alt="" draggable="false">
+        <img id="cover-preview-img" style="position: absolute; transform-origin: center center; pointer-events: none; opacity: 0.85; width: 0px; height: 0px; left: 0px; top: 0px;" src="https://drive.google.com/thumbnail?id=1Rj4yl2WbEK2CUvZa7WNmK9O3nbwm38t4&amp;sz=w1000" alt="" draggable="false">
         <!-- Grid overlay -->
         <div style="position:absolute;inset:0;pointer-events:none;
           background:linear-gradient(rgba(255,56,96,.15) 1px,transparent 1px) 0 0/33.3% 33.3%,
@@ -3234,7 +3394,7 @@ window.addEventListener('DOMContentLoaded', function(){
         <button class="btn btn-green" style="grid-column:span 2;" onclick="saveCategoryName(0)">💾 Нэр хадгалах</button>
       </div>
 
-      <p class="price-row-current" id="cur-0">110 ₮ / 3 сар</p>
+      <p class="price-row-current" id="cur-0">13,000 ₮ / 3 сар</p>
 
       <!-- ҮНЭ ЗАСВАРЛАХ -->
       <div class="price-edit-fields" id="edit-0">
@@ -3258,7 +3418,7 @@ window.addEventListener('DOMContentLoaded', function(){
         <button class="btn btn-green" style="grid-column:span 2;" onclick="saveCategoryName(1)">💾 Нэр хадгалах</button>
       </div>
 
-      <p class="price-row-current" id="cur-1">135 ₮ / 3 сар</p>
+      <p class="price-row-current" id="cur-1">13,500 ₮ / 3 сар</p>
 
       <!-- ҮНЭ ЗАСВАРЛАХ -->
       <div class="price-edit-fields" id="edit-1">
@@ -3269,7 +3429,7 @@ window.addEventListener('DOMContentLoaded', function(){
     </div>
     <div class="price-row">
       <div class="price-row-top">
-        <span class="price-row-label" id="catlabel-2">ЭРОЧИК ГРУПП</span>
+        <span class="price-row-label" id="catlabel-2">+18 EROTIC ГРУПП</span>
         <div style="display:flex;gap:6px;">
           <button class="btn-sm btn-edit" onclick="toggleRenameCategory(2)">✏ Нэр</button>
           <button class="btn-sm btn-edit" onclick="toggleEdit(2)">💰 Үнэ</button>
@@ -3278,17 +3438,17 @@ window.addEventListener('DOMContentLoaded', function(){
 
       <!-- НЭР ЗАСВАРЛАХ -->
       <div class="price-edit-fields" id="rename-2">
-        <input type="text" id="catname-input-2" value="ЭРОЧИК" placeholder="Жишээ: AI DRAMA" style="grid-column:span 2;">
+        <input type="text" id="catname-input-2" value="+18 EROTIC" placeholder="Жишээ: AI DRAMA" style="grid-column:span 2;">
         <button class="btn btn-green" style="grid-column:span 2;" onclick="saveCategoryName(2)">💾 Нэр хадгалах</button>
       </div>
 
-      <p class="price-row-current" id="cur-2">150 ₮ / 3 сар</p>
+      <p class="price-row-current" id="cur-2">15,000 ₮ / 3 сар</p>
 
       <!-- ҮНЭ ЗАСВАРЛАХ -->
       <div class="price-edit-fields" id="edit-2">
         <input type="text" id="price-2" placeholder="13,000 ₮">
         <input type="text" id="period-2" placeholder="3 сар">
-        <button class="btn btn-green" style="grid-column:span 2;" onclick="savePrice(2,'ЭРОЧИК ГРУПП')">💾 Хадгалах</button>
+        <button class="btn btn-green" style="grid-column:span 2;" onclick="savePrice(2,'+18 EROTIC ГРУПП')">💾 Хадгалах</button>
       </div>
     </div></div>
 
@@ -3300,7 +3460,7 @@ window.addEventListener('DOMContentLoaded', function(){
         <span class="price-row-label">БҮХ VIP ГРУПП</span>
         <button class="btn-sm btn-edit" onclick="toggleEdit('all')">✏ Засах</button>
       </div>
-      <p class="price-row-current" id="cur-all">250 ₮ / 3 сар</p>
+      <p class="price-row-current" id="cur-all">25,000 ₮ / 3 сар</p>
       <div class="price-edit-fields" id="edit-all">
         <input type="text" id="price-all" placeholder="25,000 ₮" oninput="onPriceInput(this)" onblur="onPriceBlur(this)">
         <input type="text" id="period-all" placeholder="3 сар">
@@ -3336,16 +3496,16 @@ window.addEventListener('DOMContentLoaded', function(){
   <!-- ══ САБ-TAB СЭЛГҮҮР ══ -->
   <div class="section" style="padding-bottom:0;">
     <div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
-      <button id="cftab-a" onclick="setCfTab('a')" class="cf-subtab" style="flex-shrink:0;">🔑 A. Credential</button>
+      <button id="cftab-a" onclick="setCfTab('a')" class="cf-subtab active" style="flex-shrink:0;">🔑 A. Credential</button>
       <button id="cftab-b" onclick="setCfTab('b')" class="cf-subtab" style="flex-shrink:0;">🎬 B. Кино линк</button>
       <button id="cftab-c" onclick="setCfTab('c')" class="cf-subtab" style="flex-shrink:0;">💬 C. Харилцаа</button>
       <button id="cftab-d" onclick="setCfTab('d')" class="cf-subtab" style="flex-shrink:0;">🧾 D. Гүйлгээ/Зураг</button>
-      <button id="cftab-e" onclick="setCfTab('e')" class="cf-subtab active" style="flex-shrink:0;">🩺 E. Алдаа шалгах</button>
+      <button id="cftab-e" onclick="setCfTab('e')" class="cf-subtab" style="flex-shrink:0;">🩺 E. Алдаа шалгах</button>
     </div>
   </div>
 
   <!-- ══ A. CREDENTIAL САН ══ -->
-  <div id="cfpanel-a" class="cf-panel" style="display: none;">
+  <div id="cfpanel-a" class="cf-panel" style="">
     <div class="section">
 
       <!-- ══ ACCORDION: ДАНС/QPAY ══ -->
@@ -3353,7 +3513,7 @@ window.addEventListener('DOMContentLoaded', function(){
         <button class="cf-accordion-btn" onclick="toggleAccordion('acc-bank')">
           🏦 Хүлээн авагчийн данс / QPay <span class="cf-acc-arrow" id="arr-acc-bank">▼</span>
         </button>
-        <div class="cf-accordion-body" id="acc-bank">
+        <div class="cf-accordion-body" id="acc-bank" style="display: none;">
           <div class="info-box">⚙ Энд оруулсан данс/QPay мэдээлэл "Худалдан авах" modal дотор шууд харагдана. Солигдоход "Файл татах" хийгээрэй.</div>
           <label>Банкны нэр</label>
           <input type="text" id="bank-name" placeholder="Жишээ: Хаан Банк">
@@ -3361,10 +3521,55 @@ window.addEventListener('DOMContentLoaded', function(){
           <input type="text" id="bank-account-number" placeholder="5XXXXXXXXXXXXXXXXX">
           <label>Данс эзэмшигчийн нэр</label>
           <input type="text" id="bank-account-holder" placeholder="ОВОГ НЭР">
-          <div class="cf-divider">QPay (удахгүй)</div>
-          <label>QPay Merchant ID</label>
-          <input type="text" id="qpay-merchant" placeholder="QPay холбогдсоны дараа бөглөнө">
-          <button class="btn btn-green" onclick="saveBankInfo()" style="margin-top:12px;">💾 Данс/QPay хадгалах</button>
+          <button class="btn btn-green" onclick="saveBankInfo()" style="margin-top:12px;">💾 Данс хадгалах</button>
+        </div>
+      </div>
+
+      <!-- ══ ACCORDION: QPAY MERCHANT-ууд ══ -->
+      <div class="cf-accordion">
+        <button class="cf-accordion-btn" onclick="toggleAccordion('acc-qpay')">
+          💳 QPay Merchant <span class="cf-acc-arrow" id="arr-acc-qpay">▲</span>
+        </button>
+        <div class="cf-accordion-body" id="acc-qpay" style="">
+          <div class="info-box">⚙ QPay merchant мэдээллийг оруулснаар хэрэглэгчид QR кодоор автомат төлбөр төлж, систем автоматаар баталгаажуулна. Олон merchant нэмж, идэвхтэйг сонгоно.</div>
+          <div id="qpay-merchant-list">
+    <div class="token-row" style="margin-bottom:10px;">
+      <div class="token-row-header">
+        <span class="token-row-name">🟢 Тагтаа qpay</span>
+        <div style="display:flex;gap:5px;">
+          <button class="btn-sm btn-edit" onclick="editQpayMerchant(0)">✏</button>
+          <button class="btn-sm btn-danger" onclick="deleteQpayMerchant(0)">🗑</button>
+        </div>
+      </div>
+      <div class="token-row-fields" id="qpay-edit-0" style="display:none;padding:0 12px 10px;">
+        <label style="font-size:10px;">Нэр (танихад)</label>
+        <input type="text" id="qpay-name-0" value="Тагтаа qpay" placeholder="Жишээ: Open Zone QPay">
+        <label style="font-size:10px;">Username</label>
+        <input type="text" id="qpay-username-0" value="KINO_UZVER" placeholder="QPay username">
+        <label style="font-size:10px;">Password</label>
+        <input type="password" id="qpay-password-0" value="R7ag1GLm" placeholder="QPay password">
+        <label style="font-size:10px;">Invoice Code</label>
+        <input type="text" id="qpay-invoice-0" value="R7ag1GLm" placeholder="TEST_INVOICE">
+        <label style="font-size:10px;">Merchant ID (заавал биш)</label>
+        <input type="text" id="qpay-mid-0" value="" placeholder="Merchant ID">
+        <label style="display:flex;align-items:center;gap:8px;margin-top:10px;cursor:pointer;">
+          <input type="checkbox" id="qpay-active-0" checked="" style="width:16px;height:16px;margin:0;">
+          <span style="font-size:11px;color:#fff;">Идэвхтэй (энэ merchant ашиглах)</span>
+        </label>
+        <div style="display:flex;gap:6px;margin-top:10px;">
+          <button class="btn-sm btn-edit" onclick="saveQpayMerchant(0)">💾 Хадгалах</button>
+          <button class="btn-sm" style="background:var(--ad-card2);color:var(--ad-muted);border:1px solid var(--ad-border);" onclick="cancelEditQpay(0)">Цуцлах</button>
+        </div>
+      </div>
+      <div class="token-row-preview" id="qpay-preview-0" style="padding:0 12px 10px;">
+        <span style="font-size:10px;color:var(--ad-muted);font-family:monospace;">KINO_UZVER · R7ag1GLm</span>
+      </div>
+    </div>
+  </div>
+          <button class="btn-sm btn-edit" onclick="addNewQpayMerchant()" style="margin-top:10px;width:100%;justify-content:center;">
+            ➕ QPay Merchant нэмэх
+          </button>
+          <p class="cf-hint" style="margin-top:8px;">QPay-аас авах: username, password, invoice_code, merchant_id</p>
         </div>
       </div>
 
@@ -3396,37 +3601,37 @@ window.addEventListener('DOMContentLoaded', function(){
           <div id="page-token-list">
     <div style="display:flex;gap:5px;overflow-x:auto;margin-bottom:12px;-webkit-overflow-scrolling:touch;">
       
-    <button class="cf-subtab" style="flex-shrink:0;" onclick="setTokenTab(0)">AI DRAMA</button>
+    <button class="cf-subtab active" style="flex-shrink:0;" onclick="setTokenTab(0)">AI DRAMA</button>
   
     <button class="cf-subtab" style="flex-shrink:0;" onclick="setTokenTab(1)">ACTION</button>
   
-    <button class="cf-subtab active" style="flex-shrink:0;" onclick="setTokenTab(2)">ЭРОЧИК</button>
+    <button class="cf-subtab" style="flex-shrink:0;" onclick="setTokenTab(2)">+18 EROTIC</button>
   
     </div>
     <div id="token-page-list">
-    <div class="token-row" id="token-row-2-0">
+    <div class="token-row" id="token-row-0-0">
       <div class="token-row-header">
-        <span class="token-row-name" id="token-name-display-2-0">Open zone</span>
+        <span class="token-row-name" id="token-name-display-0-0">Open zone</span>
         <div style="display:flex;gap:5px;">
-          <button class="btn-sm btn-edit" onclick="editPageToken(2,0)">✏</button>
-          <button class="btn-sm btn-danger" onclick="confirmDeleteToken(2,0)">🗑</button>
+          <button class="btn-sm btn-edit" onclick="editPageToken(0,0)">✏</button>
+          <button class="btn-sm btn-danger" onclick="confirmDeleteToken(0,0)">🗑</button>
         </div>
       </div>
-      <div class="token-row-fields" id="token-edit-2-0" style="display:none;">
-        <input type="text" id="token-name-2-0" value="Open zone" placeholder="Пэйжийн нэр (жишээ: Open Zone AI Drama)">
-        <input type="password" id="token-val-2-0" value="EAAYlbc4COwEBR8JnZBimKv8L5i1l8eMFkFg8GeZAlwTKIAusJVpkpMZAtOJSc1mtZCG4HBvm3iB8EpdhHZCqzqetG6ZA4GOlEZBD6kb53pY2aoexOzNfG8ZCsLZCPdMxeKl21EPIfXsbctpVrZB2biOO4eSwY7mLmwLGZAZAyBdi9JKAHcdaT9lGGZAp9d5QJ39kPWfEZBKIWXChIFLgZDZD" placeholder="EAAxxxxxxxxxxxxx">
+      <div class="token-row-fields" id="token-edit-0-0" style="display:none;">
+        <input type="text" id="token-name-0-0" value="Open zone" placeholder="Пэйжийн нэр (жишээ: Open Zone AI Drama)">
+        <input type="password" id="token-val-0-0" value="EAAYlbc4COwEBR8JnZBimKv8L5i1l8eMFkFg8GeZAlwTKIAusJVpkpMZAtOJSc1mtZCG4HBvm3iB8EpdhHZCqzqetG6ZA4GOlEZBD6kb53pY2aoexOzNfG8ZCsLZCPdMxeKl21EPIfXsbctpVrZB2biOO4eSwY7mLmwLGZAZAyBdi9JKAHcdaT9lGGZAp9d5QJ39kPWfEZBKIWXChIFLgZDZD" placeholder="EAAxxxxxxxxxxxxx">
         <div style="display:flex;gap:6px;margin-top:4px;">
-          <button class="btn-sm btn-edit" onclick="savePageToken(2,0)">💾 Хадгалах</button>
-          <button class="btn-sm" style="background:var(--ad-card2);color:var(--ad-muted);border:1px solid var(--ad-border);" onclick="cancelEditToken(2,0)">Цуцлах</button>
+          <button class="btn-sm btn-edit" onclick="savePageToken(0,0)">💾 Хадгалах</button>
+          <button class="btn-sm" style="background:var(--ad-card2);color:var(--ad-muted);border:1px solid var(--ad-border);" onclick="cancelEditToken(0,0)">Цуцлах</button>
         </div>
       </div>
-      <div class="token-row-preview" id="token-preview-2-0">
+      <div class="token-row-preview" id="token-preview-0-0">
         <span style="font-size:10px;color:var(--ad-muted);font-family:monospace;">
           EAAYlbc4COwE••••••••••
         </span>
       </div>
     </div></div>
-    <button class="btn-sm btn-edit" onclick="addNewPageToken(2)" style="margin-top:10px;width:100%;justify-content:center;">
+    <button class="btn-sm btn-edit" onclick="addNewPageToken(0)" style="margin-top:10px;width:100%;justify-content:center;">
       ➕ Пэйж нэмэх
     </button>
   </div>
@@ -3454,34 +3659,26 @@ window.addEventListener('DOMContentLoaded', function(){
         </div>
 
         <!-- Таб тус бүрийн дотоод сэлгүүр -->
-        <div style="display:flex;gap:5px;overflow-x:auto;margin-bottom:14px;-webkit-overflow-scrolling:touch;" id="linktab-row"><button class="cf-subtab" style="flex-shrink:0;" onclick="setLinkTab(0)">AI DRAMA</button><button class="cf-subtab" style="flex-shrink:0;" onclick="setLinkTab(1)">ACTION</button><button class="cf-subtab active" style="flex-shrink:0;" onclick="setLinkTab(2)">ЭРОЧИК</button></div>
+        <div style="display:flex;gap:5px;overflow-x:auto;margin-bottom:14px;-webkit-overflow-scrolling:touch;" id="linktab-row"><button class="cf-subtab active" style="flex-shrink:0;" onclick="setLinkTab(0)">AI DRAMA</button><button class="cf-subtab" style="flex-shrink:0;" onclick="setLinkTab(1)">ACTION</button><button class="cf-subtab" style="flex-shrink:0;" onclick="setLinkTab(2)">+18 EROTIC</button></div>
 
         <div id="movie-link-container">
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">ЗОЖИГ ОХИН-1 <span style="color:var(--ad-muted);font-weight:400;">(M24)</span></p>
-        <input type="text" id="movielink-M24" value="https://mute-sun-2382.naraa333bb.workers.dev/" placeholder="https://... контент линк" style="margin-top:0;">
+        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">АЛТАН НҮДЭТ ХҮҮ <span style="color:var(--ad-muted);font-weight:400;">(M11)</span></p>
+        <input type="text" id="movielink-M11" value="" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">ЧӨЛӨӨТ ЯРИЛЦЛАГА <span style="color:var(--ad-muted);font-weight:400;">(M25)</span></p>
-        <input type="text" id="movielink-M25" value="https://odd-tooth-f6e9.naraa333bb.workers.dev/" placeholder="https://... контент линк" style="margin-top:0;">
+        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Номын Санч <span style="color:var(--ad-muted);font-weight:400;">(M02)</span></p>
+        <input type="text" id="movielink-M02" value="" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">НОМЫН САНЧ <span style="color:var(--ad-muted);font-weight:400;">(M23)</span></p>
-        <input type="text" id="movielink-M23" value="https://wild-voice-f381.naraa333bb.workers.dev/" placeholder="https://... контент линк" style="margin-top:0;">
+        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Өндөр Эмэгтэй <span style="color:var(--ad-muted);font-weight:400;">(M03)</span></p>
+        <input type="text" id="movielink-M03" value="" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
-      <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">ХҮҮХЭД АСРАГЧ <span style="color:var(--ad-muted);font-weight:400;">(M22)</span></p>
-        <input type="text" id="movielink-M22" value="https://solitary-base-fe06.naraa333bb.workers.dev/?fbclid=IwZXh0bgNhZW0CMTAAYnJpZBExNW1WUjF2R04wN1VQUlR3M3NydGMGYXBwX2lkEDIyMjAzOTE3ODgyMDA4OTIAAR4ubpR_H3h4q7_07WaLW16JlJuJPVrwh7VUx6JzpnSFsTNJB2Ro2KkrKXJTUA_aem_h7pFxXyRhnylPdlzYi00IQ" placeholder="https://... контент линк" style="margin-top:0;">
-      </div>
-      <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">ХОЙД ЭЭЖ <span style="color:var(--ad-muted);font-weight:400;">(M21)</span></p>
-        <input type="text" id="movielink-M21" value="https://delicate-night-01c5.naraa333bb.workers.dev/" placeholder="https://... контент линк" style="margin-top:0;">
-      </div>
-    <div class="cf-divider">"ЭРОЧИК" групп линк</div>
-    <input type="text" id="cf-link-grp-2" value="https://www.facebook.com/groups/1084450000435909/" placeholder="https://t.me/joinchat/... эсвэл fb групп линк">
+    <div class="cf-divider">"AI DRAMA" групп линк</div>
+    <input type="text" id="cf-link-grp-0" value="" placeholder="https://t.me/joinchat/... эсвэл fb групп линк">
 
     <div class="cf-divider">БҮХ VIP групп линк (бүх таб дунд нийтлэг)</div>
-    <input type="text" id="cf-link-grp-all" value="https://www.facebook.com/groups/934843989294547/  https://www.facebook.com/groups/1482374652823993/ https://www.facebook.com/groups/1084450000435909/" placeholder="https://...">
+    <input type="text" id="cf-link-grp-all" value="" placeholder="https://...">
 
     <button class="btn btn-primary" onclick="saveMovieLinks()" style="margin-top:14px;">💾 Линкүүд хадгалах (локал)</button>
 
@@ -3529,7 +3726,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
 
   <!-- ══ E. АЛДАА ШАЛГАХ + BACKUP ══ -->
-  <div id="cfpanel-e" class="cf-panel" style="">
+  <div id="cfpanel-e" class="cf-panel" style="display: none;">
     <div class="section">
       <p class="sec-title">🩺 Системийн алдаа шалгах</p>
       <div class="card">
@@ -3581,7 +3778,11 @@ window.addEventListener('DOMContentLoaded', function(){
         <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--ad-border);">
           <p style="font-size:11px;color:#fff;font-weight:700;margin-bottom:8px;">🔄 Backup-аас сэргээх</p>
           <p class="cf-hint" style="margin-bottom:8px;">Хадгалсан backup.txt файлыг сонгоход бүх мэдээлэл автоматаар орж ирнэ</p>
-          <input type="file" id="backup-import-file" accept=".txt" onchange="importSystemBackup(this)" style="font-size:11px;">
+          <input type="file" id="backup-import-file" accept=".txt" onchange="importSystemBackup(this)" style="display:none;">
+          <button class="btn btn-primary" onclick="document.getElementById('backup-import-file').click()" style="width:100%;">
+            📂 Backup файл сонгох (.txt)
+          </button>
+          <p id="backup-import-status" class="cf-hint" style="margin-top:6px;"></p>
         </div>
       </div>
     </div>
