@@ -734,7 +734,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1783889584108;
+const CATALOG_VERSION = 1783889682010;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -3663,7 +3663,17 @@ window.addEventListener('DOMContentLoaded', function(){
     <textarea id="patch-input" placeholder="{&quot;name&quot;:&quot;Жишээ засвар&quot;,&quot;old&quot;:&quot;хуучин код&quot;,&quot;new&quot;:&quot;шинэ код&quot;}" style="min-height:100px;font-family:monospace;font-size:11px;"></textarea>
     <button class="btn btn-primary" onclick="addPatch()" style="margin-top:8px;">➕ Оруулах</button>
     <p class="sec-title" style="margin-top:14px;font-size:11px;">Оруулсан засварууд:</p>
-    <div id="patch-list"><p class="cf-hint" style="padding:6px 0;">Оруулсан засвар байхгүй</p></div>
+    <div id="patch-list">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--ad-card2,#1a1a2e);border:1px solid var(--ad-border,#333);border-radius:6px;margin-bottom:5px;">
+      <span style="font-size:11px;color:#fff;">✅ 2026-07-12 20:35 — Version систем 1 — тамга</span>
+      <button class="btn-sm btn-danger" onclick="deletePatch(0)" style="padding:2px 8px;">🗑</button>
+    </div>
+  
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--ad-card2,#1a1a2e);border:1px solid var(--ad-border,#333);border-radius:6px;margin-bottom:5px;">
+      <span style="font-size:11px;color:#fff;">✅ 2026-07-12 20:36 — Version систем 2 — deploy тамга</span>
+      <button class="btn-sm btn-danger" onclick="deletePatch(1)" style="padding:2px 8px;">🗑</button>
+    </div>
+  </div>
   </div>
 </div>
 
@@ -3715,40 +3725,7 @@ window.addEventListener('DOMContentLoaded', function(){
         </button>
         <div class="cf-accordion-body" id="acc-qpay" style="">
           <div class="info-box">⚙ QPay merchant мэдээллийг оруулснаар хэрэглэгчид QR кодоор автомат төлбөр төлж, систем автоматаар баталгаажуулна. Олон merchant нэмж, идэвхтэйг сонгоно.</div>
-          <div id="qpay-merchant-list">
-    <div class="token-row" style="margin-bottom:10px;">
-      <div class="token-row-header">
-        <span class="token-row-name">🟢 Тагтаа qpay</span>
-        <div style="display:flex;gap:5px;">
-          <button class="btn-sm btn-edit" onclick="editQpayMerchant(0)">✏</button>
-          <button class="btn-sm btn-danger" onclick="deleteQpayMerchant(0)">🗑</button>
-        </div>
-      </div>
-      <div class="token-row-fields" id="qpay-edit-0" style="display:none;padding:0 12px 10px;">
-        <label style="font-size:10px;">Нэр (танихад)</label>
-        <input type="text" id="qpay-name-0" value="Тагтаа qpay" placeholder="Жишээ: Open Zone QPay">
-        <label style="font-size:10px;">Username</label>
-        <input type="text" id="qpay-username-0" value="KINO_UZVER" placeholder="QPay username">
-        <label style="font-size:10px;">Password</label>
-        <input type="password" id="qpay-password-0" value="R7ag1GLm" placeholder="QPay password">
-        <label style="font-size:10px;">Invoice Code</label>
-        <input type="text" id="qpay-invoice-0" value="R7ag1GLm" placeholder="TEST_INVOICE">
-        <label style="font-size:10px;">Merchant ID (заавал биш)</label>
-        <input type="text" id="qpay-mid-0" value="" placeholder="Merchant ID">
-        <label style="display:flex;align-items:center;gap:8px;margin-top:10px;cursor:pointer;">
-          <input type="checkbox" id="qpay-active-0" checked="" style="width:16px;height:16px;margin:0;">
-          <span style="font-size:11px;color:#fff;">Идэвхтэй (энэ merchant ашиглах)</span>
-        </label>
-        <div style="display:flex;gap:6px;margin-top:10px;">
-          <button class="btn-sm btn-edit" onclick="saveQpayMerchant(0)">💾 Хадгалах</button>
-          <button class="btn-sm" style="background:var(--ad-card2);color:var(--ad-muted);border:1px solid var(--ad-border);" onclick="cancelEditQpay(0)">Цуцлах</button>
-        </div>
-      </div>
-      <div class="token-row-preview" id="qpay-preview-0" style="padding:0 12px 10px;">
-        <span style="font-size:10px;color:var(--ad-muted);font-family:monospace;">KINO_UZVER · R7ag1GLm</span>
-      </div>
-    </div>
-  </div>
+          <div id="qpay-merchant-list"><p class="cf-hint" style="padding:10px 0;">QPay merchant байхгүй. "➕ QPay Merchant нэмэх" дарна уу.</p></div>
           <button class="btn-sm btn-edit" onclick="addNewQpayMerchant()" style="margin-top:10px;width:100%;justify-content:center;">
             ➕ QPay Merchant нэмэх
           </button>
@@ -3842,34 +3819,34 @@ window.addEventListener('DOMContentLoaded', function(){
         </div>
 
         <!-- Таб тус бүрийн дотоод сэлгүүр -->
-        <div style="display:flex;gap:5px;overflow-x:auto;margin-bottom:14px;-webkit-overflow-scrolling:touch;" id="linktab-row"><button class="cf-subtab active" style="flex-shrink:0;" onclick="setLinkTab(0)">AI DRAMA</button><button class="cf-subtab" style="flex-shrink:0;" onclick="setLinkTab(1)">ACTION</button><button class="cf-subtab" style="flex-shrink:0;" onclick="setLinkTab(2)">+21 ЭРОЧИК</button></div>
+        <div style="display:flex;gap:5px;overflow-x:auto;margin-bottom:14px;-webkit-overflow-scrolling:touch;" id="linktab-row"><button class="cf-subtab" style="flex-shrink:0;" onclick="setLinkTab(0)">AI DRAMA</button><button class="cf-subtab" style="flex-shrink:0;" onclick="setLinkTab(1)">ACTION</button><button class="cf-subtab active" style="flex-shrink:0;" onclick="setLinkTab(2)">+21 ЭРОЧИК</button></div>
 
         <div id="movie-link-container">
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">ЗҮРХ БУЛААСАН БАГШ <span style="color:var(--ad-muted);font-weight:400;">(M15)</span></p>
-        <input type="text" id="movielink-M15" value="https://flat-hall-bdb6.naraa333bb.workers.dev/?fbclid=IwZXh0bgNhZW0CMTAAYnJpZBExQ1hRZUhtQnVtOFhEb2FRZHNydGMGYXBwX2lkEDIyMjAzOTE3ODgyMDA4OTIAAR7cdnV3CjNEVI-i21u1Km7ffx7W0BFDUe2Ipz_AHsSe7l04aU5L3Vqa_SGxcQ_aem_PbhObAjLbCVmH0qWunBbtA" placeholder="https://... контент линк" style="margin-top:0;">
+        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">ЗОЖИГ ОХИН-1 <span style="color:var(--ad-muted);font-weight:400;">(M24)</span></p>
+        <input type="text" id="movielink-M24" value="https://mute-sun-2382.naraa333bb.workers.dev/" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">ИХЭРҮҮДИЙН БОСС ААВ <span style="color:var(--ad-muted);font-weight:400;">(M14)</span></p>
-        <input type="text" id="movielink-M14" value="https://sweet-surf-2e44.naraa333bb.workers.dev/?fbclid=IwZXh0bgNhZW0CMTAAYnJpZBExQ1hRZUhtQnVtOFhEb2FRZHNydGMGYXBwX2lkEDIyMjAzOTE3ODgyMDA4OTIAAR7-EF19OokvpigJgRDacgvXz5I-R2TiBri_Grm524H3oi9RlKdMdxaZSy0_-A_aem_rTMdLw1rpzYN9X3KKZ9y1Q" placeholder="https://... контент линк" style="margin-top:0;">
+        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">ЧӨЛӨӨТ ЯРИЛЦЛАГА <span style="color:var(--ad-muted);font-weight:400;">(M25)</span></p>
+        <input type="text" id="movielink-M25" value="https://odd-tooth-f6e9.naraa333bb.workers.dev/" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">ТУСГАЙ ДААЛГАВАР <span style="color:var(--ad-muted);font-weight:400;">(M13)</span></p>
-        <input type="text" id="movielink-M13" value="https://nameless-heart-4f94.naraa333bb.workers.dev/?fbclid=IwZXh0bgNhZW0CMTAAYnJpZBExQ1hRZUhtQnVtOFhEb2FRZHNydGMGYXBwX2lkEDIyMjAzOTE3ODgyMDA4OTIAAR6j123FDIey7nEos3IVzPeqGhCq5oKRjRBQCcMbOhHK84icH-ynYhB5BDMVYQ_aem_kbllF1gRGiiTPh4qbsDfxA" placeholder="https://... контент линк" style="margin-top:0;">
+        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">НОМЫН САНЧ <span style="color:var(--ad-muted);font-weight:400;">(M23)</span></p>
+        <input type="text" id="movielink-M23" value="https://wild-voice-f381.naraa333bb.workers.dev/" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">АЛТАН НҮДЭТ ХҮҮ <span style="color:var(--ad-muted);font-weight:400;">(M11)</span></p>
-        <input type="text" id="movielink-M11" value="https://quiet-cloud-4be2.naraa333bb.workers.dev/" placeholder="https://... контент линк" style="margin-top:0;">
+        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">ХҮҮХЭД АСРАГЧ <span style="color:var(--ad-muted);font-weight:400;">(M22)</span></p>
+        <input type="text" id="movielink-M22" value="https://solitary-base-fe06.naraa333bb.workers.dev/?fbclid=IwZXh0bgNhZW0CMTAAYnJpZBExNW1WUjF2R04wN1VQUlR3M3NydGMGYXBwX2lkEDIyMjAzOTE3ODgyMDA4OTIAAR4ubpR_H3h4q7_07WaLW16JlJuJPVrwh7VUx6JzpnSFsTNJB2Ro2KkrKXJTUA_aem_h7pFxXyRhnylPdlzYi00IQ" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
-        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">ЛУУГЫН УДАМ <span style="color:var(--ad-muted);font-weight:400;">(M12)</span></p>
-        <input type="text" id="movielink-M12" value="https://noisy-term-23bd.naraa333bb.workers.dev/?fbclid=IwZXh0bgNhZW0CMTAAYnJpZBExQ1hRZUhtQnVtOFhEb2FRZHNydGMGYXBwX2lkEDIyMjAzOTE3ODgyMDA4OTIAAR6j123FDIey7nEos3IVzPeqGhCq5oKRjRBQCcMbOhHK84icH-ynYhB5BDMVYQ_aem_kbllF1gRGiiTPh4qbsDfxA" placeholder="https://... контент линк" style="margin-top:0;">
+        <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">ХОЙД ЭЭЖ <span style="color:var(--ad-muted);font-weight:400;">(M21)</span></p>
+        <input type="text" id="movielink-M21" value="https://delicate-night-01c5.naraa333bb.workers.dev/" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
-    <div class="cf-divider">"AI DRAMA" групп линк</div>
-    <input type="text" id="cf-link-grp-0" value="https://www.facebook.com/groups/934843989294547/" placeholder="https://t.me/joinchat/... эсвэл fb групп линк">
+    <div class="cf-divider">"+21 ЭРОЧИК" групп линк</div>
+    <input type="text" id="cf-link-grp-2" value="https://www.facebook.com/groups/1084450000435909/" placeholder="https://t.me/joinchat/... эсвэл fb групп линк">
 
     <div class="cf-divider">БҮХ VIP групп линк (бүх таб дунд нийтлэг)</div>
-    <input type="text" id="cf-link-grp-all" value="https://www.facebook.com/groups/934843989294547/ https://www.facebook.com/groups/1482374652823993/ https://www.facebook.com/groups/1084450000435909/" placeholder="https://...">
+    <input type="text" id="cf-link-grp-all" value="https://www.facebook.com/groups/934843989294547/  https://www.facebook.com/groups/1482374652823993/ https://www.facebook.com/groups/1084450000435909/" placeholder="https://...">
 
     <button class="btn btn-primary" onclick="saveMovieLinks()" style="margin-top:14px;">💾 Линкүүд хадгалах (локал)</button>
 
