@@ -734,7 +734,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1783889682010;
+const CATALOG_VERSION = 1784957330007;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -1038,6 +1038,11 @@ function updateTxnCode(movieId, catIndex){
   // QPay panel дотор ч txnCode харуулна
   const txnQpay = document.getElementById('txnCodeQpay');
   if(txnQpay) txnQpay.textContent = txnCode;
+  // QPay panel нээлттэй үед гүйлгээний утга өөрчлөгдвөл invoice-оо дахин үүсгэнэ
+  const qp = document.getElementById('panelQpay');
+  if(qp && qp.classList.contains('open') && typeof createQpayInvoice === 'function'){
+    createQpayInvoice();
+  }
 }
 
 // 1+N card scroll UI — promoCount тооны хэмжээгээр үнэгүй кино олон сонгох боломжтой
@@ -1127,11 +1132,66 @@ function selectPay(method){
     acctBtn.classList.remove('active');
     qpayPanel.classList.add('open');
     acctPanel.classList.remove('open');
+    createQpayInvoice();
   } else {
     acctBtn.classList.add('active');
     qpayBtn.classList.remove('active');
     acctPanel.classList.add('open');
     qpayPanel.classList.remove('open');
+  }
+}
+
+// ══ QPAY INVOICE ҮҮСГЭХ — Cloudflare worker-ээр дамжина ══
+const QPAY_WORKER_URL = 'https://kinobot.burentsetseg1987.workers.dev';
+let _qpayInvoiceForTxn = null;
+
+async function createQpayInvoice(){
+  const txnCode = (document.getElementById('txnCode').textContent || '').trim();
+  if(!txnCode || txnCode === '—') return;
+  if(_qpayInvoiceForTxn === txnCode) return; // энэ гүйлгээний утгад invoice аль хэдийн үүссэн
+
+  const priceText = document.getElementById('modalPrice').textContent || '';
+  const pm = priceText.match(/\d+(?:\.\d+)?/);
+  const amount = pm ? parseFloat(pm[0]) : 0;
+  const movieName = document.getElementById('modalMovieName').textContent || 'Кино';
+  const area = document.getElementById('qpayInvoiceArea');
+  if(!area) return;
+
+  area.innerHTML = '<p class="pay-note">⏳ QPay нэхэмжлэл үүсгэж байна...</p>';
+  try{
+    const res = await fetch(QPAY_WORKER_URL + '/qpay-invoice', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({txnCode, amount, movieName})
+    });
+    const data = await res.json();
+    if(!data.success) throw new Error(data.error || 'Invoice үүсгэж чадсангүй');
+    _qpayInvoiceForTxn = txnCode;
+
+    let html = '';
+    if(data.qr_image){
+      html += '<div style="text-align:center;margin:10px 0;">'
+            + '<img src="data:image/png;base64,' + data.qr_image + '" alt="QPay QR" '
+            + 'style="width:200px;height:200px;border-radius:12px;background:#fff;padding:8px;"></div>'
+            + '<p style="font-size:11px;color:var(--muted);text-align:center;">Банкны аппаараа дээрх QR-ийг уншуулна уу</p>';
+    }
+    if(data.short_url){
+      html += '<p style="text-align:center;margin:8px 0;">'
+            + '<a href="' + data.short_url + '" target="_blank" rel="noopener" '
+            + 'style="color:var(--accent2);font-weight:700;">📱 Утаснаас төлөх бол энд дарна уу</a></p>';
+    }
+    if(data.deeplinks && data.deeplinks.length){
+      html += '<div class="qpay-bank-list">' + data.deeplinks.map(d =>
+        '<a class="qpay-bank" href="' + d.link + '" style="text-decoration:none;">'
+        + (d.logo ? '<img src="' + d.logo + '" alt="" style="width:26px;height:26px;border-radius:6px;margin-bottom:4px;" onerror="this.style.display=\'none\'">' : '<div class="qpay-bank-icon">🏦</div>')
+        + '<div class="qpay-bank-name">' + (d.name || '') + '</div></a>'
+      ).join('') + '</div>';
+    }
+    area.innerHTML = html || '<p class="pay-note">Invoice үүссэн боловч QR ирсэнгүй — дахин оролдоно уу.</p>';
+  }catch(e){
+    area.innerHTML = '<p class="pay-note" style="color:#ff6b81;">⚠ QPay алдаа: ' + e.message + '</p>'
+      + '<p class="pay-note"><button class="pay-btn" style="margin-top:6px;" '
+      + 'onclick="_qpayInvoiceForTxn=null;createQpayInvoice()">🔄 Дахин оролдох</button></p>';
   }
 }
 
@@ -3365,18 +3425,17 @@ window.addEventListener('DOMContentLoaded', function(){
 
       <!-- QPAY PANEL -->
       <div class="pay-panel" id="panelQpay">
-        <p style="font-size:12px;color:var(--muted);">QPay-ээр төлөхдөө банкны аппаараа доорх QR/линкийг уншуулна уу:</p>
-        <div class="qpay-bank-list">
-          <div class="qpay-bank" onclick="alert('Khan Bank QPay (placeholder)')"><div class="qpay-bank-icon">🏦</div><div class="qpay-bank-name">Khan Bank</div></div>
-          <div class="qpay-bank" onclick="alert('TDB QPay (placeholder)')"><div class="qpay-bank-icon">🏦</div><div class="qpay-bank-name">TDB</div></div>
-          <div class="qpay-bank" onclick="alert('Golomt QPay (placeholder)')"><div class="qpay-bank-icon">🏦</div><div class="qpay-bank-name">Golomt</div></div>
-          <div class="qpay-bank" onclick="alert('Xac Bank QPay (placeholder)')"><div class="qpay-bank-icon">🏦</div><div class="qpay-bank-name">Xac Bank</div></div>
-          <div class="qpay-bank" onclick="alert('State Bank QPay (placeholder)')"><div class="qpay-bank-icon">🏦</div><div class="qpay-bank-name">State Bank</div></div>
-          <div class="qpay-bank" onclick="alert('Capitron QPay (placeholder)')"><div class="qpay-bank-icon">🏦</div><div class="qpay-bank-name">Capitron</div></div>
-          <div class="qpay-bank" onclick="alert('M bank QPay (placeholder)')"><div class="qpay-bank-icon">🏦</div><div class="qpay-bank-name">M Bank</div></div>
-          <div class="qpay-bank" onclick="alert('Most Money QPay (placeholder)')"><div class="qpay-bank-icon">🏦</div><div class="qpay-bank-name">Most Money</div></div>
+        <div class="acct-row">
+          <div class="acct-info-box">
+            <p class="acct-label">Гүйлгээний утга</p>
+            <p class="acct-val" id="txnCodeQpay">—</p>
+          </div>
+          <button class="acct-copy" id="copyTxnQpayBtn" onclick="copyText('txnCodeQpay','copyTxnQpayBtn')">📋</button>
         </div>
-        <p class="pay-note">⚙ QPay холболт түр зуурын placeholder — invoice API холбогдсоны дараа жинхэнэ QR/линк ажиллана.</p>
+        <div id="qpayInvoiceArea">
+          <p class="pay-note">⏳ QPay нэхэмжлэл бэлдэж байна...</p>
+        </div>
+        <p class="pay-note">Төлбөр төлөгдмөгц AI bot таныг автоматаар таньж, Messenger-ээр линкийг илгээнэ.</p>
       </div>
 
       <!-- ACCOUNT PANEL -->
