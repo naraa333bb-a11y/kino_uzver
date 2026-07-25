@@ -2828,9 +2828,13 @@ async function pushAllCfConfig(){
     groupLinks:    CF_CONFIG.groupLinks,
     promptChat:    CF_CONFIG.promptChat,
     promptVision:  CF_CONFIG.promptVision,
-    qpayMerchants: CF_CONFIG.qpayMerchants || [],
     bankInfo:      BANK_INFO,
   };
+  // Хоосон жагсаалт илгээвэл worker KV дээрх merchant тохиргоог дарж устгах тул
+  // зөвхөн merchant бүртгэлтэй үед л илгээнэ
+  if(CF_CONFIG.qpayMerchants && CF_CONFIG.qpayMerchants.length){
+    payload.qpayMerchants = CF_CONFIG.qpayMerchants;
+  }
 
   try{
     const res = await fetch(`${workerUrl}/config?secret=${encodeURIComponent(secret)}`, {
