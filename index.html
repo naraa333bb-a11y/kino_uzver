@@ -734,7 +734,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785053807022;
+const CATALOG_VERSION = 1785054633798;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -2490,6 +2490,7 @@ async function deployToGitHub(html, token){
 // ТОП-LEVEL TAB СЭЛГҮҮР (Кино каталог / Cloudflare)
 // ══════════════════════════════════════════
 function setTopTab(tab){
+  captureAdminEdits();   // таб солихоос өмнө засварыг алдахгүй хадгална
   const catBtn = document.getElementById('toptab-catalog');
   const cfBtn  = document.getElementById('toptab-cloudflare');
   const catPanel = document.getElementById('toppanel-catalog');
@@ -2515,6 +2516,7 @@ function setTopTab(tab){
 // CLOUDFLARE САБ-TAB СЭЛГҮҮР (A/B/C/D/E)
 // ══════════════════════════════════════════
 function setCfTab(tab){
+  captureAdminEdits();   // таб солихоос өмнө засварыг алдахгүй хадгална
   ['a','b','c','d','e'].forEach(t=>{
     const btn = document.getElementById('cftab-'+t);
     const panel = document.getElementById('cfpanel-'+t);
@@ -3068,6 +3070,54 @@ function saveCfCredentials(){
   saveAllCfCredentials();
 }
 
+// ══════════════════════════════════════════
+// АВТОМАТ ХАДГАЛАЛТ
+// Талбар засаад "Хадгалах" дарахаа мартаж өөр таб руу шилжихэд засвар
+// алдагддаг байсныг зогсооно. Бичих бүрд (0.5 сек саатлаар) болон таб
+// солих бүрд түр санах ойд (localStorage) чимээгүй хадгална.
+// ══════════════════════════════════════════
+let _autoSaveTimer = null;
+
+function captureAdminEdits(){
+  try{
+    // Credential + кино линк + групп линк (талбарууд байгаа үед л)
+    if(document.getElementById('cf-worker-url') && typeof saveAllCfCredentials === 'function'){
+      saveAllCfCredentials();
+    }
+    // Промптууд
+    const pc = document.getElementById('cf-prompt-chat');
+    const pv = document.getElementById('cf-prompt-vision');
+    if(pc) CF_CONFIG.promptChat   = pc.value;
+    if(pv) CF_CONFIG.promptVision = pv.value;
+    if(typeof saveCfConfigToStorage === 'function') saveCfConfigToStorage(CF_CONFIG);
+
+    // Банкны данс — дансны дугаар хоосон бол дарж бичихгүй
+    const ba = document.getElementById('bank-account-number');
+    if(ba && ba.value.trim()){
+      BANK_INFO.bankName      = (document.getElementById('bank-name')?.value || '').trim();
+      BANK_INFO.accountNumber = ba.value.trim();
+      BANK_INFO.accountHolder = (document.getElementById('bank-account-holder')?.value || '').trim();
+      localStorage.setItem('toorxon_bank_info', JSON.stringify(BANK_INFO));
+    }
+  }catch(e){
+    console.warn('captureAdminEdits:', e.message);
+  }
+}
+
+function scheduleAutoSave(){
+  clearTimeout(_autoSaveTimer);
+  _autoSaveTimer = setTimeout(captureAdminEdits, 500);
+}
+
+// Админ панелийн аль ч талбарт бичихэд автоматаар хадгална
+function initAutoSave(){
+  const ap = document.getElementById('admin-panel');
+  if(!ap || ap.dataset.autosave === '1') return;
+  ap.addEventListener('input',  scheduleAutoSave);
+  ap.addEventListener('change', scheduleAutoSave);
+  ap.dataset.autosave = '1';
+}
+
 
 // ══ B. КИНО ЛИНК — CATEGORIES-аар tab болгож, MOVIES-аас автоматаар үүсгэх ══
 let activeLinkTab = CATEGORIES.length ? CATEGORIES[0].id : 0;
@@ -3570,6 +3620,8 @@ window.addEventListener('DOMContentLoaded', function(){
 
     // Хуудас хуучирсан эсэхийг шалгаж, шаардвал улаан анхааруулга гаргана
     if(typeof checkStaleTab === 'function') checkStaleTab();
+    // Талбар засах бүрд автоматаар хадгалдаг болгоно
+    if(typeof initAutoSave === 'function') initAutoSave();
 
     // ── Admin input-уудыг одоогийн утгуудаар бөглөх ──
     openCoverEditor(CATEGORIES.length ? CATEGORIES[0].id : 0);
@@ -4253,11 +4305,11 @@ window.addEventListener('DOMContentLoaded', function(){
         </button>
 
         <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--ad-border);">
-          <p style="font-size:11px;color:#fff;font-weight:700;margin-bottom:8px;">🔄 Backup-аас сэргээх</p>
-          <p class="cf-hint" style="margin-bottom:8px;">Хадгалсан backup.txt файлыг сонгоход бүх мэдээлэл автоматаар орж ирнэ</p>
+          <p style="font-size:11px;color:#fff;font-weight:700;margin-bottom:8px;">🔄 ПС-нээс мэдээлэл оруулах</p>
+          <p class="cf-hint" style="margin-bottom:8px;">Компьютерт хадгалсан backup .txt файлыг сонгоход бүх мэдээлэл автоматаар орж ирнэ</p>
           <input type="file" id="backup-import-file" accept=".txt" onchange="importSystemBackup(this)" style="display:none;">
           <button class="btn btn-primary" onclick="document.getElementById('backup-import-file').click()" style="width:100%;">
-            📂 Backup файл сонгох (.txt)
+            📂 ПС-нээс мэдээлэл оруулах (.txt)
           </button>
           <p id="backup-import-status" class="cf-hint" style="margin-top:6px;">✅ Backup амжилттай уншигдлаа — "☁ ШИНЭЧЛЭХ" дарна уу</p>
         </div>
