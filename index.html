@@ -739,7 +739,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785066041744;
+const CATALOG_VERSION = 1785071771062;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -847,8 +847,11 @@ function genTxnCode(movieId, catIndex){
   if(!ref || !CATEGORY_REFS[catIndex] || !CATEGORY_REFS[catIndex].includes(ref)){
     ref = defaultRefByCat[catIndex];
   }
-  // Кино код: M01, M02 ... эсвэл групп бол GRP
-  const movieCode = movieId==='GRP' ? 'GRP' : 'M'+String(movieId).padStart(2,'0');
+  // Кино код: M01, M02 ... · нэг ангиллын групп бол GRP · бүх групп бол ALL
+  // (GRP болон ALL-ыг ялгаж бичсэнээр бот аль группын линкийг илгээхээ мэднэ)
+  const movieCode = (movieId==='GRP' || movieId==='ALL')
+    ? movieId
+    : 'M'+String(movieId).padStart(2,'0');
   // Гүйлгээний код: REF-MOVIECODE-SESSION
   // SESSION_ID нь "Эхлэх" товчоор PSID-тай аль хэдийн холбогдсон —
   // AI bot энэ session-аар хэрэглэгчийг 100% таних боломжтой
@@ -1050,7 +1053,8 @@ function openBuyModal(movieId, catIndex){
 
 // Гүйлгээний утга шинэчлэх (1+N сонголт хийхэд ч дуудагдана)
 function updateTxnCode(movieId, catIndex){
-  const codeMovieId = (movieId==='GRP'||movieId==='ALL') ? 'GRP' : movieId;
+  // GRP (нэг ангиллын групп) болон ALL (бүх групп)-ыг ялгаж дамжуулна
+  const codeMovieId = movieId;
   let txnCode = genTxnCode(codeMovieId, catIndex);
 
   // Сонгосон үнэгүй кино(ну)удыг txnCode-д нэмнэ — олон сонголттой бол бүгдийг +-аар холбоно
