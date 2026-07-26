@@ -734,7 +734,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785057034753;
+const CATALOG_VERSION = 1785057587018;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -2332,7 +2332,46 @@ async function deployAll(){
   showDeployReport(gh, cf);
 }
 
+// Cloudflare руу түлхээд тайланг харуулна (зөвхөн бот — GitHub хөндөхгүй)
+async function pushCfAndReport(){
+  const cf = await pushAllCfConfig() || {ok:false, error:'хариу ирсэнгүй'};
+  showDeployReport(null, cf);
+}
+
+// ══════════════════════════════════════════
+// ЗӨВХӨН GITHUB ШИНЭЧЛЭХ — кино каталогийн засварт
+// Кино нэр, үнэ, ковер, трейлер зэрэг нь HTML-д шигддэг тул зөвхөн
+// GitHub-д байршуулахад хангалттай. Cloudflare (бот) хөндөх шаардлагагүй.
+// ══════════════════════════════════════════
+async function deployGithubOnly(){
+  captureAdminEdits();
+
+  const ghToken = document.getElementById('gh-token-catalog')?.value?.trim()
+               || document.getElementById('gh-token-input')?.value?.trim();
+  if(!ghToken){
+    showError('GitHub Token оруулна уу');
+    return;
+  }
+
+  // Хуучирсан хуудаснаас хадгалахаас сэргийлнэ
+  showToast('⏳ Хувилбар шалгаж байна...');
+  const live = await fetchLiveVersion();
+  if(live && live > CATALOG_VERSION){
+    await checkStaleTab();
+    if(!confirm(
+      'АНХААР!\n\nТаны нээсэн хуудас хуучирсан байна. Одоо хадгалвал ' +
+      'хожим орсон бүх өөрчлөлт устана.\n\nЯмар ч байсан үргэлжлүүлэх үү?'
+    )){ showToast('Цуцаллаа — хуудсаа дахин ачаална уу'); return; }
+  }
+
+  showToast('⏳ GitHub-д байршуулж байна...');
+  const html = buildFinalHtml();
+  const gh = await deployToGitHub(html, ghToken);
+  showDeployReport(gh, null);
+}
+
 // ── Хадгалсны дараах тайлан — "дарсан болов уу" гэсэн эргэлзээг арилгана ──
+// cf = null бол зөвхөн GitHub-ийн мөр харагдана
 function showDeployReport(gh, cf){
   const t = new Date().toLocaleTimeString('mn-MN');
   let box = document.getElementById('deploy-report');
@@ -2348,20 +2387,36 @@ function showDeployReport(gh, cf){
     `<div style="margin-top:4px;">${ok ? '✅' : '❌'} <b>${label}</b>` +
     (detail ? `<br><span style="color:#9aa3b2;font-size:11px;">${detail}</span>` : '') + '</div>';
 
-  let cfDetail = '';
-  if(cf.ok){
-    cfDetail = (cf.saved && cf.saved.length) ? 'Хадгалсан: ' + cf.saved.join(', ') : 'Шинэ өөрчлөлт алга';
-    if(cf.skipped && cf.skipped.length) cfDetail += '<br>Хоосон тул хэвээр: ' + cf.skipped.join(', ');
-  } else {
-    cfDetail = cf.error || '';
+  let rows = '';
+  // gh === null бол GitHub-ийн мөрийг харуулахгүй (зөвхөн Cloudflare шинэчилсэн)
+  if(gh){
+    rows += line(gh.ok, 'GitHub (вэб сайт)',
+      gh.ok ? '1-2 минутын дараа сайт дээр гарна' : (gh.error || ''));
+  }
+  // cf === null бол Cloudflare-ийн мөрийг харуулахгүй (зөвхөн GitHub шинэчилсэн)
+  if(cf){
+    let cfDetail;
+    if(cf.ok){
+      cfDetail = (cf.saved && cf.saved.length) ? 'Хадгалсан: ' + cf.saved.join(', ') : 'Шинэ өөрчлөлт алга';
+      if(cf.skipped && cf.skipped.length) cfDetail += '<br>Хоосон тул хэвээр: ' + cf.skipped.join(', ');
+    } else {
+      cfDetail = cf.error || '';
+    }
+    rows += line(cf.ok, 'Cloudflare (бот)', cfDetail);
   }
 
-  box.innerHTML =
-    `<div style="font-weight:700;margin-bottom:6px;">Хадгалалтын тайлан · ${t}</div>`
-    + line(gh && gh.ok, 'GitHub (вэб сайт)', gh && gh.ok ? '1-2 минутын дараа сайт дээр гарна' : (gh && gh.error) || '')
-    + line(cf.ok, 'Cloudflare (бот)', cfDetail)
+  const header = `<div style="font-weight:700;margin-bottom:6px;">Хадгалалтын тайлан · ${t}</div>`;
+
+  box.innerHTML = header + rows
     + '<button onclick="this.parentNode.remove()" style="margin-top:10px;width:100%;padding:6px;'
     + 'border:0;border-radius:6px;background:#2b3242;color:#e8eaf0;cursor:pointer;">Хаах</button>';
+
+  // Cloudflare табын дотор ч мөн тайланг үлдээнэ (хөвөгч цонх хаагдсан ч үлдэнэ)
+  const inline = document.getElementById('deploy-report-inline');
+  if(inline){
+    inline.style.display = '';
+    inline.innerHTML = header + rows;
+  }
 }
 
 // ══════════════════════════════════════════
@@ -3060,8 +3115,24 @@ async function pushAllCfConfig(){
       return {ok: false, error: data.error || String(res.status)};
     }
   } catch(e){
-    showError('Холболтын алдаа: ' + e.message);
-    return {ok: false, error: e.message};
+    // "Failed to fetch" гэдэг нь ихэвчлэн CORS/холболтын асуудал.
+    // Хамгийн түгээмэл шалтгаануудыг нэрлэж өгнө.
+    const hints = [];
+    if(location.protocol === 'file:'){
+      hints.push('Файлыг file:// гэж нээсэн байна — Chrome ийм үед сервер рүү хандахыг хориглодог. Амьд хаягаараа (https://...github.io/kino_uzver/?admin=2020) орно уу.');
+    }
+    if(!/^https:\/\//i.test(workerUrl)){
+      hints.push('Worker URL нь https:// -ээр эхлээгүй байна.');
+    }
+    if(/burentsetseg1987/.test(workerUrl)){
+      hints.push('Worker URL хуучин хаяг руу заасан байна. Зөв нь: https://kinobot.naraa333bb.workers.dev');
+    }
+    if(!hints.length){
+      hints.push('Worker URL болон Refresh Secret зөв эсэхийг шалгана уу.');
+    }
+    const msg = 'Холбогдож чадсангүй. ' + hints.join(' ');
+    showError(msg);
+    return {ok: false, error: msg};
   }
 }
 
@@ -3777,7 +3848,7 @@ window.addEventListener('DOMContentLoaded', function(){
 
 
 <!-- ══════════════════ ADMIN PANEL (?admin=2020) ══════════════════ -->
-<div id="admin-panel" class="" data-autosave="1">
+<div id="admin-panel" class="">
 
 
 <div class="header">
@@ -4026,6 +4097,18 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
 </div>
 
+<!-- ══ STICKY: ЗӨВХӨН GITHUB ШИНЭЧЛЭХ (кино каталог) ══ -->
+<div style="position:sticky;bottom:0;z-index:100;background:linear-gradient(to top,var(--ad-bg) 80%,transparent);padding:12px 16px 16px;">
+  <input type="password" id="gh-token-catalog" placeholder="GitHub Token (ghp_...)" style="font-family:monospace;margin-bottom:8px;">
+  <button class="btn btn-primary" onclick="deployGithubOnly()" style="width:100%;padding:14px;">
+    🚀 ВЭБ САЙТ ШИНЭЧЛЭХ (GitHub)
+  </button>
+  <p class="cf-hint" style="margin-top:6px;text-align:center;">
+    Кино нэр, үнэ, ковер, трейлер, гарчиг — эдгээр нь вэб сайтад л хамаатай тул
+    зөвхөн GitHub шинэчилнэ. Бот (Cloudflare) хөндөгдөхгүй.
+  </p>
+</div>
+
 </div>
 <!-- ══ /TOP TAB 1: КИНО КАТАЛОГ ══ -->
 
@@ -4074,40 +4157,7 @@ window.addEventListener('DOMContentLoaded', function(){
         </button>
         <div class="cf-accordion-body" id="acc-qpay" style="">
           <div class="info-box">⚙ QPay merchant мэдээллийг оруулснаар хэрэглэгчид QR кодоор автомат төлбөр төлж, систем автоматаар баталгаажуулна. Олон merchant нэмж, идэвхтэйг сонгоно.</div>
-          <div id="qpay-merchant-list">
-    <div class="token-row" style="margin-bottom:10px;">
-      <div class="token-row-header">
-        <span class="token-row-name">🟢 Kino Uzver QPay</span>
-        <div style="display:flex;gap:5px;">
-          <button class="btn-sm btn-edit" onclick="editQpayMerchant(0)">✏</button>
-          <button class="btn-sm btn-danger" onclick="deleteQpayMerchant(0)">🗑</button>
-        </div>
-      </div>
-      <div class="token-row-fields" id="qpay-edit-0" style="display:none;padding:0 12px 10px;">
-        <label style="font-size:10px;">Нэр (танихад)</label>
-        <input type="text" id="qpay-name-0" value="Kino Uzver QPay" placeholder="Жишээ: Open Zone QPay">
-        <label style="font-size:10px;">Username</label>
-        <input type="text" id="qpay-username-0" value="KINO_UZVER" placeholder="QPay username">
-        <label style="font-size:10px;">Password</label>
-        <input type="password" id="qpay-password-0" value="R7ag1GLm" placeholder="QPay password">
-        <label style="font-size:10px;">Invoice Code</label>
-        <input type="text" id="qpay-invoice-0" value="KINO_UZVER_INVOICE" placeholder="TEST_INVOICE">
-        <label style="font-size:10px;">Merchant ID (заавал биш)</label>
-        <input type="text" id="qpay-mid-0" value="" placeholder="Merchant ID">
-        <label style="display:flex;align-items:center;gap:8px;margin-top:10px;cursor:pointer;">
-          <input type="checkbox" id="qpay-active-0" checked="" style="width:16px;height:16px;margin:0;">
-          <span style="font-size:11px;color:#fff;">Идэвхтэй (энэ merchant ашиглах)</span>
-        </label>
-        <div style="display:flex;gap:6px;margin-top:10px;">
-          <button class="btn-sm btn-edit" onclick="saveQpayMerchant(0)">💾 Хадгалах</button>
-          <button class="btn-sm" style="background:var(--ad-card2);color:var(--ad-muted);border:1px solid var(--ad-border);" onclick="cancelEditQpay(0)">Цуцлах</button>
-        </div>
-      </div>
-      <div class="token-row-preview" id="qpay-preview-0" style="padding:0 12px 10px;">
-        <span style="font-size:10px;color:var(--ad-muted);font-family:monospace;">KINO_UZVER · KINO_UZVER_INVOICE</span>
-      </div>
-    </div>
-  </div>
+          <div id="qpay-merchant-list"><p class="cf-hint" style="padding:10px 0;">QPay merchant байхгүй. "➕ QPay Merchant нэмэх" дарна уу.</p></div>
           <button class="btn-sm btn-edit" onclick="addNewQpayMerchant()" style="margin-top:10px;width:100%;justify-content:center;">
             ➕ QPay Merchant нэмэх
           </button>
@@ -4218,29 +4268,29 @@ window.addEventListener('DOMContentLoaded', function(){
         <div id="movie-link-container">
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
         <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">ЗҮРХ БУЛААСАН БАГШ <span style="color:var(--ad-muted);font-weight:400;">(M15)</span></p>
-        <input type="text" id="movielink-M15" value="https://flat-hall-bdb6.naraa333bb.workers.dev/?fbclid=IwZXh0bgNhZW0CMTAAYnJpZBExQ1hRZUhtQnVtOFhEb2FRZHNydGMGYXBwX2lkEDIyMjAzOTE3ODgyMDA4OTIAAR7cdnV3CjNEVI-i21u1Km7ffx7W0BFDUe2Ipz_AHsSe7l04aU5L3Vqa_SGxcQ_aem_PbhObAjLbCVmH0qWunBbtA" placeholder="https://... контент линк" style="margin-top:0;">
+        <input type="text" id="movielink-M15" value="" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
         <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">ИХЭРҮҮДИЙН БОСС ААВ <span style="color:var(--ad-muted);font-weight:400;">(M14)</span></p>
-        <input type="text" id="movielink-M14" value="https://sweet-surf-2e44.naraa333bb.workers.dev/?fbclid=IwZXh0bgNhZW0CMTAAYnJpZBExQ1hRZUhtQnVtOFhEb2FRZHNydGMGYXBwX2lkEDIyMjAzOTE3ODgyMDA4OTIAAR7-EF19OokvpigJgRDacgvXz5I-R2TiBri_Grm524H3oi9RlKdMdxaZSy0_-A_aem_rTMdLw1rpzYN9X3KKZ9y1Q" placeholder="https://... контент линк" style="margin-top:0;">
+        <input type="text" id="movielink-M14" value="" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
         <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">ТУСГАЙ ДААЛГАВАР <span style="color:var(--ad-muted);font-weight:400;">(M13)</span></p>
-        <input type="text" id="movielink-M13" value="https://nameless-heart-4f94.naraa333bb.workers.dev/?fbclid=IwZXh0bgNhZW0CMTAAYnJpZBExQ1hRZUhtQnVtOFhEb2FRZHNydGMGYXBwX2lkEDIyMjAzOTE3ODgyMDA4OTIAAR6j123FDIey7nEos3IVzPeqGhCq5oKRjRBQCcMbOhHK84icH-ynYhB5BDMVYQ_aem_kbllF1gRGiiTPh4qbsDfxA" placeholder="https://... контент линк" style="margin-top:0;">
+        <input type="text" id="movielink-M13" value="" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
         <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">АЛТАН НҮДЭТ ХҮҮ <span style="color:var(--ad-muted);font-weight:400;">(M11)</span></p>
-        <input type="text" id="movielink-M11" value="https://quiet-cloud-4be2.naraa333bb.workers.dev/?fbclid=IwZXh0bgNhZW0CMTAAYnJpZBExQ1hRZUhtQnVtOFhEb2FRZHNydGMGYXBwX2lkEDIyMjAzOTE3ODgyMDA4OTIAAR6j123FDIey7nEos3IVzPeqGhCq5oKRjRBQCcMbOhHK84icH-ynYhB5BDMVYQ_aem_kbllF1gRGiiTPh4qbsDfxA" placeholder="https://... контент линк" style="margin-top:0;">
+        <input type="text" id="movielink-M11" value="" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
         <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">ЛУУГЫН УДАМ <span style="color:var(--ad-muted);font-weight:400;">(M12)</span></p>
-        <input type="text" id="movielink-M12" value="https://noisy-term-23bd.naraa333bb.workers.dev/?fbclid=IwZXh0bgNhZW0CMTAAYnJpZBExQ1hRZUhtQnVtOFhEb2FRZHNydGMGYXBwX2lkEDIyMjAzOTE3ODgyMDA4OTIAAR6j123FDIey7nEos3IVzPeqGhCq5oKRjRBQCcMbOhHK84icH-ynYhB5BDMVYQ_aem_kbllF1gRGiiTPh4qbsDfxA" placeholder="https://... контент линк" style="margin-top:0;">
+        <input type="text" id="movielink-M12" value="" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
     <div class="cf-divider">"AI DRAMA" групп линк</div>
-    <input type="text" id="cf-link-grp-0" value="https://www.facebook.com/groups/934843989294547/" placeholder="https://t.me/joinchat/... эсвэл fb групп линк">
+    <input type="text" id="cf-link-grp-0" value="" placeholder="https://t.me/joinchat/... эсвэл fb групп линк">
 
     <div class="cf-divider">БҮХ VIP групп линк (бүх таб дунд нийтлэг)</div>
-    <input type="text" id="cf-link-grp-all" value="https://www.facebook.com/groups/934843989294547/ https://www.facebook.com/groups/1482374652823993/ https://www.facebook.com/groups/1084450000435909/" placeholder="https://...">
+    <input type="text" id="cf-link-grp-all" value="" placeholder="https://...">
 
     <button class="btn btn-primary" onclick="saveMovieLinks()" style="margin-top:14px;">💾 Линкүүд хадгалах (локал)</button>
 
@@ -4352,7 +4402,8 @@ window.addEventListener('DOMContentLoaded', function(){
 
   <!-- ══ STICKY: БҮГДИЙГ CLOUDFLARE-РУУ ШИНЭЧЛЭХ ══ -->
   <div style="position:sticky;bottom:0;z-index:100;background:linear-gradient(to top,var(--ad-bg) 80%,transparent);padding:12px 16px 16px;">
-    <button class="btn btn-green" onclick="pushAllCfConfig()" style="width:100%;padding:14px;">
+    <div id="deploy-report-inline" style="display:none;background:#161a22;border:1px solid #2b3242;border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:12px;line-height:1.6;color:#e8eaf0;"></div>
+    <button class="btn btn-green" onclick="pushCfAndReport()" style="width:100%;padding:14px;">
       ☁ БҮГДИЙГ CLOUDFLARE-РУУ ШИНЭЧЛЭХ
     </button>
     <p class="cf-hint" style="text-align:center;margin-top:6px;">A/B/C/D хэсгийн бүх мэдээллийг нэг дор push хийнэ</p>
