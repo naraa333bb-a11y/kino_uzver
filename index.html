@@ -739,7 +739,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785061983235;
+const CATALOG_VERSION = 1785066041744;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -4429,8 +4429,12 @@ window.addEventListener('DOMContentLoaded', function(){
     <div class="section">
       <p class="sec-title">💬 Харилцааны промпт (Bot-ийн зан төлөв)</p>
       <div class="card">
-        <div class="info-box">
-          ⚙ Энэ нь Google Doc-г бүрэн орлоно. Bot хэрхэн мэндчилэх, аль өнгө аястай байх, ямар дүрэм баримтлахыг энд тодорхойлно. Кино жагсаалт энд бичих ШААРДЛАГАГҮЙ — тэр автоматаар "B. Кино линк" хэсгээс ирнэ.
+        <div class="info-box" style="background:rgba(255,193,7,.12);border-color:rgba(255,193,7,.5);">
+          ⚠ <b>Энэ хэсэг ашиглагдахаа больсон.</b> Ботын харилцааны заавар одоо
+          <b>kinobot_worker.js</b> файлын <b>CHAT_PROMPT</b> хэсэгт байна.<br><br>
+          Ингэснээр хөтчийн хоосон эсвэл алдаатай утга ботын зааврыг дарж бичих
+          эрсдэлгүй болсон. Промпт сайжруулах бол тэр файлыг засаад
+          <b>"🚀 WORKER КОД БАЙРШУУЛАХ"</b> дарна (A. Credential хэсэгт).
         </div>
         <textarea id="cf-prompt-chat" rows="16" style="font-family:monospace;font-size:12px;line-height:1.6;" placeholder="Та &quot;Кино Үзвэр&quot; сервисийн AI туслах мөн...
 
@@ -4449,8 +4453,10 @@ window.addEventListener('DOMContentLoaded', function(){
     <div class="section">
       <p class="sec-title">🧾 Гүйлгээ/Зураг унших промпт (Vision)</p>
       <div class="card">
-        <div class="info-box">
-          ⚙ Хэрэглэгч төлбөрийн баримт зураг илгээхэд Gemini Vision энэ зааврын дагуу зургийг уншиж дүгнэлт гаргана.
+        <div class="info-box" style="background:rgba(255,193,7,.12);border-color:rgba(255,193,7,.5);">
+          ⚠ <b>Энэ хэсэг ашиглагдахаа больсон.</b> Баримт таних заавар одоо
+          <b>kinobot_worker.js</b> файлын <b>VISION_PROMPT</b> хэсэгт байна.<br><br>
+          Засвар хийх бол тэр файлыг өөрчлөөд <b>"🚀 WORKER КОД БАЙРШУУЛАХ"</b> дарна.
         </div>
         <textarea id="cf-prompt-vision" rows="12" style="font-family:monospace;font-size:12px;line-height:1.6;" placeholder="Энэ зургийг төлбөрийн баримт гэж үзэж анализ хий:
 1. Гүйлгээний дүн
