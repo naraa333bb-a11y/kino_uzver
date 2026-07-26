@@ -351,7 +351,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
 .gate-btn-icon{font-size:18px;}
 
 
-/* ══ ADMIN PANEL — зөвхөн ?admin=1 үед харагдана ══ */
+/* ══ ADMIN PANEL — зөвхөн ?admin=2020 үед харагдана ══ */
 #admin-panel{display:none;}
 #admin-panel.show{display:block;}
 .admin-toggle-btn{
@@ -734,7 +734,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785045930681;
+const CATALOG_VERSION = 1785051611392;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -2957,6 +2957,64 @@ async function pullCfConfig(){
   }
 }
 
+// ══════════════════════════════════════════
+// WORKER КОДЫГ CLOUDFLARE РУУ DEPLOY ХИЙХ
+// Cloudflare API token шаардана. Token хадгалагдахгүй — удаа бүрд бичнэ.
+// ХАМГААЛАЛТ: одоогийн binding-үүдийг (CATALOG_KV) эхлээд уншиж, дахин
+// хэрэглэнэ. Уншиж чадахгүй бол deploy хийхгүй — binding алдвал бот унтарна.
+// ══════════════════════════════════════════
+async function deployWorkerCode(){
+  const apiToken   = document.getElementById('cf-api-token')?.value?.trim();
+  const scriptName = document.getElementById('cf-script-name')?.value?.trim() || 'kinobot';
+  const code       = document.getElementById('cf-worker-code')?.value;
+
+  if(!apiToken){ showError('Cloudflare API Token оруулна уу'); return; }
+  if(!code || code.trim().length < 500){ showError('Worker код хоосон эсвэл дутуу байна'); return; }
+  if(!code.includes('export default')){ showError('Код "export default" агуулаагүй — буруу файл байж магадгүй'); return; }
+
+  // Cloudflare API нь хөтчийн хандалтыг (CORS) зөвшөөрдөггүй тул
+  // өөрийн worker-ээр дамжуулж илгээнэ
+  const workerUrl = document.getElementById('cf-worker-url')?.value?.trim() || CF_CONFIG.workerUrl;
+  const secret    = document.getElementById('cf-refresh-secret')?.value?.trim() || CF_CONFIG.refreshSecret;
+  if(!workerUrl){ showError('Worker URL оруулна уу'); return; }
+  if(!secret){    showError('Refresh Secret оруулна уу'); return; }
+
+  if(!confirm(
+    `Worker "${scriptName}" дээр шинэ код байршуулах уу?\n\n` +
+    `Кодын хэмжээ: ${code.length} тэмдэгт\n\n` +
+    `KV холболт автоматаар хадгалагдана. Хэрэв код алдаатай бол бот унтарч, ` +
+    `дараагийн deploy-г Cloudflare dashboard-аас хийх шаардлагатай болно.`
+  )) return;
+
+  try{
+    showToast('⏳ Код байршуулж байна...');
+    const res = await fetch(`${workerUrl.replace(/\/+$/,'')}/deploy-worker?secret=${encodeURIComponent(secret)}`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ apiToken, scriptName, code })
+    });
+
+    if(res.status === 403){ showError('Refresh Secret буруу байна'); return; }
+    if(res.status === 404 || !res.ok){
+      showError('Worker дээр /deploy-worker байхгүй — эхний удаа кодыг Cloudflare dashboard-аас гараар буулгана уу'); return;
+    }
+
+    const data = await res.json();
+    if(data.success){
+      showToast('✅ ' + (data.message || 'Worker шинэчлэгдлээ'));
+      document.getElementById('cf-api-token').value = '';  // token-ыг цэвэрлэнэ
+    } else {
+      showError('Deploy алдаа — ' + (data.error || 'тодорхойгүй'));
+    }
+  }catch(e){
+    // Worker дээр /deploy-worker байхгүй үед хариу нь CORS толгойгүй ирдэг тул
+    // хөтөч "Failed to fetch" гэж хэлдэг — үүнийг ойлгомжтой тайлбарлана
+    showError('Холбогдож чадсангүй. Энэ боломж ажиллахын тулд worker дээр '
+      + 'шинэ код (/deploy-worker) байх шаардлагатай. Эхний нэг удаа Cloudflare '
+      + 'dashboard-аас гараар буулгана уу — дараа нь эндээс шууд хийж болно.');
+  }
+}
+
 // ══ БҮГДИЙГ CLOUDFLARE-РУУ НЭГТ PUSH ══
 async function pushAllCfConfig(){
   saveAllCfCredentials();
@@ -3459,10 +3517,10 @@ function toggleAdminPanel(){
 
 // #admin-panel нь script-ийн дараа байрладаг тул DOM бүрэн ачаалсны дараа ажиллана
 window.addEventListener('DOMContentLoaded', function(){
-  // URL ?admin=1 байвал admin panel-г DOM-д нэмж, харин ?admin=1 үгүй бол
+  // URL ?admin=2020 байвал admin panel-г DOM-д нэмж, харин ?admin=2020 үгүй бол
   // template нь render хийгдэхгүй — Ctrl+U-д admin код харагдахгүй
   const params = new URLSearchParams(window.location.search);
-  if(params.get('admin')==='1'){
+  if(params.get('admin')==='2020'){
     const dataEl = document.getElementById('admin-panel-data');
     if(dataEl){
       // Base64 decode хийж admin HTML-г DOM-д нэмнэ
@@ -3635,7 +3693,7 @@ window.addEventListener('DOMContentLoaded', function(){
 
 
 
-<!-- ══════════════════ ADMIN PANEL (?admin=1) ══════════════════ -->
+<!-- ══════════════════ ADMIN PANEL (?admin=2020) ══════════════════ -->
 <div id="admin-panel" class="">
 
 
@@ -3956,6 +4014,27 @@ window.addEventListener('DOMContentLoaded', function(){
           <label>Worker Refresh Secret</label>
           <input type="password" id="cf-refresh-secret" placeholder="kino-refresh-2026">
           <p class="cf-hint">Worker дотрох REFRESH_SECRET-тэй яг адил байх ёстой</p>
+
+          <!-- ══ WORKER КОД DEPLOY ══ -->
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--ad-border);">
+            <label>⚙ Worker код байршуулах (Cloudflare API)</label>
+            <p class="cf-hint" style="margin-bottom:8px;">
+              Cloudflare дээр гараар хуулахын оронд эндээс шууд deploy хийнэ.
+              <a href="https://dash.cloudflare.com/profile/api-tokens" target="_blank" style="color:var(--ad-accent2);">Token авах →</a>
+              (<b>Edit Cloudflare Workers</b> загвар сонгоно уу)
+            </p>
+            <input type="password" id="cf-api-token" placeholder="Cloudflare API Token" style="font-family:monospace;">
+            <p class="cf-hint" style="margin:4px 0 8px;">Token хадгалагдахгүй — deploy бүрд оруулна уу</p>
+            <input type="text" id="cf-script-name" value="kinobot" placeholder="Worker-ийн нэр">
+            <textarea id="cf-worker-code" rows="8" placeholder="kinobot_worker.js файлын агуулгыг энд буулгана уу..." style="font-family:monospace;font-size:11px;margin-top:6px;"></textarea>
+            <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="deployWorkerCode()">
+              🚀 WORKER КОД БАЙРШУУЛАХ
+            </button>
+            <p class="cf-hint" style="margin-top:6px;">
+              KV холболт (CATALOG_KV) автоматаар хадгалагдана — deploy хийхээс өмнө
+              одоогийн тохиргоог уншиж, дахин хэрэглэдэг.
+            </p>
+          </div>
 
           <!-- ══ CLOUDFLARE-ААС ТАТАХ ══ -->
           <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--ad-border);">
