@@ -734,7 +734,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785045291405;
+const CATALOG_VERSION = 1785045930681;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -2894,6 +2894,69 @@ function saveAllCfCredentials(){
   showToast('Бүх тохиргоо локал хадгалагдлаа');
 }
 
+// ══════════════════════════════════════════
+// CLOUDFLARE-ААС ТАТАХ — KV дэх бодит тохиргоог админ панелд буулгана
+// Татаж авсан HTML нь Cloudflare хэсэг хоосонтой ирдэг (түлхүүрүүд нийтэд
+// ил гарахаас сэргийлж HTML-д шигддэггүй). Тиймээс хуучин backup файлаас
+// сэргээхийн оронд эндээс шууд татаж авна — үргэлж хамгийн сүүлийн утга.
+// ══════════════════════════════════════════
+async function pullCfConfig(){
+  const workerUrl = document.getElementById('cf-worker-url')?.value?.trim() || CF_CONFIG.workerUrl;
+  const secret    = document.getElementById('cf-refresh-secret')?.value?.trim() || CF_CONFIG.refreshSecret;
+
+  if(!workerUrl){ showError('Worker URL оруулна уу'); return; }
+  if(!secret){    showError('Refresh Secret оруулна уу'); return; }
+
+  showToast('⏳ Cloudflare-аас татаж байна...');
+  try{
+    const res = await fetch(`${workerUrl.replace(/\/+$/,'')}/config-get?secret=${encodeURIComponent(secret)}`);
+    if(!res.ok){
+      showError('Татаж чадсангүй: ' + res.status + (res.status===403 ? ' (Secret буруу эсвэл worker хуучин код)' : ''));
+      return;
+    }
+    const d = await res.json();
+
+    // Зөвхөн агуулгатай утгыг л буулгана — хоосон нь одоогийнхыг дарахгүй
+    const has = v => v !== null && v !== undefined &&
+      (typeof v === 'string' ? v.trim() : (Array.isArray(v) || typeof v === 'object' ? Object.keys(v).length : true));
+
+    const got = [];
+    if(has(d.geminiKey)){     CF_CONFIG.geminiKey     = d.geminiKey;     got.push('Gemini key'); }
+    if(has(d.pageTokens)){    CF_CONFIG.pageTokens    = d.pageTokens;    got.push('пэйж токен'); }
+    if(has(d.movieLinks)){    CF_CONFIG.movieLinks    = d.movieLinks;    got.push('кино линк ('+Object.keys(d.movieLinks).length+')'); }
+    if(has(d.groupLinks)){    CF_CONFIG.groupLinks    = d.groupLinks;    got.push('групп линк'); }
+    if(has(d.promptChat)){    CF_CONFIG.promptChat    = d.promptChat;    got.push('чат промпт'); }
+    if(has(d.promptVision)){  CF_CONFIG.promptVision  = d.promptVision;  got.push('зураг промпт'); }
+    if(has(d.qpayMerchants)){ CF_CONFIG.qpayMerchants = d.qpayMerchants; got.push('QPay merchant'); }
+    if(has(d.bankInfo) && d.bankInfo.accountNumber){
+      BANK_INFO = Object.assign({}, BANK_INFO, d.bankInfo);
+      localStorage.setItem('toorxon_bank_info', JSON.stringify(BANK_INFO));
+      got.push('данс (' + d.bankInfo.accountNumber + ')');
+    }
+
+    CF_CONFIG.workerUrl = workerUrl;
+    CF_CONFIG.refreshSecret = secret;
+    saveCfConfigToStorage(CF_CONFIG);
+
+    // Талбаруудыг дахин зурна
+    try{
+      const g = document.getElementById('cf-gemini-key'); if(g) g.value = CF_CONFIG.geminiKey || '';
+      if(typeof renderPageTokenList === 'function') renderPageTokenList();
+      if(typeof renderQpayMerchants === 'function') renderQpayMerchants();
+      if(typeof renderMovieLinkList === 'function') renderMovieLinkList();
+      const bn = document.getElementById('bank-name');           if(bn) bn.value = BANK_INFO.bankName || '';
+      const ba = document.getElementById('bank-account-number'); if(ba) ba.value = BANK_INFO.accountNumber || '';
+      const bh = document.getElementById('bank-account-holder'); if(bh) bh.value = BANK_INFO.accountHolder || '';
+      const pc = document.getElementById('cf-prompt-chat');      if(pc) pc.value = CF_CONFIG.promptChat || '';
+      const pv = document.getElementById('cf-prompt-vision');    if(pv) pv.value = CF_CONFIG.promptVision || '';
+    }catch(e){}
+
+    showToast('✅ Татлаа: ' + (got.length ? got.join(', ') : 'хоосон байна'));
+  }catch(e){
+    showError('Холболтын алдаа: ' + e.message);
+  }
+}
+
 // ══ БҮГДИЙГ CLOUDFLARE-РУУ НЭГТ PUSH ══
 async function pushAllCfConfig(){
   saveAllCfCredentials();
@@ -3893,6 +3956,19 @@ window.addEventListener('DOMContentLoaded', function(){
           <label>Worker Refresh Secret</label>
           <input type="password" id="cf-refresh-secret" placeholder="kino-refresh-2026">
           <p class="cf-hint">Worker дотрох REFRESH_SECRET-тэй яг адил байх ёстой</p>
+
+          <!-- ══ CLOUDFLARE-ААС ТАТАХ ══ -->
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--ad-border);">
+            <button class="btn btn-green" style="width:100%;" onclick="pullCfConfig()">
+              ⬇ CLOUDFLARE-ААС ТОХИРГОО ТАТАХ
+            </button>
+            <p class="cf-hint" style="margin-top:6px;">
+              Татаж авсан HTML нь энэ хэсэг хоосонтой ирдэг — түлхүүр, токен нийтэд ил
+              гарахаас сэргийлж HTML-д хадгалагддаггүй. Хуучин backup файл сэргээхийн
+              оронд <b>энэ товчийг дарж</b> Cloudflare дээрх хамгийн сүүлийн тохиргоог
+              шууд татаж аваарай.
+            </p>
+          </div>
         </div>
       </div>
 
