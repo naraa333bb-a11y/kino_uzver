@@ -739,7 +739,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785076788229;
+const CATALOG_VERSION = 1785077389329;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -1268,8 +1268,13 @@ async function createQpayInvoice(){
       // Тиймээс энд ямар ч onclick, preventDefault хэрэглэхгүй.
       html += '<p style="font-size:11px;color:var(--muted);text-align:center;margin:10px 0 6px;">'
             + 'эсвэл банкаа сонгоно уу</p>';
+      // Аппын холбоосыг ШУУД биш, worker-ийн /bank гүүрээр дамжуулна.
+      // Facebook/Messenger "khanbank://"-ийг блоклодог ч "https://"-ийг
+      // блоклодоггүй. Гүүр нь 302-оор аппын схем рүү шилжүүлэхэд үйлдлийн
+      // систем аппыг нээнэ.
+      const bridge = link => QPAY_WORKER_URL + '/bank?u=' + encodeURIComponent(link);
       html += '<div class="qpay-bank-list">' + data.deeplinks.map(d =>
-        '<a class="qpay-bank" href="' + d.link + '" style="text-decoration:none;">'
+        '<a class="qpay-bank" href="' + bridge(d.link) + '" style="text-decoration:none;">'
         + (d.logo ? '<img src="' + d.logo + '" alt="" style="width:26px;height:26px;border-radius:6px;margin-bottom:4px;" onerror="this.style.display=\'none\'">' : '<div class="qpay-bank-icon">🏦</div>')
         + '<div class="qpay-bank-name">' + (d.name || '') + '</div></a>'
       ).join('') + '</div>';
