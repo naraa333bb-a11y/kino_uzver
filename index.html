@@ -734,7 +734,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785057587018;
+const CATALOG_VERSION = 1785058186226;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -2276,6 +2276,28 @@ async function fetchLiveVersion(){
   }catch(e){ return null; }
 }
 
+// ── Локал файлаас нээсэн эсэхийг шалгана ──
+// file:// горимд Chrome сервер рүү хандахыг хориглодог тул Cloudflare,
+// GitHub, QPay бүгд ажиллахгүй. Шууд анхааруулж, амьд хаяг руу зална.
+const LIVE_ADMIN_URL = 'https://naraa333bb-a11y.github.io/kino_uzver/?admin=2020';
+
+function checkFileProtocol(){
+  if(location.protocol !== 'file:') return false;
+
+  const bar = document.createElement('div');
+  bar.id = 'file-warning';
+  bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#b7791f;'
+    + 'color:#fff;padding:12px 16px;font-size:13px;line-height:1.5;text-align:center;'
+    + 'box-shadow:0 2px 12px rgba(0,0,0,.4);';
+  bar.innerHTML = '⚠ <b>Локал файлаас нээсэн байна.</b> Энэ горимд Cloudflare шинэчлэх, '
+    + 'GitHub байршуулах, тохиргоо татах зэрэг ажиллахгүй.<br>'
+    + '<a href="' + LIVE_ADMIN_URL + '" style="display:inline-block;margin-top:8px;padding:6px 18px;'
+    + 'border-radius:6px;background:#fff;color:#b7791f;font-weight:700;text-decoration:none;">'
+    + '🌐 Амьд админ хуудас руу очих</a>';
+  document.body.appendChild(bar);
+  return true;
+}
+
 // ── Нээлттэй таб хуучирсан эсэхийг шалгаж анхааруулна ──
 // Хуучирсан хуудаснаас хадгалвал хожим орсон бүх өөрчлөлт устдаг тул чухал
 async function checkStaleTab(){
@@ -3689,8 +3711,10 @@ window.addEventListener('DOMContentLoaded', function(){
     document.getElementById('adminToggleBtn').classList.add('show');
     document.getElementById('welcomeGate').classList.add('hidden');
 
+    // Локал файлаас нээсэн бол шууд анхааруулна (тэр горимд юу ч ажиллахгүй)
+    const isFile = (typeof checkFileProtocol === 'function') && checkFileProtocol();
     // Хуудас хуучирсан эсэхийг шалгаж, шаардвал улаан анхааруулга гаргана
-    if(typeof checkStaleTab === 'function') checkStaleTab();
+    if(!isFile && typeof checkStaleTab === 'function') checkStaleTab();
     // Талбар засах бүрд автоматаар хадгалдаг болгоно
     if(typeof initAutoSave === 'function') initAutoSave();
 
