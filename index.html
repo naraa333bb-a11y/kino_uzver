@@ -734,7 +734,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785051611392;
+const CATALOG_VERSION = 1785053807022;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -3401,10 +3401,41 @@ function buildBackupText(){
 }
 
 // Хуучин нэр — backup дангаар татах (хэрэв хэрэгтэй бол)
-function exportSystemBackup(){
+// Тохиргоо нь хөтчийн санах ойд амьдардаг тул шинэ орчноос нээхэд хоосон байдаг.
+// Хоосон backup татахаас сэргийлж, эхлээд Cloudflare-аас автоматаар татна.
+async function exportSystemBackup(){
+  const cfgEmpty =
+    !CF_CONFIG.geminiKey &&
+    !(CF_CONFIG.movieLinks && Object.keys(CF_CONFIG.movieLinks).length) &&
+    !(CF_CONFIG.pageTokens && Object.keys(CF_CONFIG.pageTokens).length);
+
+  if(cfgEmpty){
+    const wu  = document.getElementById('cf-worker-url')?.value?.trim() || CF_CONFIG.workerUrl;
+    const sec = document.getElementById('cf-refresh-secret')?.value?.trim() || CF_CONFIG.refreshSecret;
+    if(wu && sec){
+      showToast('⏳ Тохиргоо хоосон байна — Cloudflare-аас татаж байна...');
+      await pullCfConfig();
+    } else {
+      showError('Тохиргоо хоосон байна. Cloudflare табын A хэсэгт Worker URL болон '
+              + 'Refresh Secret бичээд "⬇ CLOUDFLARE-ААС ТОХИРГОО ТАТАХ" дарсны дараа backup хийнэ үү.');
+      return;
+    }
+  }
+
   const content = buildBackupText();
+
+  // Татсаны дараа хэр бүрэн болсныг хэлж өгнө — хоосон файлыг чимээгүй өгөхгүй
+  const emptyCount = (content.match(/: *—\s*$/gm) || []).length
+                   + (content.match(/— *(токен|линк) байхгүй *—/g) || []).length;
+
   _fallbackDownload(content, 'kino_uzver_backup_' + new Date().toISOString().slice(0,10) + '.txt', 'text/plain;charset=utf-8');
-  showToast('Backup файл татагдлаа — аюулгүй газарт хадгална уу');
+
+  if(emptyCount > 3){
+    showError('⚠ Backup татагдсан ч ' + emptyCount + ' хэсэг хоосон байна. '
+            + 'Эхлээд "Cloudflare-аас тохиргоо татах" дарж, дараа нь дахин backup хийнэ үү.');
+  } else {
+    showToast('✅ Backup татагдлаа — аюулгүй газарт хадгална уу');
+  }
 }
 
 function importSystemBackup(input){
