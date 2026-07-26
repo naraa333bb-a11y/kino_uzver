@@ -618,15 +618,20 @@ function applyHeroText(title, sub){
 
 // ══ ?ref= ПАРАМЕТРААР ПЭЙЖ ТОДОРХОЙЛОХ ══
 // 8 пэйжийн Messenger линкийг энд тохируулна (placeholder)
+// ЗААВАЛ ботын webhook-д холбогдсон пэйж байх ёстой. Өөр пэйж рүү заавал
+// Facebook ref-ийг worker руу илгээхгүй тул хэрэглэгчийн ID баригдахгүй,
+// төлбөр төлөгдсөн ч кино линк очихгүй болно.
+const BOT_PAGE = "https://m.me/1027017460500989";   // Тагтаа Студио -2
+
 const PAGE_LINKS = {
-  ai1:   "https://m.me/955274960996562",
-  ai2:   "https://m.me/AI_DRAMA_PAGE_2",
-  act1:  "https://m.me/ACTION_PAGE_1",
-  act2:  "https://m.me/ACTION_PAGE_2",
-  ero1:  "https://m.me/EROTIC_PAGE_1",
-  ero2:  "https://m.me/EROTIC_PAGE_2",
-  ero3:  "https://m.me/EROTIC_PAGE_3",
-  ero4:  "https://m.me/EROTIC_PAGE_4",
+  ai1:   BOT_PAGE,
+  ai2:   BOT_PAGE,
+  act1:  BOT_PAGE,
+  act2:  BOT_PAGE,
+  ero1:  BOT_PAGE,
+  ero2:  BOT_PAGE,
+  ero3:  BOT_PAGE,
+  ero4:  BOT_PAGE,
 };
 
 // Категори бүрийн анхдагч (default) пэйж — ref параметр байхгүй үед
@@ -734,7 +739,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785059502130;
+const CATALOG_VERSION = 1785061983235;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -863,10 +868,22 @@ function getMessengerPageId(catIndex){
 // ══ SESSION ID — НЭГ ХЭРЭГЛЭГЧИЙГ ТОДОРХОЙЛОХ TҮЛХҮҮР ══
 // HTML нээх бүрд шинээр үүснэ — бүх кино/групп сонголтуудад ижил session-г ашиглана
 // ══ SESSION ID — HTML нээх бүрд шинээр үүснэ (хадгалагдахгүй) ══
+// Сешн ID нь хэрэглэгчийг Messenger-тэй холбох "гүүр" юм.
+// Хуудас нээх бүрд шинээр үүсгэвэл "Эхлэх" товчоор үүссэн холбоос хүчингүй
+// болж, төлбөр төлөгдсөний дараа кино линк хэнд илгээхээ мэдэхгүй болдог.
+// Тиймээс нэг удаа үүсгээд localStorage-д хадгалж, дараа нь дахин ашиглана.
+const SESSION_KEY = 'toorxon_session_id';
+
 function getSessionId(){
+  try{
+    const saved = localStorage.getItem(SESSION_KEY);
+    if(saved && /^[A-Z0-9]{8}$/.test(saved)) return saved;
+  }catch(e){}
+
   const chars='ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
   let sid='';
   for(let i=0;i<8;i++) sid+=chars[Math.floor(Math.random()*chars.length)];
+  try{ localStorage.setItem(SESSION_KEY, sid); }catch(e){}
   return sid;
 }
 
@@ -1017,6 +1034,18 @@ function openBuyModal(movieId, catIndex){
   document.getElementById('btnAcct').classList.remove('active');
 
   document.getElementById('buyModal').classList.add('open');
+
+  // Messenger холбоос үүссэн эсэхийг шалгаж, үгүй бол анхааруулга гаргана
+  const warn = document.getElementById('msgr-connect-warn');
+  if(warn){
+    warn.style.display = 'none';
+    warn.innerHTML = '';
+    isSessionLinked().then(ok => {
+      // Модал хаагдсан бол харуулах шаардлагагүй
+      if(!document.getElementById('buyModal').classList.contains('open')) return;
+      if(!ok) renderMessengerConnect(warn);
+    });
+  }
 }
 
 // Гүйлгээний утга шинэчлэх (1+N сонголт хийхэд ч дуудагдана)
@@ -1138,6 +1167,65 @@ function selectPay(method){
     qpayBtn.classList.remove('active');
     acctPanel.classList.add('open');
     qpayPanel.classList.remove('open');
+  }
+}
+
+// ══════════════════════════════════════════
+// MESSENGER ХОЛБООС ШАЛГАХ
+// Кино линкийг төлбөр төлөгдсөний дараа Messenger-ээр илгээдэг тул
+// хэрэглэгчийн Messenger ID нь сешнтэй холбогдсон байх ёстой. Холбогдоогүй
+// байвал төлбөр төлсөн ч линк хүрэхгүй — тиймээс төлбөрөөс өмнө шалгаж,
+// шаардлагатай бол хэрэглэгчид холбох товч харуулна.
+// ══════════════════════════════════════════
+let _sessionLinked = false;
+
+async function isSessionLinked(){
+  if(_sessionLinked) return true;
+  try{
+    const res = await fetch(`${QPAY_WORKER_URL}/session-check?sid=${encodeURIComponent(SESSION_ID)}`);
+    if(!res.ok) return false;
+    const d = await res.json();
+    _sessionLinked = !!d.linked;
+    return _sessionLinked;
+  }catch(e){
+    return false;   // шалгаж чадаагүй бол сануулга харуулна (аюулгүй тал)
+  }
+}
+
+// Холбогдоогүй үед төлбөрийн хэсэгт анхааруулга + холбох товч гаргана
+function renderMessengerConnect(container){
+  if(!container) return;
+  const link = `https://m.me/${getMessengerPageId(currentCat || 0)}?ref=SESSION-${SESSION_ID}`;
+  container.style.display = '';
+  container.innerHTML =
+      '<div style="background:rgba(255,193,7,.12);border:1px solid rgba(255,193,7,.5);'
+    + 'border-radius:10px;padding:12px;margin-bottom:12px;">'
+    + '<p style="font-size:12px;color:#ffc107;font-weight:700;margin-bottom:6px;">'
+    + '⚠ Messenger холболт хийгээгүй байна</p>'
+    + '<p style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:10px;">'
+    + 'Төлбөр төлсний дараа киноны линкийг Messenger-ээр илгээнэ. Тиймээс доорх '
+    + 'товчийг дарж чатаа нээгээд <b style="color:#fff">нэг мессеж бичээрэй</b> '
+    + '(жишээ нь "сайн байна уу"). Дараа нь буцаж ирээд төлбөрөө хийнэ үү.</p>'
+    + '<a href="' + link + '" target="_blank" rel="noopener" '
+    + 'style="display:block;text-align:center;padding:10px;border-radius:8px;'
+    + 'background:#0084ff;color:#fff;font-weight:700;text-decoration:none;font-size:13px;">'
+    + '💬 Messenger-ээр холбогдох</a>'
+    + '<button onclick="recheckSessionLink(this)" style="width:100%;margin-top:8px;padding:8px;'
+    + 'border:0;border-radius:8px;background:var(--card2);color:var(--muted);font-size:11px;cursor:pointer;">'
+    + '🔄 Холбогдсон — дахин шалгах</button>'
+    + '</div>';
+}
+
+async function recheckSessionLink(btn){
+  if(btn){ btn.textContent = 'Шалгаж байна...'; btn.disabled = true; }
+  _sessionLinked = false;
+  const ok = await isSessionLinked();
+  const warn = document.getElementById('msgr-connect-warn');
+  if(ok){
+    if(warn){ warn.style.display = 'none'; warn.innerHTML = ''; }
+    showToast && showToast('✅ Messenger холболт бэлэн');
+  } else {
+    if(btn){ btn.textContent = '🔄 Хараахан холбогдоогүй — дахин шалгах'; btn.disabled = false; }
   }
 }
 
@@ -3821,6 +3909,9 @@ window.addEventListener('DOMContentLoaded', function(){
           ✓ Гүйлгээний утганд сонгосон киноны код нэмэгдлээ
         </p>
       </div>
+
+      <!-- MESSENGER ХОЛБООСЫН АНХААРУУЛГА (шаардлагатай үед л гарна) -->
+      <div id="msgr-connect-warn" style="display:none;"></div>
 
       <!-- TOGGLE BUTTONS -->
       <div class="pay-row">
