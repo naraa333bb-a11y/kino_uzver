@@ -739,7 +739,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785079518288;
+const CATALOG_VERSION = 1785080653009;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -1239,29 +1239,31 @@ function isInAppBrowser(){
 }
 function isAndroid(){ return /Android/i.test(navigator.userAgent || ''); }
 
-// Android дээр Chrome-ийг шууд нээх боломжтой (intent схем).
-// iOS дээр ийм арга байхгүй тул зааврыг харуулна.
-function buildOpenInBrowserHtml(){
-  const cur = location.href;
-  if(isAndroid()){
-    const noScheme = cur.replace(/^https?:\/\//, '');
-    const intent = 'intent://' + noScheme
-      + '#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url='
-      + encodeURIComponent(cur) + ';end';
-    return '<a href="' + intent + '" style="display:block;text-align:center;padding:14px;'
-      + 'border-radius:10px;background:#0084ff;color:#fff;font-weight:700;'
-      + 'text-decoration:none;font-size:14px;">🌐 Браузераар нээж төлөх</a>'
-      + '<p style="font-size:11px;color:var(--muted);text-align:center;margin-top:8px;">'
-      + 'Facebook-ийн цонхноос банкны апп нээгддэггүй тул браузераар нээнэ</p>';
-  }
-  return '<div style="background:rgba(0,132,255,.12);border:1px solid rgba(0,132,255,.5);'
-    + 'border-radius:10px;padding:14px;">'
-    + '<p style="font-size:13px;color:#fff;font-weight:700;margin-bottom:6px;">'
-    + '📱 Банкаар төлөхийн тулд браузераар нээнэ үү</p>'
-    + '<p style="font-size:12px;color:var(--muted);line-height:1.6;">'
-    + 'Facebook-ийн цонхноос банкны апп нээгддэггүй.<br>'
-    + 'Баруун доод/дээд булангийн <b style="color:#fff">⋯</b> товч дарж '
-    + '<b style="color:#fff">"Safari-аар нээх"</b> сонгоно уу.</p></div>';
+// ── Банкны товчны холбоосыг орчинд тааруулж бэлдэнэ ──
+//
+// Facebook/Messenger-ийн цонх "khanbank://" схемийг блоклодог. Гэвч:
+//   · Android дээр "intent://" схемийг МӨН ЛЭ дэмждэг — Android өөрөө тухайн
+//     схемийг зохицуулах аппыг олж нээнэ. Package нэр мэдэх шаардлагагүй.
+//   · iOS дээр "x-safari-https://" угтвар нь Safari-г нээдэг. Түүгээр
+//     worker-ийн /bank гүүр рүү оруулбал 302-оор банкны апп нээгдэнэ.
+// Жинхэнэ браузерт шууд схемийг ашиглана.
+
+function toIntentUrl(link){
+  const m = String(link).match(/^([a-z0-9\-\+\.]+):\/\/([\s\S]*)$/i);
+  if(!m) return link;
+  // Утга дотор ";" эсвэл "#" байвал intent тайлалт эвдэрнэ — тийм үед шууд орхино
+  if(/[;#]/.test(m[2])) return link;
+  return 'intent://' + m[2] + '#Intent;scheme=' + m[1] + ';end';
+}
+
+function toSafariUrl(link){
+  const host = QPAY_WORKER_URL.replace(/^https?:\/\//, '');
+  return 'x-safari-https://' + host + '/bank?u=' + encodeURIComponent(link);
+}
+
+function bankHref(link){
+  if(!isInAppBrowser()) return link;          // жинхэнэ браузер — шууд
+  return isAndroid() ? toIntentUrl(link) : toSafariUrl(link);
 }
 
 // ══ QPAY INVOICE ҮҮСГЭХ — Cloudflare worker-ээр дамжина ══
@@ -1293,12 +1295,7 @@ async function createQpayInvoice(){
 
     let html = '';
 
-    // Facebook/Messenger-ийн дотоод цонхноос банкны апп нээгддэггүй.
-    // Тиймээс банкны товч харуулахын оронд браузераар нээх зам санал болгоно.
     const inApp = isInAppBrowser();
-    if(inApp){
-      html += buildOpenInBrowserHtml() + '<div style="height:14px;"></div>';
-    }
 
     if(data.qr_image){
       html += '<div style="text-align:center;margin:10px 0;">'
@@ -1308,19 +1305,16 @@ async function createQpayInvoice(){
             + (inApp ? 'Эсвэл өөр төхөөрөмжөөс энэ QR-ийг уншуулна уу'
                      : 'Банкны аппаараа дээрх QR-ийг уншуулна уу') + '</p>';
     }
-    // Банкны товчийг зөвхөн ЖИНХЭНЭ браузерт харуулна — дотоод цонхонд
-    // ажиллахгүй тул харуулах нь хэрэглэгчийг төөрөгдүүлнэ.
-    if(!inApp && data.deeplinks && data.deeplinks.length){
+    if(data.deeplinks && data.deeplinks.length){
       // Банкны аппын холбоос ("khanbank://…").
       // ЭНГИЙН <a href> байдлаар үлдээнэ — хэрэглэгчийн шууд даралтыг
       // хөтчүүд зөвшөөрдөг бол JS-ээр дуудсан шилжилтийг блоклодог.
       // Тиймээс энд ямар ч onclick, preventDefault хэрэглэхгүй.
       html += '<p style="font-size:11px;color:var(--muted);text-align:center;margin:10px 0 6px;">'
             + 'эсвэл банкаа сонгоно уу</p>';
-      // Жинхэнэ браузерт шууд аппын холбоос асуудалгүй ажилладаг тул
-      // нэмэлт дамжуулга хэрэггүй.
+      // Товч бүр өөрөө гүүр — орчноос хамаарч холбоосыг хөрвүүлнэ
       html += '<div class="qpay-bank-list">' + data.deeplinks.map(d =>
-        '<a class="qpay-bank" href="' + d.link + '" style="text-decoration:none;">'
+        '<a class="qpay-bank" href="' + bankHref(d.link) + '" style="text-decoration:none;">'
         + (d.logo ? '<img src="' + d.logo + '" alt="" style="width:26px;height:26px;border-radius:6px;margin-bottom:4px;" onerror="this.style.display=\'none\'">' : '<div class="qpay-bank-icon">🏦</div>')
         + '<div class="qpay-bank-name">' + (d.name || '') + '</div></a>'
       ).join('') + '</div>';
