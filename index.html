@@ -739,7 +739,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785083104274;
+const CATALOG_VERSION = 1785087102133;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -1190,24 +1190,28 @@ async function isSessionLinked(){
   }
 }
 
-// Холбогдоогүй үед төлбөрийн хэсэгт анхааруулга + холбох товч гаргана
+// Холбогдоогүй үед төлбөрийн хэсэгт анхааруулга + Messenger рүү үсэргэх товч.
+// Реферралд сонгосон кино/группын кодыг хамт дамжуулна — бот мэндчилгээндээ
+// киноны нэрийг дурдаж, худалдан авалт руу нь чиглүүлнэ.
 function renderMessengerConnect(container){
   if(!container) return;
-  const link = `https://m.me/${getMessengerPageId(currentCat || 0)}?ref=SESSION-${SESSION_ID}`;
+  const txn = (document.getElementById('txnCode')?.textContent || '');
+  const cm = txn.match(/-(M\d{2}|GRP|ALL)-/);
+  const ref = 'SESSION-' + SESSION_ID + (cm ? '-' + cm[1] : '');
+  const link = `https://m.me/${getMessengerPageId(currentCat || 0)}?ref=${ref}`;
   container.style.display = '';
   container.innerHTML =
-      '<div style="background:rgba(255,193,7,.12);border:1px solid rgba(255,193,7,.5);'
+      '<div style="background:rgba(0,132,255,.10);border:1px solid rgba(0,132,255,.5);'
     + 'border-radius:10px;padding:12px;margin-bottom:12px;">'
-    + '<p style="font-size:12px;color:#ffc107;font-weight:700;margin-bottom:6px;">'
-    + '⚠ Messenger холболт хийгээгүй байна</p>'
+    + '<p style="font-size:12px;color:#6ab7ff;font-weight:700;margin-bottom:6px;">'
+    + '🛒 Худалдан авалт Messenger-ээр хийгдэнэ</p>'
     + '<p style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:10px;">'
-    + 'Төлбөр төлсний дараа киноны линкийг Messenger-ээр илгээнэ. Тиймээс доорх '
-    + 'товчийг дарж чатаа нээгээд <b style="color:#fff">нэг мессеж бичээрэй</b> '
-    + '(жишээ нь "сайн байна уу"). Дараа нь буцаж ирээд төлбөрөө хийнэ үү.</p>'
+    + 'Доорх товчийг дарахад Messenger нээгдэж, бот танд худалдан авалтын линк '
+    + 'илгээнэ. Түүгээр орж төлбөрөө хийхэд киноны линк мөн энэ чатаар очно.</p>'
     + '<a href="' + link + '" target="_blank" rel="noopener" '
     + 'style="display:block;text-align:center;padding:10px;border-radius:8px;'
     + 'background:#0084ff;color:#fff;font-weight:700;text-decoration:none;font-size:13px;">'
-    + '💬 Messenger-ээр холбогдох</a>'
+    + '💬 Messenger-ээр үргэлжлүүлэх</a>'
     + '<button onclick="recheckSessionLink(this)" style="width:100%;margin-top:8px;padding:8px;'
     + 'border:0;border-radius:8px;background:var(--card2);color:var(--muted);font-size:11px;cursor:pointer;">'
     + '🔄 Холбогдсон — дахин шалгах</button>'
@@ -1242,6 +1246,24 @@ function bankHref(link){
 // ══ QPAY INVOICE ҮҮСГЭХ — Cloudflare worker-ээр дамжина ══
 const QPAY_WORKER_URL = 'https://kinobot.naraa333bb.workers.dev';
 let _qpayInvoiceForTxn = null;
+
+// ── БОТЫН ЛИНКЭЭР ОРЖ ИРСЭН СЕШНИЙГ ЧИМЭЭГҮЙ ХОЛБОХ ──
+// Бот Messenger чатад "сайт/?ms=XXXXXXXX" линк илгээдэг. Тэр линкээр
+// Messenger доторх цонхонд сайт нээгдэхэд ЭНД шинэ сешн үүсдэг тул
+// ms түлхүүгээр worker-ээс PSID-г нь олж, шинэ сешнээ шууд холбоно.
+// Ингэснээр "Messenger-ээр холбогдоно уу" гэж дахин шаардахгүй.
+(async function adoptMsToken(){
+  try{
+    const ms = new URLSearchParams(location.search).get('ms');
+    if(!ms || !/^[A-Z0-9]{8}$/i.test(ms)) return;
+    const res = await fetch(QPAY_WORKER_URL + '/adopt?sid=' + SESSION_ID
+      + '&ms=' + encodeURIComponent(ms.toUpperCase()));
+    if(res.ok){
+      const d = await res.json();
+      if(d.linked) _sessionLinked = true;
+    }
+  }catch(e){}
+})();
 
 async function createQpayInvoice(){
   const txnCode = (document.getElementById('txnCode').textContent || '').trim();
