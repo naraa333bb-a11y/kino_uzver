@@ -739,7 +739,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785080653009;
+const CATALOG_VERSION = 1785082605991;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -1228,42 +1228,15 @@ async function recheckSessionLink(btn){
 }
 
 // ══════════════════════════════════════════
-// ДОТООД БРАУЗЕР ИЛРҮҮЛЭХ
-// Facebook/Messenger/Instagram-ийн дотоод цонхноос банкны апп нээх
-// БОЛОМЖГҮЙ — QPay өөрөө ч "open in external browser" гэж заадаг.
-// Тиймээс тэр тохиолдолд гадаад браузер руу залах товч харуулна.
+// БАНКНЫ ТОВЧНЫ ХОЛБООС
+// kora.mn дээр нотлогдсон: түүхий "khanbank://" схемийг шууд href-д
+// тавихад Facebook/Messenger-ийн цонх ӨӨРӨӨ "Leave Facebook → Open app"
+// гүүр цонхоо гаргаж аппыг нээдэг (iOS дээр туршиж баталсан).
+// Ямар ч хувиргалт (intent://, x-safari-https://) хийх ХЭРЭГГҮЙ —
+// хувиргалт нь эсрэгээрээ танигдахгүй схем болж гацдаг байсан.
 // ══════════════════════════════════════════
-function isInAppBrowser(){
-  const ua = navigator.userAgent || '';
-  return /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Messenger|Line\/|MicroMessenger/i.test(ua);
-}
-function isAndroid(){ return /Android/i.test(navigator.userAgent || ''); }
-
-// ── Банкны товчны холбоосыг орчинд тааруулж бэлдэнэ ──
-//
-// Facebook/Messenger-ийн цонх "khanbank://" схемийг блоклодог. Гэвч:
-//   · Android дээр "intent://" схемийг МӨН ЛЭ дэмждэг — Android өөрөө тухайн
-//     схемийг зохицуулах аппыг олж нээнэ. Package нэр мэдэх шаардлагагүй.
-//   · iOS дээр "x-safari-https://" угтвар нь Safari-г нээдэг. Түүгээр
-//     worker-ийн /bank гүүр рүү оруулбал 302-оор банкны апп нээгдэнэ.
-// Жинхэнэ браузерт шууд схемийг ашиглана.
-
-function toIntentUrl(link){
-  const m = String(link).match(/^([a-z0-9\-\+\.]+):\/\/([\s\S]*)$/i);
-  if(!m) return link;
-  // Утга дотор ";" эсвэл "#" байвал intent тайлалт эвдэрнэ — тийм үед шууд орхино
-  if(/[;#]/.test(m[2])) return link;
-  return 'intent://' + m[2] + '#Intent;scheme=' + m[1] + ';end';
-}
-
-function toSafariUrl(link){
-  const host = QPAY_WORKER_URL.replace(/^https?:\/\//, '');
-  return 'x-safari-https://' + host + '/bank?u=' + encodeURIComponent(link);
-}
-
 function bankHref(link){
-  if(!isInAppBrowser()) return link;          // жинхэнэ браузер — шууд
-  return isAndroid() ? toIntentUrl(link) : toSafariUrl(link);
+  return link;   // kora.mn-тэй яг адил: түүхий схемийг шууд
 }
 
 // ══ QPAY INVOICE ҮҮСГЭХ — Cloudflare worker-ээр дамжина ══
@@ -1295,15 +1268,12 @@ async function createQpayInvoice(){
 
     let html = '';
 
-    const inApp = isInAppBrowser();
-
     if(data.qr_image){
       html += '<div style="text-align:center;margin:10px 0;">'
             + '<img src="data:image/png;base64,' + data.qr_image + '" alt="QPay QR" '
             + 'style="width:200px;height:200px;border-radius:12px;background:#fff;padding:8px;"></div>'
             + '<p style="font-size:11px;color:var(--muted);text-align:center;">'
-            + (inApp ? 'Эсвэл өөр төхөөрөмжөөс энэ QR-ийг уншуулна уу'
-                     : 'Банкны аппаараа дээрх QR-ийг уншуулна уу') + '</p>';
+            + 'Банкны аппаараа дээрх QR-ийг уншуулна уу</p>';
     }
     if(data.deeplinks && data.deeplinks.length){
       // Банкны аппын холбоос ("khanbank://…").
