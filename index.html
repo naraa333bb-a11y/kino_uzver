@@ -739,7 +739,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785071771062;
+const CATALOG_VERSION = 1785073536864;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -3115,6 +3115,17 @@ async function pullCfConfig(){
       got.push('данс (' + d.bankInfo.accountNumber + ')');
     }
 
+    // Ботын горим
+    if(d.botMode){
+      CF_CONFIG.botMode = d.botMode;
+      const sel = document.getElementById('cf-bot-mode');
+      if(sel) sel.value = d.botMode;
+      const st = document.getElementById('bot-mode-status');
+      if(st) st.textContent = 'Одоогийн горим: ' +
+        ({on:'🟢 Асаалттай', test:'🟡 Тест', off:'🔴 Унтраалттай'}[d.botMode] || d.botMode);
+      got.push('ботын горим');
+    }
+
     CF_CONFIG.workerUrl = workerUrl;
     CF_CONFIG.refreshSecret = secret;
     saveCfConfigToStorage(CF_CONFIG);
@@ -3135,6 +3146,43 @@ async function pullCfConfig(){
     showToast('✅ Татлаа: ' + (got.length ? got.join(', ') : 'хоосон байна'));
   }catch(e){
     showError('Холболтын алдаа: ' + e.message);
+  }
+}
+
+// ══════════════════════════════════════════
+// БОТЫН ГОРИМ — асаах / тест / унтраах
+// Кодыг засаж дахин байршуулах шаардлагагүй, шууд Cloudflare-д хадгална.
+// ══════════════════════════════════════════
+async function saveBotMode(){
+  const mode = document.getElementById('cf-bot-mode')?.value;
+  const st   = document.getElementById('bot-mode-status');
+  if(!['on','test','off'].includes(mode)){ showError('Горим сонгоно уу'); return; }
+
+  const workerUrl = normWorkerUrl(document.getElementById('cf-worker-url')?.value || CF_CONFIG.workerUrl);
+  const secret    = document.getElementById('cf-refresh-secret')?.value?.trim() || CF_CONFIG.refreshSecret;
+  if(!workerUrl){ showError('Worker URL оруулна уу'); return; }
+  if(!secret){    showError('Refresh Secret оруулна уу'); return; }
+
+  if(st) st.textContent = '⏳ Хадгалж байна...';
+  try{
+    const res = await fetch(`${workerUrl}/config?secret=${encodeURIComponent(secret)}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ botMode: mode })
+    });
+    const data = await res.json();
+    if(data.success && (data.saved || []).includes('botMode')){
+      const label = {on:'🟢 Асаалттай', test:'🟡 Тест', off:'🔴 Унтраалттай'}[mode];
+      showToast('✅ Ботын горим: ' + label);
+      if(st) st.textContent = 'Одоогийн горим: ' + label + ' · ' + new Date().toLocaleTimeString('mn-MN');
+      CF_CONFIG.botMode = mode;
+      saveCfConfigToStorage(CF_CONFIG);
+    } else {
+      showError('Хадгалж чадсангүй — worker хуучин код байж магадгүй');
+      if(st) st.textContent = '';
+    }
+  }catch(e){
+    showError('Холбогдож чадсангүй: ' + e.message);
+    if(st) st.textContent = '';
   }
 }
 
@@ -4309,6 +4357,24 @@ window.addEventListener('DOMContentLoaded', function(){
           <label>Worker Refresh Secret</label>
           <input type="password" id="cf-refresh-secret" placeholder="kino-refresh-2026">
           <p class="cf-hint">Worker дотрох REFRESH_SECRET-тэй яг адил байх ёстой</p>
+
+          <!-- ══ БОТЫН ГОРИМ ══ -->
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--ad-border);">
+            <label>🤖 Ботын горим</label>
+            <select id="cf-bot-mode" style="width:100%;">
+              <option value="on">🟢 Асаалттай — бүх харилцагчид хариулна</option>
+              <option value="test">🟡 Тест — зөвхөн миний аккаунтад хариулна</option>
+              <option value="off">🔴 Унтраалттай — чатад хариулахгүй</option>
+            </select>
+            <p class="cf-hint" style="margin-top:6px;">
+              Төлбөр төлөгдсөн кино линк <b>горим ямар ч байсан илгээгдэнэ</b> —
+              мөнгө төлсөн харилцагч бараагаа авна.
+            </p>
+            <button class="btn btn-green" style="width:100%;margin-top:8px;" onclick="saveBotMode()">
+              💾 Горимыг хадгалах
+            </button>
+            <p id="bot-mode-status" class="cf-hint" style="margin-top:6px;"></p>
+          </div>
 
           <!-- ══ WORKER КОД DEPLOY ══ -->
           <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--ad-border);">
