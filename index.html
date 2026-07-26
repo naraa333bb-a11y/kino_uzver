@@ -739,7 +739,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785073536864;
+const CATALOG_VERSION = 1785074540812;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -1038,17 +1038,11 @@ function openBuyModal(movieId, catIndex){
 
   document.getElementById('buyModal').classList.add('open');
 
-  // Messenger холбоос үүссэн эсэхийг шалгаж, үгүй бол анхааруулга гаргана
+  // Messenger холболтын анхааруулгыг харуулахгүй — "Эхлэх" товчоор холболт
+  // аль хэдийн үүссэн байдаг тул хэрэглэгчийг төөрөгдүүлэхээс сэргийлнэ.
+  // (Шалгах функцууд хэвээр байгаа — шаардвал буцааж асааж болно.)
   const warn = document.getElementById('msgr-connect-warn');
-  if(warn){
-    warn.style.display = 'none';
-    warn.innerHTML = '';
-    isSessionLinked().then(ok => {
-      // Модал хаагдсан бол харуулах шаардлагагүй
-      if(!document.getElementById('buyModal').classList.contains('open')) return;
-      if(!ok) renderMessengerConnect(warn);
-    });
-  }
+  if(warn){ warn.style.display = 'none'; warn.innerHTML = ''; }
 }
 
 // Гүйлгээний утга шинэчлэх (1+N сонголт хийхэд ч дуудагдана)
@@ -1233,6 +1227,40 @@ async function recheckSessionLink(btn){
   }
 }
 
+// ══════════════════════════════════════════
+// БАНКНЫ АПП НЭЭХ
+// "khanbank://" гэх мэт аппын холбоосыг Facebook/Instagram-ийн дотоод
+// браузер ихэвчлэн блоклодог. Тиймээс JS-ээр нээж, 1.5 секундын дотор
+// хуудас нуугдаагүй бол (=апп нээгдээгүй) хэрэглэгчид зөвлөгөө харуулна.
+// ══════════════════════════════════════════
+function openBankApp(ev, idx){
+  const link = (window._qpayBankLinks || [])[idx];
+  if(!link) return true;               // линк алга — энгийн байдлаар нээх
+  ev.preventDefault();
+
+  const hint = document.getElementById('bank-open-hint');
+  let left = false;
+  const onHide = () => { if(document.hidden) left = true; };
+  document.addEventListener('visibilitychange', onHide);
+
+  try { window.location.href = link; } catch(e){}
+
+  setTimeout(()=>{
+    document.removeEventListener('visibilitychange', onHide);
+    if(left || !hint) return;          // апп нээгдсэн — зөвлөгөө хэрэггүй
+    const inApp = /FBAN|FBAV|Instagram|Messenger/i.test(navigator.userAgent);
+    hint.style.display = '';
+    hint.innerHTML = inApp
+      ? '⚠ Facebook-ийн дотоод цонхноос банкны апп нээгдэхгүй.<br>'
+        + 'Баруун дээд булангийн <b>⋯</b> цэснээс <b>"Chrome/Safari-аар нээх"</b> сонгоод дахин оролдоно уу, '
+        + 'эсвэл дээрх <b>QR кодыг</b> банкны аппаараа уншуулна уу.'
+      : '⚠ Банкны апп олдсонгүй. Утсан дээрээ нээх, эсвэл дээрх <b>QR кодыг</b> '
+        + 'банкны аппаараа уншуулна уу.';
+  }, 1500);
+
+  return false;
+}
+
 // ══ QPAY INVOICE ҮҮСГЭХ — Cloudflare worker-ээр дамжина ══
 const QPAY_WORKER_URL = 'https://kinobot.naraa333bb.workers.dev';
 let _qpayInvoiceForTxn = null;
@@ -1267,17 +1295,20 @@ async function createQpayInvoice(){
             + 'style="width:200px;height:200px;border-radius:12px;background:#fff;padding:8px;"></div>'
             + '<p style="font-size:11px;color:var(--muted);text-align:center;">Банкны аппаараа дээрх QR-ийг уншуулна уу</p>';
     }
-    if(data.short_url){
-      html += '<p style="text-align:center;margin:8px 0;">'
-            + '<a href="' + data.short_url + '" target="_blank" rel="noopener" '
-            + 'style="color:var(--accent2);font-weight:700;">📱 Утаснаас төлөх бол энд дарна уу</a></p>';
-    }
     if(data.deeplinks && data.deeplinks.length){
-      html += '<div class="qpay-bank-list">' + data.deeplinks.map(d =>
-        '<a class="qpay-bank" href="' + d.link + '" style="text-decoration:none;">'
+      // Банкны линк нь "khanbank://" гэх мэт аппын схем. Энгийн <a> байдлаар
+      // Facebook-ийн дотоод браузер ихэвчлэн блоклодог тул JS-ээр нээж,
+      // бүтэлгүйтвэл хэрэглэгчид зөвлөгөө өгнө.
+      window._qpayBankLinks = data.deeplinks.map(d => d.link);
+      html += '<p style="font-size:11px;color:var(--muted);text-align:center;margin:10px 0 6px;">'
+            + 'эсвэл банкаа сонгоно уу</p>';
+      html += '<div class="qpay-bank-list">' + data.deeplinks.map((d, i) =>
+        '<a class="qpay-bank" href="' + d.link + '" onclick="return openBankApp(event,' + i + ')" style="text-decoration:none;">'
         + (d.logo ? '<img src="' + d.logo + '" alt="" style="width:26px;height:26px;border-radius:6px;margin-bottom:4px;" onerror="this.style.display=\'none\'">' : '<div class="qpay-bank-icon">🏦</div>')
         + '<div class="qpay-bank-name">' + (d.name || '') + '</div></a>'
       ).join('') + '</div>';
+      html += '<p id="bank-open-hint" style="display:none;font-size:11px;color:#ffc107;'
+            + 'text-align:center;margin-top:8px;line-height:1.5;"></p>';
     }
     area.innerHTML = html || '<p class="pay-note">Invoice үүссэн боловч QR ирсэнгүй — дахин оролдоно уу.</p>';
   }catch(e){
@@ -3973,13 +4004,8 @@ window.addEventListener('DOMContentLoaded', function(){
 
       <!-- QPAY PANEL -->
       <div class="pay-panel" id="panelQpay">
-        <div class="acct-row">
-          <div class="acct-info-box">
-            <p class="acct-label">Гүйлгээний утга</p>
-            <p class="acct-val" id="txnCodeQpay">—</p>
-          </div>
-          <button class="acct-copy" id="copyTxnQpayBtn" onclick="copyText('txnCodeQpay','copyTxnQpayBtn')">📋</button>
-        </div>
+        <!-- QPay-д гүйлгээний утга нэхэмжлэлд шигдсэн байдаг тул энд
+             харуулах шаардлагагүй — банкны апп дотор автоматаар гарна -->
         <div id="qpayInvoiceArea">
           <p class="pay-note">⏳ QPay нэхэмжлэл бэлдэж байна...</p>
         </div>
