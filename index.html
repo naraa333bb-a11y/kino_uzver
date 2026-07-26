@@ -739,7 +739,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785088362617;
+const CATALOG_VERSION = 1785089389591;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -1201,6 +1201,10 @@ function renderMessengerConnect(container){
     + 'style="display:block;text-align:center;padding:10px;border-radius:8px;'
     + 'background:#0084ff;color:#fff;font-weight:700;text-decoration:none;font-size:13px;">'
     + '💬 Messenger-ээр үргэлжлүүлэх</a>'
+    // Facebook-ийн завсрын хуудас гарвал том "Get the Messenger app" товч нь
+    // App Store руу аваачдаг — доод талын жижиг холбоосыг нь дарах ёстой
+    + '<p style="font-size:10px;color:var(--muted);margin-top:6px;text-align:center;">'
+    + 'Хэрэв сонголт гарвал доод талын <b style="color:#9cc7ff">Open in Messenger</b> дээр дарна уу</p>'
     + '<button onclick="recheckSessionLink(this)" style="width:100%;margin-top:8px;padding:8px;'
     + 'border:0;border-radius:8px;background:var(--card2);color:var(--muted);font-size:11px;cursor:pointer;">'
     + '🔄 Холбогдсон — дахин шалгах</button>'
