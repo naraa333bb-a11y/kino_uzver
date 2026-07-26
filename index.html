@@ -739,7 +739,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785074999294;
+const CATALOG_VERSION = 1785076788229;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -2363,6 +2363,27 @@ async function fetchLiveVersion(){
   }catch(e){ return null; }
 }
 
+// ══════════════════════════════════════════
+// ХУУЧИРСАН ХУУДСЫГ АВТОМАТААР ШИНЭЧЛЭХ
+// GitHub Pages хуудсыг 10 минут кэшлэдэг ба Facebook-ийн дотоод браузер бүр
+// удаан хадгалдаг. Улмаас харилцагч хуучин хувилбар харж, засварууд хүрэхгүй
+// байх эрсдэлтэй (жишээ нь QPay-ийн банкны товч ажиллахгүй байх).
+// Шинэ хувилбар байвал НЭГ УДАА чимээгүй дахин ачаална.
+// ══════════════════════════════════════════
+async function autoRefreshIfStale(){
+  if(location.protocol === 'file:') return;
+  try{
+    const live = await fetchLiveVersion();
+    if(!live || live <= CATALOG_VERSION) return;
+
+    // Нэг хувилбарт нэгээс олон удаа ачаалахгүй — давталтаас сэргийлнэ
+    const key = 'toorxon_reloaded_' + live;
+    if(sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, '1');
+    location.reload();
+  }catch(e){}
+}
+
 // ── Локал файлаас нээсэн эсэхийг шалгана ──
 // file:// горимд Chrome сервер рүү хандахыг хориглодог тул Cloudflare,
 // GitHub, QPay бүгд ажиллахгүй. Шууд анхааруулж, амьд хаяг руу зална.
@@ -3836,6 +3857,9 @@ function toggleAdminPanel(){
 
 // #admin-panel нь script-ийн дараа байрладаг тул DOM бүрэн ачаалсны дараа ажиллана
 window.addEventListener('DOMContentLoaded', function(){
+  // Харилцагч хуучирсан (кэшлэгдсэн) хуудас харж байвал чимээгүй шинэчилнэ
+  if(typeof autoRefreshIfStale === 'function') autoRefreshIfStale();
+
   // URL ?admin=2020 байвал admin panel-г DOM-д нэмж, харин ?admin=2020 үгүй бол
   // template нь render хийгдэхгүй — Ctrl+U-д admin код харагдахгүй
   const params = new URLSearchParams(window.location.search);
