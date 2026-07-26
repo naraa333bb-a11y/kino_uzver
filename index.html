@@ -739,7 +739,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785087330212;
+const CATALOG_VERSION = 1785088362617;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -1018,11 +1018,17 @@ function openBuyModal(movieId, catIndex){
 
   document.getElementById('buyModal').classList.add('open');
 
-  // Messenger холболтын анхааруулгыг харуулахгүй — "Эхлэх" товчоор холболт
-  // аль хэдийн үүссэн байдаг тул хэрэглэгчийг төөрөгдүүлэхээс сэргийлнэ.
-  // (Шалгах функцууд хэвээр байгаа — шаардвал буцааж асааж болно.)
+  // Messenger холболтыг шалгана. Холбогдоогүй бол "Худалдан авалт
+  // Messenger-ээр хийгдэнэ" хайрцаг + апп руу үсэргэх товч харуулна.
+  // (Өмнө нь "Эхлэх" товчны далд попап холболт үүсгэдэг гэж үзээд энд
+  // нуудаг байсан — попапыг устгасан тул одоо ЭНД шалгах нь цорын ганц зам.)
   const warn = document.getElementById('msgr-connect-warn');
-  if(warn){ warn.style.display = 'none'; warn.innerHTML = ''; }
+  if(warn){
+    warn.style.display = 'none'; warn.innerHTML = '';
+    isSessionLinked().then(ok => {
+      if(!ok) renderMessengerConnect(warn);
+    }).catch(()=>{ renderMessengerConnect(warn); });
+  }
 }
 
 // Гүйлгээний утга шинэчлэх (1+N сонголт хийхэд ч дуудагдана)
