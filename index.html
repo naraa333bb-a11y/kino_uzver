@@ -739,7 +739,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785087102133;
+const CATALOG_VERSION = 1785087330212;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -904,35 +904,15 @@ function setupGate(){
 }
 
 
-// "ЭХЛЭХ" дарсан үед:
-// - localStorage-д "дарсан" гэж тэмдэглэнэ — дараагийн удаа gate шууд нуугдана
-// - m.me?ref=SESSION-XXXX линкийг шинэ tab-д нээж PSID-г webhook-аар бүртгэнэ
-// - ШУУД каталог нээгдэнэ, хэрэглэгч буцаад ирэх шаардлагагүй
-// - 2.5с дараа шинэ tab-ыг автоматаар хаах оролдлого хийнэ
-//   (Chrome/Android-д ихэвчлэн амжилттай, Safari/iOS дээр амжилтгүй бол
-//    "Цонх хаах" мэдэгдэл анхны HTML дээр гарч ирнэ)
+// "ЭХЛЭХ" дарсан үед: зөвхөн gate-ийг нууна.
+// ӨМНӨ НЬ энд m.me линкийг window.open-оор далд таб-д нээдэг байсан —
+// гэвч JS-ээр нээсэн шинэ таб universal link-ийг АПП руу өгдөггүй тул
+// browser messenger (messenger.com) нээгдэж хэрэглэгчийг төөрөгдүүлдэг
+// байв. Одоо Messenger холболт худалдан авалтын товчоор (шууд, нэг
+// түвшний шилжилтээр) хийгддэг тул энэ далд попап огт хэрэггүй.
 function onGateStart(){
   localStorage.setItem(GATE_STATE_KEY, 'yes');
-
-  const pageId = getMessengerPageId(0);
-  const link = `https://m.me/${pageId}?ref=SESSION-${SESSION_ID}`;
-  const w = window.open(link, '_blank');
-
-  // Шууд каталог нээгдэнэ
   document.getElementById('welcomeGate').classList.add('hidden');
-
-  // 2.5с дараа автомат хаах оролдлого
-  setTimeout(()=>{
-    if(w && !w.closed){
-      try{ w.close(); }catch(e){}
-      // 300мс дараа шалгаад, амжилтгүй бол гар хаах мэдэгдэл харуулна
-      setTimeout(()=>{
-        if(w && !w.closed){
-          showManualCloseHint(w);
-        }
-      }, 300);
-    }
-  }, 2500);
 }
 
 // Auto-close амжилтгүй болсон тохиолдолд анхны HTML дээр гарах
@@ -1208,7 +1188,10 @@ function renderMessengerConnect(container){
     + '<p style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:10px;">'
     + 'Доорх товчийг дарахад Messenger нээгдэж, бот танд худалдан авалтын линк '
     + 'илгээнэ. Түүгээр орж төлбөрөө хийхэд киноны линк мөн энэ чатаар очно.</p>'
-    + '<a href="' + link + '" target="_blank" rel="noopener" '
+    // target="_blank" ХЭРЭГЛЭХГҮЙ! Шинэ таб нээвэл iOS/Android-ийн universal
+    // link механизм ажиллахгүй өнгөрч, Messenger АПП биш messenger.com вэб
+    // нээгддэг. Нэг түвшний шууд шилжилт бол апп руу үсэрдэг.
+    + '<a href="' + link + '" '
     + 'style="display:block;text-align:center;padding:10px;border-radius:8px;'
     + 'background:#0084ff;color:#fff;font-weight:700;text-decoration:none;font-size:13px;">'
     + '💬 Messenger-ээр үргэлжлүүлэх</a>'
