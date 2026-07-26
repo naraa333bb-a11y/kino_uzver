@@ -739,7 +739,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785082605991;
+const CATALOG_VERSION = 1785083104274;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -2395,7 +2395,12 @@ async function autoRefreshIfStale(){
     const key = 'toorxon_reloaded_' + live;
     if(sessionStorage.getItem(key)) return;
     sessionStorage.setItem(key, '1');
-    location.reload();
+    // location.reload() нь Facebook-ийн кэшнээс ХУУЧИН хуудсыг л дахин
+    // ачаалдаг тул кэш-эвдэгч параметртэй ШИНЭ URL руу шилжинэ —
+    // шинэ URL = кэш алгасаад серверээс шинэ хувилбар татна.
+    const u = new URL(location.href);
+    u.searchParams.set('v', String(live));
+    location.replace(u.toString());
   }catch(e){}
 }
 
