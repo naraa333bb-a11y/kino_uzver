@@ -734,7 +734,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785044436594;
+const CATALOG_VERSION = 1785045291405;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -2265,20 +2265,103 @@ function renderPatchList(){
 // ══════════════════════════════════════════
 // ТОВЧ 1: GitHub + Cloudflare ШИНЭЧЛЭХ (нэг даралт)
 // ══════════════════════════════════════════
+// ── Амьд сайтын хувилбарыг уншина (кэшгүй) ──
+async function fetchLiveVersion(){
+  try{
+    const res = await fetch(location.pathname + '?_v=' + Date.now(), {cache:'no-store'});
+    if(!res.ok) return null;
+    const txt = await res.text();
+    const m = txt.match(/const CATALOG_VERSION = (\d+);/);
+    return m ? parseInt(m[1]) : null;
+  }catch(e){ return null; }
+}
+
+// ── Нээлттэй таб хуучирсан эсэхийг шалгаж анхааруулна ──
+// Хуучирсан хуудаснаас хадгалвал хожим орсон бүх өөрчлөлт устдаг тул чухал
+async function checkStaleTab(){
+  const live = await fetchLiveVersion();
+  if(!live || live <= CATALOG_VERSION) return false;
+
+  let bar = document.getElementById('stale-warning');
+  if(!bar){
+    bar = document.createElement('div');
+    bar.id = 'stale-warning';
+    bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#c0392b;'
+      + 'color:#fff;padding:12px 16px;font-size:13px;line-height:1.5;text-align:center;'
+      + 'box-shadow:0 2px 12px rgba(0,0,0,.4);';
+    bar.innerHTML = '⚠ <b>Энэ хуудас хуучирсан байна.</b> Сайт дээр шинэ хувилбар байршсан. '
+      + 'Одоо хадгалвал хожим орсон бүх өөрчлөлт устана.<br>'
+      + '<button onclick="location.reload(true)" style="margin-top:8px;padding:6px 18px;'
+      + 'border:0;border-radius:6px;background:#fff;color:#c0392b;font-weight:700;cursor:pointer;">'
+      + '🔄 Дахин ачаалах</button>';
+    document.body.appendChild(bar);
+  }
+  return true;
+}
+
 async function deployAll(){
   const ghToken = document.getElementById('gh-token-input')?.value?.trim();
   if(!ghToken){
     showError('GitHub Token оруулна уу');
     return;
   }
+
+  // ── ХАМГААЛАЛТ: хуучирсан хуудаснаас хадгалахаас сэргийлнэ ──
+  showToast('⏳ Хувилбар шалгаж байна...');
+  const live = await fetchLiveVersion();
+  if(live && live > CATALOG_VERSION){
+    await checkStaleTab();
+    const ok = confirm(
+      'АНХААР!\n\nТаны нээсэн хуудас хуучирсан байна. Сайт дээр илүү шинэ хувилбар байршсан.\n\n' +
+      'Одоо хадгалвал тэр хойно орсон БҮХ өөрчлөлт (код засвар, кино, үнэ) устана.\n\n' +
+      'Зөв алхам: Цуцлаад хуудсаа дахин ачаалж (Ctrl+Shift+R), дараа нь засвараа хийнэ үү.\n\n' +
+      'Ямар ч байсан үргэлжлүүлэх үү?'
+    );
+    if(!ok){ showToast('Цуцаллаа — хуудсаа дахин ачаална уу'); return; }
+  }
+
   showToast('⏳ GitHub + Cloudflare шинэчилж байна...');
   const html = buildFinalHtml();
   // 1. GitHub deploy
-  await deployToGitHub(html, ghToken);
+  const gh = await deployToGitHub(html, ghToken);
   // 2. Cloudflare KV push
+  let cf = {ok: false, error: 'алгассан'};
   if(typeof pushAllCfConfig === 'function'){
-    await pushAllCfConfig();
+    cf = await pushAllCfConfig() || {ok:false, error:'хариу ирсэнгүй'};
   }
+  showDeployReport(gh, cf);
+}
+
+// ── Хадгалсны дараах тайлан — "дарсан болов уу" гэсэн эргэлзээг арилгана ──
+function showDeployReport(gh, cf){
+  const t = new Date().toLocaleTimeString('mn-MN');
+  let box = document.getElementById('deploy-report');
+  if(!box){
+    box = document.createElement('div');
+    box.id = 'deploy-report';
+    box.style.cssText = 'position:fixed;bottom:16px;right:16px;z-index:99998;max-width:340px;'
+      + 'background:#161a22;border:1px solid #2b3242;border-radius:12px;padding:14px 16px;'
+      + 'color:#e8eaf0;font-size:12px;line-height:1.6;box-shadow:0 6px 24px rgba(0,0,0,.5);';
+    document.body.appendChild(box);
+  }
+  const line = (ok, label, detail) =>
+    `<div style="margin-top:4px;">${ok ? '✅' : '❌'} <b>${label}</b>` +
+    (detail ? `<br><span style="color:#9aa3b2;font-size:11px;">${detail}</span>` : '') + '</div>';
+
+  let cfDetail = '';
+  if(cf.ok){
+    cfDetail = (cf.saved && cf.saved.length) ? 'Хадгалсан: ' + cf.saved.join(', ') : 'Шинэ өөрчлөлт алга';
+    if(cf.skipped && cf.skipped.length) cfDetail += '<br>Хоосон тул хэвээр: ' + cf.skipped.join(', ');
+  } else {
+    cfDetail = cf.error || '';
+  }
+
+  box.innerHTML =
+    `<div style="font-weight:700;margin-bottom:6px;">Хадгалалтын тайлан · ${t}</div>`
+    + line(gh && gh.ok, 'GitHub (вэб сайт)', gh && gh.ok ? '1-2 минутын дараа сайт дээр гарна' : (gh && gh.error) || '')
+    + line(cf.ok, 'Cloudflare (бот)', cfDetail)
+    + '<button onclick="this.parentNode.remove()" style="margin-top:10px;width:100%;padding:6px;'
+    + 'border:0;border-radius:6px;background:#2b3242;color:#e8eaf0;cursor:pointer;">Хаах</button>';
 }
 
 // ══════════════════════════════════════════
@@ -2389,12 +2472,15 @@ async function deployToGitHub(html, token){
 
     if(putRes.ok){
       showToast('✅ GitHub-т амжилттай байршлаа!');
+      return {ok: true};
     } else {
       const err = await putRes.json();
       showError('GitHub алдаа: ' + (err.message || putRes.status));
+      return {ok: false, error: err.message || String(putRes.status)};
     }
   } catch(e) {
     showError('GitHub холболт амжилтгүй: ' + e.message);
+    return {ok: false, error: e.message};
   }
 }
 
@@ -2815,8 +2901,8 @@ async function pushAllCfConfig(){
   const workerUrl = CF_CONFIG.workerUrl;
   const secret    = CF_CONFIG.refreshSecret;
 
-  if(!workerUrl){ showError('Worker URL оруулаагүй байна (A хэсэг → Gemini + Worker URL)'); return; }
-  if(!secret){    showError('Refresh Secret оруулаагүй байна');  return; }
+  if(!workerUrl){ showError('Worker URL оруулаагүй байна (A хэсэг → Gemini + Worker URL)'); return {ok:false, error:'Worker URL хоосон'}; }
+  if(!secret){    showError('Refresh Secret оруулаагүй байна');  return {ok:false, error:'Refresh Secret хоосон'}; }
 
   showToast('Cloudflare-д илгээж байна...');
 
@@ -2845,11 +2931,14 @@ async function pushAllCfConfig(){
     const data = await res.json();
     if(data.success){
       showToast('✅ Cloudflare амжилттай шинэчлэгдлээ');
+      return {ok: true, saved: data.saved || [], skipped: data.skipped || []};
     } else {
       showError('Cloudflare алдаа: ' + (data.error || res.status));
+      return {ok: false, error: data.error || String(res.status)};
     }
   } catch(e){
     showError('Холболтын алдаа: ' + e.message);
+    return {ok: false, error: e.message};
   }
 }
 
@@ -3326,6 +3415,9 @@ window.addEventListener('DOMContentLoaded', function(){
     }
     document.getElementById('adminToggleBtn').classList.add('show');
     document.getElementById('welcomeGate').classList.add('hidden');
+
+    // Хуудас хуучирсан эсэхийг шалгаж, шаардвал улаан анхааруулга гаргана
+    if(typeof checkStaleTab === 'function') checkStaleTab();
 
     // ── Admin input-уудыг одоогийн утгуудаар бөглөх ──
     openCoverEditor(CATEGORIES.length ? CATEGORIES[0].id : 0);
