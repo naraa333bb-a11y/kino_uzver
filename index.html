@@ -739,7 +739,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785498324545;
+const CATALOG_VERSION = 1785498551469;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -2286,6 +2286,35 @@ function buildFinalHtml(){
   // modal-trailer/buyPosterEl гэх мэт runtime-аар бөглөгдсөн iframe-уудыг хоослох
   const cTrailer = clone.querySelector('#modalTrailer');
   if(cTrailer) cTrailer.innerHTML = '';
+
+  // ══ НУУЦЛАЛЫН ЦЭВЭРЛЭГЭЭ (ЗААВАЛ!) ══
+  // Админ панелын бөглөгдсөн утгууд (нууц үг, токен, кино линк) нийтийн
+  // HTML-д ХЭЗЭЭ Ч орох ёсгүй. 2026-07-31-нд админ deploy QPay-ийн нууц үг
+  // болон бүх киноны линкийг public хуудсанд ил тавьсан осол гарсан —
+  // энэ блок түүнээс бүрмөсөн сэргийлнэ.
+  const cPanelSec = clone.querySelector('#admin-panel');
+  if(cPanelSec){
+    cPanelSec.querySelectorAll('input').forEach(inp=>{
+      inp.removeAttribute('value');
+      inp.removeAttribute('checked');
+    });
+    cPanelSec.querySelectorAll('textarea').forEach(t=>{ t.textContent=''; });
+    cPanelSec.removeAttribute('data-autosave');
+  }
+  // Deploy тайлан, runtime мэдэгдлүүдийг хасна
+  ['deploy-report','warn-11','file-warning','stale-warning','token-confirm-overlay'].forEach(id=>{
+    const el = clone.querySelector('#'+id);
+    if(el) el.remove();
+  });
+  const cRepIn = clone.querySelector('#deploy-report-inline');
+  if(cRepIn){ cRepIn.innerHTML=''; cRepIn.style.display='none'; }
+  // Хөтчийн өргөтгөлийн (VPN гэх мэт) оруулсан гадны элемент, стилийг хасна
+  clone.querySelectorAll('*').forEach(el=>{
+    if(el.tagName && el.tagName.includes('-') && !el.id) el.remove();
+  });
+  clone.querySelectorAll('style').forEach(st=>{
+    if((st.textContent||'').includes('chrome-extension://')) st.remove();
+  });
 
   let html = clone.outerHTML;
 
