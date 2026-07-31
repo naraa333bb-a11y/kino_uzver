@@ -741,7 +741,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785498883244;
+const CATALOG_VERSION = 1785498890265;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -4806,7 +4806,7 @@ window.addEventListener('DOMContentLoaded', function(){
 
   <!-- ══ STICKY: БҮГДИЙГ CLOUDFLARE-РУУ ШИНЭЧЛЭХ ══ -->
   <div style="position:sticky;bottom:0;z-index:100;background:linear-gradient(to top,var(--ad-bg) 80%,transparent);padding:12px 16px 16px;">
-    <div id="deploy-report-inline" style="display:none;background:#161a22;border:1px solid #2b3242;border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:12px;line-height:1.6;color:#e8eaf0;"></div>
+    <div id="deploy-report-inline" style="background: rgb(22, 26, 34); border: 1px solid rgb(43, 50, 66); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 12px; line-height: 1.6; color: rgb(232, 234, 240); display: none;"></div>
     <button class="btn btn-green" onclick="pushCfAndReport()" style="width:100%;padding:14px;">
       ☁ БҮГДИЙГ CLOUDFLARE-РУУ ШИНЭЧЛЭХ
     </button>
