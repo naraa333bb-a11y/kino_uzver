@@ -5,6 +5,8 @@ body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relati
 body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relative; } 
 </style><style>body {transition: opacity ease-in 0.2s; } 
 body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relative; } 
+</style><style>body {transition: opacity ease-in 0.2s; } 
+body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relative; } 
 </style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -739,7 +741,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785498551469;
+const CATALOG_VERSION = 1785498883244;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -4242,7 +4244,7 @@ window.addEventListener('DOMContentLoaded', function(){
       </label>
       <div id="promo11-count-wrap" style="margin-top: 10px; display: none;">
         <label>Хэдэн кино үнэгүй өгөх вэ?</label>
-        <input type="number" id="f-promo11-count" min="1" max="5" value="1" placeholder="1">
+        <input type="number" id="f-promo11-count" min="1" max="5" placeholder="1">
         <p class="cf-hint">Жишээ: 1 гэвэл "1+1" (нэг кино авахад нэг үнэгүй), 2 гэвэл "1+2" гэх мэт.</p>
       </div>
     </div>
@@ -4294,7 +4296,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <!-- Zoom slider -->
       <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
         <span style="font-size:16px;">🔍</span>
-        <input type="range" id="cover-zoom-slider" min="50" max="300" value="100" style="flex:1;accent-color:var(--accent);" oninput="onZoomSlider()">
+        <input type="range" id="cover-zoom-slider" min="50" max="300" style="flex:1;accent-color:var(--accent);" oninput="onZoomSlider()">
         <span id="cover-zoom-label" style="font-size:11px;color:var(--muted);min-width:36px;">50%</span>
       </div>
 
@@ -4332,7 +4334,7 @@ window.addEventListener('DOMContentLoaded', function(){
 
       <!-- НЭР ЗАСВАРЛАХ -->
       <div class="price-edit-fields" id="rename-0">
-        <input type="text" id="catname-input-0" value="AI DRAMA" placeholder="Жишээ: AI DRAMA" style="grid-column:span 2;">
+        <input type="text" id="catname-input-0" placeholder="Жишээ: AI DRAMA" style="grid-column:span 2;">
         <button class="btn btn-green" style="grid-column:span 2;" onclick="saveCategoryName(0)">💾 Нэр хадгалах</button>
       </div>
 
@@ -4356,7 +4358,7 @@ window.addEventListener('DOMContentLoaded', function(){
 
       <!-- НЭР ЗАСВАРЛАХ -->
       <div class="price-edit-fields" id="rename-1">
-        <input type="text" id="catname-input-1" value="ACTION" placeholder="Жишээ: AI DRAMA" style="grid-column:span 2;">
+        <input type="text" id="catname-input-1" placeholder="Жишээ: AI DRAMA" style="grid-column:span 2;">
         <button class="btn btn-green" style="grid-column:span 2;" onclick="saveCategoryName(1)">💾 Нэр хадгалах</button>
       </div>
 
@@ -4380,7 +4382,7 @@ window.addEventListener('DOMContentLoaded', function(){
 
       <!-- НЭР ЗАСВАРЛАХ -->
       <div class="price-edit-fields" id="rename-2">
-        <input type="text" id="catname-input-2" value="+21 ЭРОЧИК" placeholder="Жишээ: AI DRAMA" style="grid-column:span 2;">
+        <input type="text" id="catname-input-2" placeholder="Жишээ: AI DRAMA" style="grid-column:span 2;">
         <button class="btn btn-green" style="grid-column:span 2;" onclick="saveCategoryName(2)">💾 Нэр хадгалах</button>
       </div>
 
@@ -4502,7 +4504,40 @@ window.addEventListener('DOMContentLoaded', function(){
         </button>
         <div class="cf-accordion-body" id="acc-qpay" style="">
           <div class="info-box">⚙ QPay merchant мэдээллийг оруулснаар хэрэглэгчид QR кодоор автомат төлбөр төлж, систем автоматаар баталгаажуулна. Олон merchant нэмж, идэвхтэйг сонгоно.</div>
-          <div id="qpay-merchant-list"><p class="cf-hint" style="padding:10px 0;">QPay merchant байхгүй. "➕ QPay Merchant нэмэх" дарна уу.</p></div>
+          <div id="qpay-merchant-list">
+    <div class="token-row" style="margin-bottom:10px;">
+      <div class="token-row-header">
+        <span class="token-row-name">🟢 Kino Uzver QPay</span>
+        <div style="display:flex;gap:5px;">
+          <button class="btn-sm btn-edit" onclick="editQpayMerchant(0)">✏</button>
+          <button class="btn-sm btn-danger" onclick="deleteQpayMerchant(0)">🗑</button>
+        </div>
+      </div>
+      <div class="token-row-fields" id="qpay-edit-0" style="display:none;padding:0 12px 10px;">
+        <label style="font-size:10px;">Нэр (танихад)</label>
+        <input type="text" id="qpay-name-0" placeholder="Жишээ: Open Zone QPay">
+        <label style="font-size:10px;">Username</label>
+        <input type="text" id="qpay-username-0" placeholder="QPay username">
+        <label style="font-size:10px;">Password</label>
+        <input type="password" id="qpay-password-0" placeholder="QPay password">
+        <label style="font-size:10px;">Invoice Code</label>
+        <input type="text" id="qpay-invoice-0" placeholder="TEST_INVOICE">
+        <label style="font-size:10px;">Merchant ID (заавал биш)</label>
+        <input type="text" id="qpay-mid-0" placeholder="Merchant ID">
+        <label style="display:flex;align-items:center;gap:8px;margin-top:10px;cursor:pointer;">
+          <input type="checkbox" id="qpay-active-0" style="width:16px;height:16px;margin:0;">
+          <span style="font-size:11px;color:#fff;">Идэвхтэй (энэ merchant ашиглах)</span>
+        </label>
+        <div style="display:flex;gap:6px;margin-top:10px;">
+          <button class="btn-sm btn-edit" onclick="saveQpayMerchant(0)">💾 Хадгалах</button>
+          <button class="btn-sm" style="background:var(--ad-card2);color:var(--ad-muted);border:1px solid var(--ad-border);" onclick="cancelEditQpay(0)">Цуцлах</button>
+        </div>
+      </div>
+      <div class="token-row-preview" id="qpay-preview-0" style="padding:0 12px 10px;">
+        <span style="font-size:10px;color:var(--ad-muted);font-family:monospace;">KINO_UZVER · KINO_UZVER_INVOICE</span>
+      </div>
+    </div>
+  </div>
           <button class="btn-sm btn-edit" onclick="addNewQpayMerchant()" style="margin-top:10px;width:100%;justify-content:center;">
             ➕ QPay Merchant нэмэх
           </button>
@@ -4554,7 +4589,7 @@ window.addEventListener('DOMContentLoaded', function(){
             </p>
             <input type="password" id="cf-api-token" placeholder="Cloudflare API Token" style="font-family:monospace;">
             <p class="cf-hint" style="margin:4px 0 8px;">Token хадгалагдахгүй — deploy бүрд оруулна уу</p>
-            <input type="text" id="cf-script-name" value="kinobot" placeholder="Worker-ийн нэр">
+            <input type="text" id="cf-script-name" placeholder="Worker-ийн нэр">
             <textarea id="cf-worker-code" rows="8" placeholder="kinobot_worker.js файлын агуулгыг энд буулгана уу..." style="font-family:monospace;font-size:11px;margin-top:6px;"></textarea>
             <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="deployWorkerCode()">
               🚀 WORKER КОД БАЙРШУУЛАХ
@@ -4631,29 +4666,29 @@ window.addEventListener('DOMContentLoaded', function(){
         <div id="movie-link-container">
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
         <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">ЗҮРХ БУЛААСАН БАГШ <span style="color:var(--ad-muted);font-weight:400;">(M15)</span></p>
-        <input type="text" id="movielink-M15" value="" placeholder="https://... контент линк" style="margin-top:0;">
+        <input type="text" id="movielink-M15" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
         <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">ИХЭРҮҮДИЙН БОСС ААВ <span style="color:var(--ad-muted);font-weight:400;">(M14)</span></p>
-        <input type="text" id="movielink-M14" value="" placeholder="https://... контент линк" style="margin-top:0;">
+        <input type="text" id="movielink-M14" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
         <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">ТУСГАЙ ДААЛГАВАР <span style="color:var(--ad-muted);font-weight:400;">(M13)</span></p>
-        <input type="text" id="movielink-M13" value="" placeholder="https://... контент линк" style="margin-top:0;">
+        <input type="text" id="movielink-M13" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
         <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">АЛТАН НҮДЭТ ХҮҮ <span style="color:var(--ad-muted);font-weight:400;">(M11)</span></p>
-        <input type="text" id="movielink-M11" value="" placeholder="https://... контент линк" style="margin-top:0;">
+        <input type="text" id="movielink-M11" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
       <div style="margin-bottom:10px;padding:10px;background:var(--ad-card2);border-radius:8px;">
         <p style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">ЛУУГЫН УДАМ <span style="color:var(--ad-muted);font-weight:400;">(M12)</span></p>
-        <input type="text" id="movielink-M12" value="" placeholder="https://... контент линк" style="margin-top:0;">
+        <input type="text" id="movielink-M12" placeholder="https://... контент линк" style="margin-top:0;">
       </div>
     <div class="cf-divider">"AI DRAMA" групп линк</div>
-    <input type="text" id="cf-link-grp-0" value="" placeholder="https://t.me/joinchat/... эсвэл fb групп линк">
+    <input type="text" id="cf-link-grp-0" placeholder="https://t.me/joinchat/... эсвэл fb групп линк">
 
     <div class="cf-divider">БҮХ VIP групп линк (бүх таб дунд нийтлэг)</div>
-    <input type="text" id="cf-link-grp-all" value="" placeholder="https://...">
+    <input type="text" id="cf-link-grp-all" placeholder="https://...">
 
     <button class="btn btn-primary" onclick="saveMovieLinks()" style="margin-top:14px;">💾 Линкүүд хадгалах (локал)</button>
 
@@ -4807,12 +4842,4 @@ window.addEventListener('DOMContentLoaded', function(){
 
 
 
-<div id="token-confirm-overlay" style="display: none; position: fixed; inset: 0px; background: rgba(0, 0, 0, 0.7); z-index: 3000; align-items: center; justify-content: center;">
-      <div style="background:var(--ad-card);border-radius:14px;padding:20px 18px;max-width:300px;width:90%;text-align:center;">
-        <p style="font-size:14px;color:#fff;font-weight:700;margin-bottom:8px;">🗑 Токен устгах</p>
-        <p style="font-size:12px;color:var(--ad-muted);margin-bottom:18px;" id="token-confirm-msg">Энэ пэйжийн токеныг устгах уу?</p>
-        <div style="display:flex;gap:8px;">
-          <button class="btn btn-danger" onclick="executeDeleteToken()" style="flex:1;">Тийм, устгах</button>
-          <button class="btn" style="flex:1;background:var(--ad-card2);color:var(--ad-muted);" onclick="cancelDeleteToken()">Үгүй</button>
-        </div>
-      </div></div><veepn-lock-screen><style>@font-face{font-family:FigtreeVF;src:url(chrome-extension://majdfhpaihoncoakbjgbdhglocklcgno/fonts/FigtreeVF.woff2) format("woff2 supports variations"),url(chrome-extension://majdfhpaihoncoakbjgbdhglocklcgno/fonts/FigtreeVF.woff2) format("woff2-variations");font-weight:100 1000;font-display:swap}</style></veepn-lock-screen><div id="warn-11" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: linear-gradient(135deg,var(--accent),var(--accent2)); color: rgb(255, 255, 255); border-radius: 14px; padding: 16px 24px; font-size: 13px; font-weight: 700; text-align: center; z-index: 4000; box-shadow: rgba(0, 0, 0, 0.5) 0px 8px 32px; pointer-events: none; opacity: 0; transition: opacity 0.3s; max-width: 280px;">🎁 Үнэгүй киногоо сонгоорой!<br><span style="font-size:11px;font-weight:400;opacity:.9;">AI DRAMA-ийн нэг киног үнэгүй авах боломжтой</span></div></body></html>
+</body></html>
