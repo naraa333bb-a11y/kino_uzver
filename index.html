@@ -739,7 +739,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785089389591;
+const CATALOG_VERSION = 1785488509011;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -1018,17 +1018,42 @@ function openBuyModal(movieId, catIndex){
 
   document.getElementById('buyModal').classList.add('open');
 
-  // Messenger холболтыг шалгана. Холбогдоогүй бол "Худалдан авалт
-  // Messenger-ээр хийгдэнэ" хайрцаг + апп руу үсэргэх товч харуулна.
-  // (Өмнө нь "Эхлэх" товчны далд попап холболт үүсгэдэг гэж үзээд энд
-  // нуудаг байсан — попапыг устгасан тул одоо ЭНД шалгах нь цорын ганц зам.)
-  const warn = document.getElementById('msgr-connect-warn');
-  if(warn){
-    warn.style.display = 'none'; warn.innerHTML = '';
-    isSessionLinked().then(ok => {
-      if(!ok) renderMessengerConnect(warn);
-    }).catch(()=>{ renderMessengerConnect(warn); });
-  }
+  // Төлбөрийн хэсгийг нөхцөлөөр харуулна (доорх applyPayGate-г үзнэ үү)
+  applyPayGate();
+}
+
+// ══════════════════════════════════════════
+// ТӨЛБӨРИЙН ХААЛГА
+// Төлбөрийн товчнуудыг харуулах нөхцөл:
+//   Messenger аппын дотор нээгдсэн  ЭСВЭЛ  Messenger холболт үүссэн.
+// Бусад бүх орчинд (Facebook апп, Chrome/Safari, бусад платформ) төлбөрийг
+// нууж, зөвхөн "Messenger-ээр үргэлжлүүлэх" хайрцаг харуулна.
+// Ингэснээр худалдан авалт бүр Messenger-ээр дамжиж, кино линк хүргэх
+// хаяг (PSID) заавал бүртгэгдсэн байна. Ботын ?ms= линкээр орсон хүн
+// ямар ч браузерт холболттой болдог тул тойрог үүсэхгүй.
+// ══════════════════════════════════════════
+function applyPayGate(){
+  const payRow = document.getElementById('payRow');
+  const warn   = document.getElementById('msgr-connect-warn');
+
+  const show = ok => {
+    if(payRow) payRow.style.display = ok ? '' : 'none';
+    if(!ok){
+      document.getElementById('panelQpay')?.classList.remove('open');
+      document.getElementById('panelAcct')?.classList.remove('open');
+    }
+    if(warn){
+      if(ok){ warn.style.display = 'none'; warn.innerHTML = ''; }
+      else renderMessengerConnect(warn);
+    }
+  };
+
+  // Messenger дотор эсвэл аль хэдийн холбогдсон — шууд нээнэ
+  if(isMessengerApp() || _sessionLinked){ show(true); return; }
+
+  // Бусад орчин: түр нууж байгаад серверээс холболтыг шалгана
+  show(false);
+  isSessionLinked().then(ok => show(ok)).catch(()=>{});
 }
 
 // Гүйлгээний утга шинэчлэх (1+N сонголт хийхэд ч дуудагдана)
@@ -1215,25 +1240,46 @@ async function recheckSessionLink(btn){
   if(btn){ btn.textContent = 'Шалгаж байна...'; btn.disabled = true; }
   _sessionLinked = false;
   const ok = await isSessionLinked();
-  const warn = document.getElementById('msgr-connect-warn');
   if(ok){
-    if(warn){ warn.style.display = 'none'; warn.innerHTML = ''; }
-    showToast && showToast('✅ Messenger холболт бэлэн');
+    applyPayGate();   // хайрцгийг нууж, төлбөрийн товчнуудыг нээнэ
+    showToast && showToast('✅ Messenger холболт бэлэн — төлбөрөө хийж болно');
   } else {
     if(btn){ btn.textContent = '🔄 Хараахан холбогдоогүй — дахин шалгах'; btn.disabled = false; }
   }
 }
 
 // ══════════════════════════════════════════
-// БАНКНЫ ТОВЧНЫ ХОЛБООС
-// kora.mn дээр нотлогдсон: түүхий "khanbank://" схемийг шууд href-д
-// тавихад Facebook/Messenger-ийн цонх ӨӨРӨӨ "Leave Facebook → Open app"
-// гүүр цонхоо гаргаж аппыг нээдэг (iOS дээр туршиж баталсан).
-// Ямар ч хувиргалт (intent://, x-safari-https://) хийх ХЭРЭГГҮЙ —
-// хувиргалт нь эсрэгээрээ танигдахгүй схем болж гацдаг байсан.
+// ОРЧИН ТАНИХ + БАНКНЫ ТОВЧНЫ ХОЛБООС
+//
+// Meta-гийн дотоод браузер ОРГАНИК хандалтад аппын схем/universal link-ийг
+// санаатай блоклодог (Branch.io баталсан; "Leave Facebook → Open app" гарах
+// эсэх нь баримтжуулагдаагүй, байнга өөрчлөгддөг тул НАЙДАЖ БОЛОХГҮЙ).
+// Тиймээс дотоод цонхонд банкны товч = гадаад браузер луу гаргаад
+// QPay-ийн өөрийн хуудсыг (short_url) ачаалдаг "зугталтын" холбоос.
+// Жинхэнэ браузерт түүхий схем шууд ажилладаг тул хөндөхгүй.
 // ══════════════════════════════════════════
+function isInAppBrowser(){
+  return /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Line\/|MicroMessenger/i.test(navigator.userAgent || '');
+}
+// Messenger АППЫН дотоод цонх мөн үү (Facebook аппаас ялгаатай):
+// iOS Messenger → "FBAN/MessengerForiOS", Android Messenger → "FB_IAB/Orca-Android"
+function isMessengerApp(){
+  return /FBAN\/Messenger|Orca-Android|FB_IAB\/Orca|MessengerLite/i.test(navigator.userAgent || '');
+}
+function isAndroid(){ return /Android/i.test(navigator.userAgent || ''); }
+
+// https хуудсыг дотоод цонхноос ГАДААД браузер луу гаргаж нээх холбоос.
+// Android: intent:// — албан ёсны механизм, үндсэн браузераар нээнэ.
+// iOS: x-safari-https:// — албан бус боловч Meta-гийн цонхонд ажилладаг
+//      тохиолдол олон; бүтэхгүй бол QR болон qpay.mn-ий өөрийн заавар үлдэнэ.
+function escapeToBrowserUrl(httpsUrl){
+  const bare = String(httpsUrl).replace(/^https?:\/\//, '');
+  if(isAndroid()) return 'intent://' + bare + '#Intent;scheme=https;end';
+  return 'x-safari-https://' + bare;
+}
+
 function bankHref(link){
-  return link;   // kora.mn-тэй яг адил: түүхий схемийг шууд
+  return link;   // жинхэнэ браузерт: kora.mn-тэй яг адил түүхий схем
 }
 
 // ══ QPAY INVOICE ҮҮСГЭХ — Cloudflare worker-ээр дамжина ══
@@ -1291,15 +1337,20 @@ async function createQpayInvoice(){
             + 'Банкны аппаараа дээрх QR-ийг уншуулна уу</p>';
     }
     if(data.deeplinks && data.deeplinks.length){
-      // Банкны аппын холбоос ("khanbank://…").
-      // ЭНГИЙН <a href> байдлаар үлдээнэ — хэрэглэгчийн шууд даралтыг
-      // хөтчүүд зөвшөөрдөг бол JS-ээр дуудсан шилжилтийг блоклодог.
-      // Тиймээс энд ямар ч onclick, preventDefault хэрэглэхгүй.
+      // Банкны товчнууд. ЭНГИЙН <a href> байдлаар үлдээнэ — хэрэглэгчийн
+      // шууд даралтыг хөтчүүд зөвшөөрдөг бол JS шилжилтийг блоклодог.
+      //
+      // Дотоод цонхонд (Messenger/FB) аппын схем блоклогддог тул товч бүр
+      // ГАДААД браузер луу гаргаад QPay-ийн албан ёсны хуудсыг (short_url)
+      // нээнэ — тэндээс банкны icon дарахад апп нь шууд нээгдэнэ.
+      // Жинхэнэ браузерт түүхий схем шууд ажиллана.
+      const inApp = isInAppBrowser();
+      const esc = (inApp && data.short_url) ? escapeToBrowserUrl(data.short_url) : null;
       html += '<p style="font-size:11px;color:var(--muted);text-align:center;margin:10px 0 6px;">'
-            + 'эсвэл банкаа сонгоно уу</p>';
-      // Товч бүр өөрөө гүүр — орчноос хамаарч холбоосыг хөрвүүлнэ
+            + (esc ? 'банкаа сонгоход гадаад браузерт QPay нээгдэнэ'
+                   : 'эсвэл банкаа сонгоно уу') + '</p>';
       html += '<div class="qpay-bank-list">' + data.deeplinks.map(d =>
-        '<a class="qpay-bank" href="' + bankHref(d.link) + '" style="text-decoration:none;">'
+        '<a class="qpay-bank" href="' + (esc || bankHref(d.link)) + '" style="text-decoration:none;">'
         + (d.logo ? '<img src="' + d.logo + '" alt="" style="width:26px;height:26px;border-radius:6px;margin-bottom:4px;" onerror="this.style.display=\'none\'">' : '<div class="qpay-bank-icon">🏦</div>')
         + '<div class="qpay-bank-name">' + (d.name || '') + '</div></a>'
       ).join('') + '</div>';
@@ -4020,7 +4071,7 @@ window.addEventListener('DOMContentLoaded', function(){
       <div id="msgr-connect-warn" style="display:none;"></div>
 
       <!-- TOGGLE BUTTONS -->
-      <div class="pay-row">
+      <div class="pay-row" id="payRow">
         <button class="pay-btn" id="btnQpay" onclick="selectPay('qpay')">QPay төлөх</button>
         <button class="pay-btn active" id="btnAcct" onclick="selectPay('acct')">Дансаар төлөх</button>
       </div>
