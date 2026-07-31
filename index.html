@@ -739,7 +739,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1785488509011;
+const CATALOG_VERSION = 1785496567403;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -1048,12 +1048,20 @@ function applyPayGate(){
     }
   };
 
-  // Messenger дотор эсвэл аль хэдийн холбогдсон — шууд нээнэ
+  // Messenger дотор эсвэл аль хэдийн холбогдсон — шууд нээнэ.
+  // АНХААР: iOS дээр Messenger чатаас дарсан линк FACEBOOK аппын цонхоор
+  // нээгддэг тул isMessengerApp() ихэвчлэн false байдаг — гол найдвар нь
+  // ботын линкний ?ms= түлхүүр (доорх adopt) юм.
   if(isMessengerApp() || _sessionLinked){ show(true); return; }
 
-  // Бусад орчин: түр нууж байгаад серверээс холболтыг шалгана
+  // Бусад орчин: түр нууж, ЭХЛЭЭД adopt дуусахыг хүлээгээд дараа нь
+  // серверээс холболтыг шалгана (adopt дуусаагүй байхад шалгавал
+  // худал "холбогдоогүй" гарах уралдааны нөхцөлөөс сэргийлнэ)
   show(false);
-  isSessionLinked().then(ok => show(ok)).catch(()=>{});
+  Promise.resolve(typeof _adoptPromise !== 'undefined' ? _adoptPromise : null)
+    .then(() => isSessionLinked())
+    .then(ok => show(ok))
+    .catch(()=>{});
 }
 
 // Гүйлгээний утга шинэчлэх (1+N сонголт хийхэд ч дуудагдана)
@@ -1221,8 +1229,9 @@ function renderMessengerConnect(container){
     + 'илгээнэ. Түүгээр орж төлбөрөө хийхэд киноны линк мөн энэ чатаар очно.</p>'
     // target="_blank" ХЭРЭГЛЭХГҮЙ! Шинэ таб нээвэл iOS/Android-ийн universal
     // link механизм ажиллахгүй өнгөрч, Messenger АПП биш messenger.com вэб
-    // нээгддэг. Нэг түвшний шууд шилжилт бол апп руу үсэрдэг.
-    + '<a href="' + link + '" '
+    // нээгддэг. Жинхэнэ браузерт goMessenger() эхлээд аппын схемээр шууд
+    // оролдоно (App Store-оор дамжихгүй), бүтэхгүй бол m.me руу унана.
+    + '<a href="' + link + '" onclick="return goMessenger(this.href, event)" '
     + 'style="display:block;text-align:center;padding:10px;border-radius:8px;'
     + 'background:#0084ff;color:#fff;font-weight:700;text-decoration:none;font-size:13px;">'
     + '💬 Messenger-ээр үргэлжлүүлэх</a>'
@@ -1234,6 +1243,25 @@ function renderMessengerConnect(container){
     + 'border:0;border-radius:8px;background:var(--card2);color:var(--muted);font-size:11px;cursor:pointer;">'
     + '🔄 Холбогдсон — дахин шалгах</button>'
     + '</div>';
+}
+
+// Messenger товчны даралт. Жинхэнэ браузерт (Safari/Chrome) m.me линк
+// заримдаа App Store-оор дамждаг тул ЭХЛЭЭД Messenger аппын схемээр
+// шууд нээхийг оролдоно. Апп нээгдвэл хуудас далд орж fallback цуцлагдана;
+// 1.4 секундэд юу ч болоогүй бол m.me (ref-тэй) руу унана.
+// Дотоод цонхонд (FB/Messenger webview) JS шилжилт блоклогддог тул
+// энгийн href-ээрээ л явуулна.
+function goMessenger(link, e){
+  if(isInAppBrowser()) return true;   // дотоод цонх: энгийн m.me даралт
+  if(e) e.preventDefault();
+  const scheme = 'fb-messenger://user-thread/' + getMessengerPageId(currentCat || 0);
+  const t = setTimeout(function(){ location.href = link; }, 1400);
+  const cancel = function(){
+    if(document.hidden){ clearTimeout(t); document.removeEventListener('visibilitychange', cancel); }
+  };
+  document.addEventListener('visibilitychange', cancel);
+  location.href = scheme;
+  return false;
 }
 
 async function recheckSessionLink(btn){
@@ -1291,7 +1319,9 @@ let _qpayInvoiceForTxn = null;
 // Messenger доторх цонхонд сайт нээгдэхэд ЭНД шинэ сешн үүсдэг тул
 // ms түлхүүгээр worker-ээс PSID-г нь олж, шинэ сешнээ шууд холбоно.
 // Ингэснээр "Messenger-ээр холбогдоно уу" гэж дахин шаардахгүй.
-(async function adoptMsToken(){
+// Promise-ийг хадгална — applyPayGate() төлбөр харуулахаасаа өмнө
+// adopt дуусахыг хүлээдэг (уралдааны нөхцөлөөс сэргийлнэ)
+const _adoptPromise = (async function adoptMsToken(){
   try{
     const ms = new URLSearchParams(location.search).get('ms');
     if(!ms || !/^[A-Z0-9]{8}$/i.test(ms)) return;
