@@ -742,7 +742,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1786012006932;
+const CATALOG_VERSION = 1786016952897;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -1313,6 +1313,74 @@ function bankHref(link){
   return link;   // жинхэнэ браузерт: kora.mn-тэй яг адил түүхий схем
 }
 
+// ══════════════════════════════════════════
+// iOS ДОТООД ЦОНХНЫ ГАРЦ
+//
+// 2026-08 туршилтаар эцэслэн батлагдсан: iOS дээр Meta-гийн цонхноос
+// программаар (ямар ч схем, JS, SPA шилжилтээр) гарах ЗАМ БАЙХГҮЙ.
+// Гэвч хэрэглэгч ⋯ цэснээс "Open in external browser" дарвал ЭНЭ ХУУДАС
+// Safari-д нээгдэж, тэнд банкны товчнууд шууд ажилладаг нь батлагдсан.
+// Тиймээс тэр нэг алхмыг хамгийн ойлгомжтой, хийхэд амархан болгоно.
+//
+// Хуудасны хаягт ?ms= түлхүүр байдаг тул Safari-д нээгдэхэд сешн нь
+// автоматаар холбогдож, төлбөрийн хэсэг шууд гарна.
+// ══════════════════════════════════════════
+function escapeHintHtml(){
+  return ''
+  + '<div id="escape-hint" style="position:relative;background:linear-gradient(135deg,rgba(0,132,255,.15),rgba(0,132,255,.06));'
+  + 'border:1.5px solid rgba(0,132,255,.55);border-radius:12px;padding:12px 14px;margin:12px 0;">'
+  +   '<div style="display:flex;align-items:flex-start;gap:10px;">'
+  +     '<div style="font-size:22px;line-height:1;animation:hintUp 1.2s ease-in-out infinite;">↗</div>'
+  +     '<div style="flex:1;">'
+  +       '<p style="font-size:12px;font-weight:700;color:#6ab7ff;margin:0 0 4px;">'
+  +         'Банкны аппаараа төлөх бол</p>'
+  +       '<p style="font-size:11px;color:var(--muted);line-height:1.5;margin:0;">'
+  +         'Баруун дээд булангийн <b style="color:#fff">⋯</b> дарж '
+  +         '<b style="color:#fff">Open in external browser</b> сонгоно уу. '
+  +         'Хуудас браузерт нээгдэхэд банкны товч шууд ажиллана.</p>'
+  +     '</div>'
+  +   '</div>'
+  +   '<button onclick="copyPayLink(this)" style="width:100%;margin-top:10px;padding:9px;'
+  +   'border:0;border-radius:8px;background:rgba(255,255,255,.10);color:#cfe4ff;'
+  +   'font-size:11px;font-weight:600;cursor:pointer;">📋 Эсвэл холбоосыг хуулж браузертаа буулгах</button>'
+  + '</div>'
+  + '<style>@keyframes hintUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}</style>';
+}
+
+// Одоогийн хуудасны хаягийг хуулна (?ms= түлхүүртэйгээ — сешн хадгалагдана)
+function copyPayLink(btn){
+  const url = location.href;
+  const done = () => {
+    if(btn){
+      const old = btn.innerHTML;
+      btn.innerHTML = '✅ Хуулагдлаа — браузераа нээгээд буулгана уу';
+      setTimeout(()=>{ btn.innerHTML = old; }, 2600);
+    }
+  };
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(done).catch(()=>fallbackCopy(url, done));
+    } else {
+      fallbackCopy(url, done);
+    }
+  }catch(e){ fallbackCopy(url, done); }
+}
+
+function fallbackCopy(text, done){
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select(); ta.setSelectionRange(0, 99999);
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    done();
+  }catch(e){
+    if(typeof showToast === 'function') showToast('Хуулж чадсангүй — хаягийн мөрнөөс хуулна уу');
+  }
+}
+
 // ══ QPAY INVOICE ҮҮСГЭХ — Cloudflare worker-ээр дамжина ══
 const QPAY_WORKER_URL = 'https://kinobot.naraa333bb.workers.dev';
 let _qpayInvoiceForTxn = null;
@@ -1368,6 +1436,13 @@ async function createQpayInvoice(){
             + 'style="width:200px;height:200px;border-radius:12px;background:#fff;padding:8px;"></div>'
             + '<p style="font-size:11px;color:var(--muted);text-align:center;">'
             + 'Банкны аппаараа дээрх QR-ийг уншуулна уу</p>';
+    }
+
+    // iOS-ийн дотоод цонхонд банкны товч ажиллахгүй тул QR-ийн дараа шууд
+    // гарцын заавар харуулна (Android-д intent:// зугталт ажилладаг тул
+    // тэнд энэ заавар хэрэггүй).
+    if(isInAppBrowser() && !isAndroid()){
+      html += escapeHintHtml();
     }
     if(data.deeplinks && data.deeplinks.length){
       // Банкны товчнууд. ЭНГИЙН <a href> байдлаар үлдээнэ — хэрэглэгчийн
