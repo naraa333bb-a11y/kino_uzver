@@ -621,7 +621,10 @@ function applyHeroText(title, sub){
 // ЗААВАЛ ботын webhook-д холбогдсон пэйж байх ёстой. Өөр пэйж рүү заавал
 // Facebook ref-ийг worker руу илгээхгүй тул хэрэглэгчийн ID баригдахгүй,
 // төлбөр төлөгдсөн ч кино линк очихгүй болно.
-const BOT_PAGE = "https://m.me/1027017460500989";   // Тагтаа Студио -2
+// Ботын пэйж. 2026-08-06: Тагтаа Студио -2 (1027017460500989) болон
+// Киноны Хөтөч пэйжүүдийг өөр зориулалтаар ашиглаж эхэлсэн тул ботыг
+// тэдгээрээс салгаж, туршилтын шинэ пэйж рүү шилжүүлсэн.
+const BOT_PAGE = "https://m.me/1164939043379162";   // Kinobot туршилт
 
 const PAGE_LINKS = {
   ai1:   BOT_PAGE,
@@ -739,7 +742,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1786004592137;
+const CATALOG_VERSION = 1786006769612;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
