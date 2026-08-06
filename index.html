@@ -742,7 +742,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1786006769612;
+const CATALOG_VERSION = 1786012006932;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -1378,18 +1378,18 @@ async function createQpayInvoice(){
       // нээнэ — тэндээс банкны icon дарахад апп нь шууд нээгдэнэ.
       // Жинхэнэ браузерт түүхий схем шууд ажиллана.
       const inApp = isInAppBrowser();
-      // Android: intent:// — гадаад браузер луу гаргана (албан ёсны, ажилладаг).
-      // iOS: программаар зугтах БҮХ нүхийг Meta нөхсөн (x-safari ч ажиллахгүй
-      // нь 2026-07 туршилтаар батлагдсан) тул qpay.mn-ий хуудсыг энгийн
-      // https-ээр нээнэ — QPay өөрөө "open in external browser" зааврыг
-      // хуудсан дээрээ харуулдаг тул цэнхэр зураас гацахын оронд ойлгомжтой
-      // хуудас гарна.
-      const esc = (inApp && data.short_url)
-        ? (isAndroid() ? escapeToBrowserUrl(data.short_url) : data.short_url)
+      // ── ОРЧИН БҮРД ЯМАР ХОЛБООС ӨГӨХ ВЭ ──
+      // iOS дотоод цонх: ТҮҮХИЙ схем (khanbank://) — kora.mn-тэй бит ижил.
+      //   Meta-гийн "Leave Facebook → Open app" гүүр домэйний итгэлцлээс
+      //   хамаардаг тул tagtaakino.mn дээр ажиллах боломжтой. Хэрэв ажиллахгүй
+      //   бол доорх нөөц холбоос (QPay хуудас) хэрэглэгчид үлдэнэ.
+      // Android дотоод цонх: intent:// — гадаад браузер руу гаргана (батлагдсан).
+      // Жинхэнэ браузер: түүхий схем шууд ажиллана.
+      const esc = (inApp && isAndroid() && data.short_url)
+        ? escapeToBrowserUrl(data.short_url)
         : null;
       html += '<p style="font-size:11px;color:var(--muted);text-align:center;margin:10px 0 6px;">'
-            + (esc ? (isAndroid() ? 'банкаа сонгоход гадаад браузерт QPay нээгдэнэ'
-                                  : 'банкаа сонгоход QPay-ийн төлбөрийн хуудас нээгдэнэ')
+            + (esc ? 'банкаа сонгоход гадаад браузерт QPay нээгдэнэ'
                    : 'эсвэл банкаа сонгоно уу') + '</p>';
       html += '<div class="qpay-bank-list">' + data.deeplinks.map(d =>
         '<a class="qpay-bank" href="' + (esc || bankHref(d.link)) + '" style="text-decoration:none;">'
