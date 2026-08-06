@@ -742,7 +742,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1786016952897;
+const CATALOG_VERSION = 1786021954300;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -959,6 +959,7 @@ function showManualCloseHint(winRef){
 // ══ MODAL НЭЭХ ══
 function openBuyModal(movieId, catIndex){
   currentCat = catIndex;
+  window._lastBuyMovieId = movieId;   // GRP/ALL-ыг ялгаж хадгална (URL сэргээхэд хэрэгтэй)
   let title, price, vidSrc;
   window._selectedFreeMovieIds = []; // Шинэ modal нээх бүрд урамшууллын сонголт цэвэрлэнэ
 
@@ -1181,6 +1182,7 @@ function selectPay(method){
     acctBtn.classList.remove('active');
     qpayPanel.classList.add('open');
     acctPanel.classList.remove('open');
+    rememberPayState();      // гадаад браузерт нээгдэхэд сэргээхийн тулд
     createQpayInvoice();
   } else {
     acctBtn.classList.add('active');
@@ -1314,71 +1316,133 @@ function bankHref(link){
 }
 
 // ══════════════════════════════════════════
-// iOS ДОТООД ЦОНХНЫ ГАРЦ
+// ТӨЛБӨРИЙН БАЙДЛЫГ URL-Д ТЭМДЭГЛЭХ
 //
-// 2026-08 туршилтаар эцэслэн батлагдсан: iOS дээр Meta-гийн цонхноос
-// программаар (ямар ч схем, JS, SPA шилжилтээр) гарах ЗАМ БАЙХГҮЙ.
-// Гэвч хэрэглэгч ⋯ цэснээс "Open in external browser" дарвал ЭНЭ ХУУДАС
-// Safari-д нээгдэж, тэнд банкны товчнууд шууд ажилладаг нь батлагдсан.
-// Тиймээс тэр нэг алхмыг хамгийн ойлгомжтой, хийхэд амархан болгоно.
-//
-// Хуудасны хаягт ?ms= түлхүүр байдаг тул Safari-д нээгдэхэд сешн нь
-// автоматаар холбогдож, төлбөрийн хэсэг шууд гарна.
+// iPhone хэрэглэгч ⋯ → "Open in external browser" дарахад Safari нь ЭНЭ
+// хуудасны хаягийг нээдэг. Хаягт сонгосон кино бичигдсэн байвал Safari-д
+// шууд тэр киноны төлбөрийн хэсэг сэргэж, хэрэглэгч дахин сонгох
+// шаардлагагүй болно. ?ms= түлхүүр мөн хамт явах тул сешн ч холбогдоно.
 // ══════════════════════════════════════════
-function escapeHintHtml(){
-  return ''
-  + '<div id="escape-hint" style="position:relative;background:linear-gradient(135deg,rgba(0,132,255,.15),rgba(0,132,255,.06));'
-  + 'border:1.5px solid rgba(0,132,255,.55);border-radius:12px;padding:12px 14px;margin:12px 0;">'
-  +   '<div style="display:flex;align-items:flex-start;gap:10px;">'
-  +     '<div style="font-size:22px;line-height:1;animation:hintUp 1.2s ease-in-out infinite;">↗</div>'
-  +     '<div style="flex:1;">'
-  +       '<p style="font-size:12px;font-weight:700;color:#6ab7ff;margin:0 0 4px;">'
-  +         'Банкны аппаараа төлөх бол</p>'
-  +       '<p style="font-size:11px;color:var(--muted);line-height:1.5;margin:0;">'
-  +         'Баруун дээд булангийн <b style="color:#fff">⋯</b> дарж '
-  +         '<b style="color:#fff">Open in external browser</b> сонгоно уу. '
-  +         'Хуудас браузерт нээгдэхэд банкны товч шууд ажиллана.</p>'
-  +     '</div>'
-  +   '</div>'
-  +   '<button onclick="copyPayLink(this)" style="width:100%;margin-top:10px;padding:9px;'
-  +   'border:0;border-radius:8px;background:rgba(255,255,255,.10);color:#cfe4ff;'
-  +   'font-size:11px;font-weight:600;cursor:pointer;">📋 Эсвэл холбоосыг хуулж браузертаа буулгах</button>'
-  + '</div>'
-  + '<style>@keyframes hintUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}</style>';
+function rememberPayState(){
+  try{
+    const id = window._lastBuyMovieId;
+    if(id === undefined || id === null) return;
+    const u = new URL(location.href);
+    u.searchParams.set('pay', String(id));
+    u.searchParams.set('cat', String(currentCat || 0));
+    history.replaceState({}, '', u.toString());
+  }catch(e){}
 }
 
-// Одоогийн хуудасны хаягийг хуулна (?ms= түлхүүртэйгээ — сешн хадгалагдана)
-function copyPayLink(btn){
-  const url = location.href;
-  const done = () => {
-    if(btn){
-      const old = btn.innerHTML;
-      btn.innerHTML = '✅ Хуулагдлаа — браузераа нээгээд буулгана уу';
-      setTimeout(()=>{ btn.innerHTML = old; }, 2600);
-    }
+// Хуудас ачаалахад ?pay= байвал тэр киноны төлбөрийг автоматаар нээнэ
+function restorePayFromUrl(){
+  try{
+    const p = new URLSearchParams(location.search);
+    const pay = p.get('pay');
+    if(!pay) return;
+    const cat = parseInt(p.get('cat') || '0') || 0;
+    const id  = (pay === 'GRP' || pay === 'ALL') ? pay : parseInt(pay);
+    if(id !== 'GRP' && id !== 'ALL' && isNaN(id)) return;
+    const gate = document.getElementById('welcomeGate');
+    if(gate) gate.classList.add('hidden');
+    localStorage.setItem(GATE_STATE_KEY, 'yes');
+    openBuyModal(id, cat);
+    setTimeout(()=>{ selectPay('qpay'); }, 150);
+  }catch(e){}
+}
+
+// ══════════════════════════════════════════
+// QR-ИЙГ ЗУРГИЙН ЦОМОГТ ХАДГАЛАХ
+// iOS: navigator.share-ээр Share Sheet нээж "Save Image" сонгуулна.
+// Android болон жинхэнэ браузер: шууд татаж авна.
+// Аль нь ч боломжгүй бол зураг дээр удаан дарах зааврыг харуулна.
+// ══════════════════════════════════════════
+function dataUrlToFile(dataUrl, name){
+  const b64 = String(dataUrl).split(',')[1] || '';
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+  const blob = new Blob([arr], {type:'image/png'});
+  try{ return new File([blob], name, {type:'image/png'}); }catch(e){ return blob; }
+}
+
+async function saveQrToGallery(btn){
+  const img = document.querySelector('#qpayInvoiceArea img');
+  if(!img){ return; }
+  const ok = (msg) => {
+    if(!btn) return;
+    const old = btn.innerHTML;
+    btn.innerHTML = msg;
+    setTimeout(()=>{ btn.innerHTML = old; }, 2800);
   };
   try{
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(url).then(done).catch(()=>fallbackCopy(url, done));
-    } else {
-      fallbackCopy(url, done);
+    const file = dataUrlToFile(img.src, 'qpay-qr.png');
+    // iOS: Share Sheet дотор "Save Image" гарна
+    if(navigator.canShare && file instanceof File && navigator.canShare({files:[file]})){
+      await navigator.share({ files: [file], title: 'QPay QR' });
+      ok('✅ Хадгалагдлаа');
+      return;
     }
-  }catch(e){ fallbackCopy(url, done); }
+    // Android / desktop: шууд татах
+    const url = URL.createObjectURL(file);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'qpay-qr.png';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url), 1500);
+    ok('✅ Татагдлаа');
+  }catch(e){
+    ok('QR зураг дээр удаан дарж Save хийнэ үү');
+  }
 }
 
-function fallbackCopy(text, done){
-  try{
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
-    document.body.appendChild(ta);
-    ta.focus(); ta.select(); ta.setSelectionRange(0, 99999);
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    done();
-  }catch(e){
-    if(typeof showToast === 'function') showToast('Хуулж чадсангүй — хаягийн мөрнөөс хуулна уу');
-  }
+// ══════════════════════════════════════════
+// iPhone-Д ЗОРИУЛСАН ЗУРГАН ЗААВАР (inline SVG)
+// Messenger-ийн жинхэнэ дээд мөрийг дуурайж, ⋯ товчийг тодруулаад,
+// нээгдэх цэсэнд "Open in external browser"-ийг онцолно.
+// ══════════════════════════════════════════
+function iosGuideHtml(){
+  return ''
+  + '<div style="background:rgba(0,132,255,.07);border:1.5px solid rgba(0,132,255,.45);'
+  + 'border-radius:14px;padding:14px;margin:12px 0;">'
+  + '<p style="font-size:12.5px;font-weight:700;color:#6ab7ff;margin:0 0 10px;text-align:center;">'
+  + 'Банкны аппаараа төлөх — 2 алхам</p>'
+  + '<svg viewBox="0 0 300 250" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">'
+  +   '<defs>'
+  +     '<style>'
+  +       '.lbl{font:700 11px -apple-system,sans-serif;fill:#6ab7ff}'
+  +       '.txt{font:500 10px -apple-system,sans-serif;fill:#c9d2e0}'
+  +       '.dim{font:500 9.5px -apple-system,sans-serif;fill:#8792a6}'
+  +       '.num{font:800 12px -apple-system,sans-serif;fill:#0d0f14}'
+  +       '@keyframes ring{0%,100%{opacity:.35;r:15}50%{opacity:1;r:19}}'
+  +       '.pulse{animation:ring 1.4s ease-in-out infinite;transform-origin:center}'
+  +     '</style>'
+  +   '</defs>'
+
+  // ── АЛХАМ 1 — дээд мөр, ⋯ тодруулсан ──
+  +   '<circle cx="14" cy="16" r="11" fill="#6ab7ff"/><text x="14" y="20" text-anchor="middle" class="num">1</text>'
+  +   '<text x="32" y="20" class="lbl">Баруун дээд булангийн ⋯ дарна</text>'
+  +   '<rect x="14" y="32" width="272" height="46" rx="10" fill="#1a1d24" stroke="#2b3242"/>'
+  +   '<text x="30" y="60" class="txt" font-size="15">✕</text>'
+  +   '<text x="150" y="52" text-anchor="middle" class="txt">🔒 tagtaakino.mn</text>'
+  +   '<text x="150" y="67" text-anchor="middle" class="dim">Messenger</text>'
+  +   '<circle class="pulse" cx="264" cy="55" r="16" fill="none" stroke="#6ab7ff" stroke-width="2.5"/>'
+  +   '<text x="264" y="61" text-anchor="middle" fill="#fff" font-size="17" font-weight="700">⋯</text>'
+
+  // ── АЛХАМ 2 — цэс, зөв мөр онцолсон ──
+  +   '<circle cx="14" cy="108" r="11" fill="#6ab7ff"/><text x="14" y="112" text-anchor="middle" class="num">2</text>'
+  +   '<text x="32" y="112" class="lbl">Open in external browser сонгоно</text>'
+  +   '<rect x="60" y="126" width="226" height="112" rx="12" fill="#1a1d24" stroke="#2b3242"/>'
+  +   '<text x="76" y="148" class="dim">🔗  Copy link</text>'
+  +   '<line x1="72" y1="158" x2="274" y2="158" stroke="#2b3242"/>'
+  +   '<rect x="66" y="164" width="214" height="30" rx="8" fill="#6ab7ff" opacity=".18" stroke="#6ab7ff" stroke-width="1.5"/>'
+  +   '<text x="80" y="184" fill="#8fc7ff" font-size="10.5" font-weight="700">🌐  Open in external browser</text>'
+  +   '<line x1="72" y1="202" x2="274" y2="202" stroke="#2b3242"/>'
+  +   '<text x="76" y="220" class="dim">⚙️  Settings</text>'
+  +   '<path d="M46 179 L62 179 M56 173 L62 179 L56 185" stroke="#6ab7ff" stroke-width="2.5" fill="none" stroke-linecap="round"/>'
+  + '</svg>'
+  + '<p style="font-size:10.5px;color:var(--muted);line-height:1.5;margin:10px 0 0;text-align:center;">'
+  + 'Браузерт нээгдэхэд банкны жагсаалт гарч, банкаа сонгоход аппруу шууд орно.</p>'
+  + '</div>';
 }
 
 // ══ QPAY INVOICE ҮҮСГЭХ — Cloudflare worker-ээр дамжина ══
@@ -1434,43 +1498,56 @@ async function createQpayInvoice(){
       html += '<div style="text-align:center;margin:10px 0;">'
             + '<img src="data:image/png;base64,' + data.qr_image + '" alt="QPay QR" '
             + 'style="width:200px;height:200px;border-radius:12px;background:#fff;padding:8px;"></div>'
-            + '<p style="font-size:11px;color:var(--muted);text-align:center;">'
-            + 'Банкны аппаараа дээрх QR-ийг уншуулна уу</p>';
+            + '<p style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:8px;">'
+            + 'Банкны аппаараа дээрх QR-ийг уншуулна уу</p>'
+            + '<button onclick="saveQrToGallery(this)" style="display:block;margin:0 auto 4px;'
+            + 'padding:8px 16px;border:1px solid var(--border);border-radius:8px;'
+            + 'background:var(--card);color:var(--muted);font-size:11px;cursor:pointer;">'
+            + '🖼 QR-ийг цомогт хадгалах</button>';
     }
 
-    // iOS-ийн дотоод цонхонд банкны товч ажиллахгүй тул QR-ийн дараа шууд
-    // гарцын заавар харуулна (Android-д intent:// зугталт ажилладаг тул
-    // тэнд энэ заавар хэрэггүй).
-    if(isInAppBrowser() && !isAndroid()){
-      html += escapeHintHtml();
-    }
-    if(data.deeplinks && data.deeplinks.length){
-      // Банкны товчнууд. ЭНГИЙН <a href> байдлаар үлдээнэ — хэрэглэгчийн
-      // шууд даралтыг хөтчүүд зөвшөөрдөг бол JS шилжилтийг блоклодог.
-      //
-      // Дотоод цонхонд (Messenger/FB) аппын схем блоклогддог тул товч бүр
-      // ГАДААД браузер луу гаргаад QPay-ийн албан ёсны хуудсыг (short_url)
-      // нээнэ — тэндээс банкны icon дарахад апп нь шууд нээгдэнэ.
-      // Жинхэнэ браузерт түүхий схем шууд ажиллана.
-      const inApp = isInAppBrowser();
-      // ── ОРЧИН БҮРД ЯМАР ХОЛБООС ӨГӨХ ВЭ ──
-      // iOS дотоод цонх: ТҮҮХИЙ схем (khanbank://) — kora.mn-тэй бит ижил.
-      //   Meta-гийн "Leave Facebook → Open app" гүүр домэйний итгэлцлээс
-      //   хамаардаг тул tagtaakino.mn дээр ажиллах боломжтой. Хэрэв ажиллахгүй
-      //   бол доорх нөөц холбоос (QPay хуудас) хэрэглэгчид үлдэнэ.
-      // Android дотоод цонх: intent:// — гадаад браузер руу гаргана (батлагдсан).
-      // Жинхэнэ браузер: түүхий схем шууд ажиллана.
-      const esc = (inApp && isAndroid() && data.short_url)
-        ? escapeToBrowserUrl(data.short_url)
-        : null;
-      html += '<p style="font-size:11px;color:var(--muted);text-align:center;margin:10px 0 6px;">'
-            + (esc ? 'банкаа сонгоход гадаад браузерт QPay нээгдэнэ'
-                   : 'эсвэл банкаа сонгоно уу') + '</p>';
-      html += '<div class="qpay-bank-list">' + data.deeplinks.map(d =>
-        '<a class="qpay-bank" href="' + (esc || bankHref(d.link)) + '" style="text-decoration:none;">'
+    // ── ОРЧИН БҮРД ЯМАР ЗАМ ӨГӨХ ВЭ ──
+    // Жинхэнэ браузер (Safari/Chrome): банкны 22 icon шууд — түүхий схем
+    //   ажилладаг нь батлагдсан.
+    // Дотоод цонх (Messenger/FB): утасны төрлөөр салгана —
+    //   Android → icon бүр intent://-ээр гадаад браузер руу гаргана (ажилладаг),
+    //   iPhone → icon огт харуулахгүй, оронд нь ⋯ → "Open in external browser"
+    //            гэсэн зурган заавар (iOS дээр программын гарц байхгүй нь
+    //            2026-08-ний туршилтуудаар эцэслэн батлагдсан).
+    const deeplinks = data.deeplinks || [];
+    const bankListHtml = (href) =>
+      '<div class="qpay-bank-list">' + deeplinks.map(d =>
+        '<a class="qpay-bank" href="' + (href || bankHref(d.link)) + '" style="text-decoration:none;">'
         + (d.logo ? '<img src="' + d.logo + '" alt="" style="width:26px;height:26px;border-radius:6px;margin-bottom:4px;" onerror="this.style.display=\'none\'">' : '<div class="qpay-bank-icon">🏦</div>')
         + '<div class="qpay-bank-name">' + (d.name || '') + '</div></a>'
       ).join('') + '</div>';
+
+    if(deeplinks.length){
+      if(!isInAppBrowser()){
+        html += '<p style="font-size:11px;color:var(--muted);text-align:center;margin:10px 0 6px;">'
+              + 'эсвэл банкаа сонгоно уу</p>' + bankListHtml(null);
+      } else {
+        const androidHref = data.short_url ? escapeToBrowserUrl(data.short_url) : null;
+        html += ''
+          + '<div id="qpayDevicePick" style="margin:14px 0 4px;">'
+          +   '<p style="font-size:11.5px;color:var(--muted);text-align:center;margin:0 0 8px;">'
+          +     'Утасныхаа төрлийг сонгоно уу</p>'
+          +   '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
+          +     '<button onclick="pickPayDevice(\'ios\')" style="padding:14px 8px;border:1.5px solid var(--border);'
+          +     'border-radius:12px;background:var(--card);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">'
+          +       '<div style="font-size:22px;margin-bottom:4px;">🍎</div>iPhone</button>'
+          +     '<button onclick="pickPayDevice(\'android\')" style="padding:14px 8px;border:1.5px solid var(--border);'
+          +     'border-radius:12px;background:var(--card);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">'
+          +       '<div style="font-size:22px;margin-bottom:4px;">🤖</div>Samsung, бусад</button>'
+          +   '</div>'
+          + '</div>'
+          + '<div id="qpayAndroidPane" style="display:none;">'
+          +   '<p style="font-size:11px;color:var(--muted);text-align:center;margin:10px 0 6px;">'
+          +     'банкаа сонгоход гадаад браузерт QPay нээгдэнэ</p>'
+          +   bankListHtml(androidHref)
+          + '</div>'
+          + '<div id="qpayIphonePane" style="display:none;">' + iosGuideHtml() + '</div>';
+      }
     }
     area.innerHTML = html || '<p class="pay-note">Invoice үүссэн боловч QR ирсэнгүй — дахин оролдоно уу.</p>';
   }catch(e){
@@ -1478,6 +1555,24 @@ async function createQpayInvoice(){
       + '<p class="pay-note"><button class="pay-btn" style="margin-top:6px;" '
       + 'onclick="_qpayInvoiceForTxn=null;createQpayInvoice()">🔄 Дахин оролдох</button></p>';
   }
+}
+
+// Утасны төрөл сонгоход тухайн хувилбарыг харуулна.
+// Сонголтоо буцаах боломжтой байлгахын тулд сонгогч мөрийг үлдээж,
+// зөвхөн идэвхтэй товчийг тодруулна.
+function pickPayDevice(kind){
+  const pick = document.getElementById('qpayDevicePick');
+  const ios  = document.getElementById('qpayIphonePane');
+  const and  = document.getElementById('qpayAndroidPane');
+  if(!pick || !ios || !and) return;
+  const btns = pick.querySelectorAll('button');
+  btns.forEach((b, i) => {
+    const active = (i === 0 && kind === 'ios') || (i === 1 && kind === 'android');
+    b.style.borderColor = active ? 'var(--accent2)' : 'var(--border)';
+    b.style.background  = active ? 'rgba(255,56,96,.12)' : 'var(--card)';
+  });
+  ios.style.display = (kind === 'ios')     ? '' : 'none';
+  and.style.display = (kind === 'android') ? '' : 'none';
 }
 
 // 1+1 кино сонгоогүй үед 3 секундын мэдэгдэл
@@ -4091,6 +4186,10 @@ function toggleAdminPanel(){
 window.addEventListener('DOMContentLoaded', function(){
   // Харилцагч хуучирсан (кэшлэгдсэн) хуудас харж байвал чимээгүй шинэчилнэ
   if(typeof autoRefreshIfStale === 'function') autoRefreshIfStale();
+
+  // ⋯ → "Open in external browser"-ээр Safari-д нээгдсэн бол сонгосон
+  // киноны төлбөрийг автоматаар сэргээнэ (хэрэглэгч дахин сонгохгүй)
+  if(typeof restorePayFromUrl === 'function') setTimeout(restorePayFromUrl, 250);
 
   // URL ?admin=2020 байвал admin panel-г DOM-д нэмж, харин ?admin=2020 үгүй бол
   // template нь render хийгдэхгүй — Ctrl+U-д admin код харагдахгүй
