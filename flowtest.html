@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Урсгалын тест</title>
+<style>
+body{font-family:-apple-system,sans-serif;background:#0d0f14;color:#e8eaf0;padding:22px;line-height:1.6}
+h3{margin:0 0 14px}
+button,a.bank{display:block;width:100%;box-sizing:border-box;background:#1b2030;border:1px solid #2b3242;border-radius:14px;padding:16px;margin-bottom:12px;color:#fff;font-size:15px;text-align:center;text-decoration:none;cursor:pointer}
+a.bank{background:#0b5a2b;border-color:#0d7a3a;font-weight:700}
+.card{border:1px solid #2b3242;border-radius:14px;padding:14px;margin-bottom:20px}
+.card h4{margin:0 0 4px;color:#6ea8ff;font-size:14px}
+.card p{margin:0 0 12px;font-size:11px;color:#9aa3b2}
+.hide{display:none}
+</style>
+</head>
+<body>
+<h3>Аль зам ажиллахыг ялгах тест</h3>
+<p style="font-size:12px;color:#9aa3b2">Зам А-г эхлээд бүрэн туулаад үзээрэй. Ажиллахгүй бол хуудсаа дахин ачаалж Зам Б-г туулаарай.</p>
+
+<div class="card">
+  <h4>ЗАМ А — товч дараад дараа нь банк</h4>
+  <p>Манай жинхэнэ сайттай ижил: хэдэн товч дарсны дараа банкны линк JS-ээр үүснэ. URL өөрчлөгдөхгүй.</p>
+  <button id="a1" onclick="stepA1()">1 · Кино авах</button>
+  <button id="a2" class="hide" onclick="stepA2()">2 · QPay төлөх</button>
+  <div id="aBank"></div>
+</div>
+
+<div class="card">
+  <h4>ЗАМ Б — URL солигдсоны дараа банк</h4>
+  <p>kora-тай ижил: товч дарахад хуудасны хаяг өөрчлөгдөж (SPA шилжилт) дараа нь банкны линк үүснэ.</p>
+  <button id="b1" onclick="stepB1()">1 · Кино авах</button>
+  <button id="b2" class="hide" onclick="stepB2()">2 · QPay төлөх (хаяг солигдоно)</button>
+  <div id="bBank"></div>
+</div>
+
+<script>
+var LINK = "khanbank://q?qPay_QRcode=0002010102121531279404962794049600260810698904527540014A00000084300010108AGMOMNUB0220EXVorRCBk7uM7W6_9lU352045818530349654031005802MN5917BAASANJAVURANTUGS6011ULAANBAATAR62240720EXVorRCBk7uM7W6_9lU37106QPP_QR78151120322734953497902228002016304346C";
+function bankHtml(){
+  return '<a class="bank" href="' + LINK + '">Хаан банк нээх</a>';
+}
+function stepA1(){ document.getElementById('a2').classList.remove('hide'); }
+function stepA2(){
+  // Жинхэнэ сайт шиг: сервер рүү хандаад дараа нь линк үүсгэнэ
+  setTimeout(function(){ document.getElementById('aBank').innerHTML = bankHtml(); }, 400);
+}
+function stepB1(){ document.getElementById('b2').classList.remove('hide'); }
+function stepB2(){
+  // kora шиг: SPA маягаар хаягийг өөрчилнө
+  history.pushState({}, '', '/order/test-' + Date.now());
+  setTimeout(function(){ document.getElementById('bBank').innerHTML = bankHtml(); }, 400);
+}
+</script>
+</body>
+</html>
