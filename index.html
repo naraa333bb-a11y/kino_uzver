@@ -742,7 +742,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1786080615062;
+const CATALOG_VERSION = 1786081242181;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -1616,8 +1616,13 @@ function pickPayDevice(kind){
   //
   // Өөрийн сайт руу буцаахгүй — хэрэглэгч кино, төлбөрөө дахин
   // сонгох шаардлагагүй.
+  // qpay.mn-ий хар дэлгэц дээр бид заавар нэмж чадахгүй (тэдний хуудас).
+  // Тиймээс дундуур ӨӨРИЙН гүүр хуудсыг (pay.html) тавина:
+  //   · Messenger дотор  → монгол 2 алхамт зурган заавар харагдана
+  //   · Гадаад браузерт  → qpay.mn руу өөрөө шууд үсэрч 22 банк гарна
+  // Ингэснээр хэрэглэгч "ажиллахгүй юм байна" гэж гацахгүй.
   if(kind === 'ios' && window._qpayShortUrl){
-    location.href = window._qpayShortUrl;
+    location.href = 'pay.html?u=' + encodeURIComponent(window._qpayShortUrl);
     return;
   }
 
