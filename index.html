@@ -742,7 +742,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1786081242181;
+const CATALOG_VERSION = 1786082779546;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -3049,6 +3049,10 @@ async function deployToGitHub(html, token){
 
     if(putRes.ok){
       showToast('✅ GitHub-т амжилттай байршлаа!');
+      // Сайт дээрх кино бот руу автоматаар мэдэгдэнэ.
+      // Ботын каталог KV-д тусад нь хадгалагддаг тул сайт шинэчилсэн ч
+      // /refresh дуудахгүй бол бот ХУУЧИН киног мэдсээр байдаг.
+      refreshBotCatalog();
       return {ok: true};
     } else {
       const err = await putRes.json();
@@ -3107,6 +3111,29 @@ function setCfTab(tab){
   });
 }
 
+// ── Ботын киноны каталогийг шинэчлэх ──
+// GitHub байршуулсны дараа сайт дээр шинэ кино гарна, гэвч бот киноны
+// жагсаалтаа Cloudflare KV-гээс уншдаг. Worker-ийн /refresh нь сайтыг
+// уншиж KV-г шинэчилдэг тул байршуулалт бүрийн дараа дуудна.
+// GitHub Pages кэш тархахыг хүлээх шаардлагатай тул хойшлуулж дуудна.
+async function refreshBotCatalog(){
+  const workerUrl = normWorkerUrl(CF_CONFIG.workerUrl
+    || document.getElementById('cf-worker-url')?.value || '');
+  const secret = (CF_CONFIG.refreshSecret
+    || document.getElementById('cf-refresh-secret')?.value || '').trim();
+  if(!workerUrl || !secret) return;   // тохиргоо дутуу бол чимээгүй өнгөрнө
+
+  setTimeout(async () => {
+    try{
+      const r = await fetch(workerUrl + '/refresh?secret=' + encodeURIComponent(secret));
+      const d = await r.json();
+      if(d && (d.success || d.movieCount !== undefined)){
+        showToast('🤖 Ботын каталог шинэчлэгдлээ (' + (d.movieCount ?? '?') + ' кино)');
+      }
+    }catch(e){}
+  }, 45000);   // GitHub Pages нийтлэгдэхийг хүлээнэ
+}
+
 // ══════════════════════════════════════════
 // CLOUDFLARE CONFIG — localStorage-д хадгалах бүтэц
 // ══════════════════════════════════════════
@@ -3115,8 +3142,11 @@ function loadCfConfig(){
     const saved = localStorage.getItem('toorxon_cf_config');
     if(saved) return JSON.parse(saved);
   }catch(e){}
+  // Worker хаягийг урьдчилж бөглөнө — шинэ браузер/домэйноос админ нээх
+  // бүрд гараар бичих шаардлагагүй болно. (Refresh secret нь нууц тул
+  // урьдчилж бөглөхгүй — гараар оруулна.)
   return {
-    geminiKey: '', workerUrl: '', refreshSecret: '',
+    geminiKey: '', workerUrl: QPAY_WORKER_URL, refreshSecret: '',
     tokenAi: '', tokenAction: '', tokenErotic: '',
     movieLinks: {}, groupLinks: {ai:'', action:'', erotic:'', all:''},
     promptChat: '', promptVision: ''
