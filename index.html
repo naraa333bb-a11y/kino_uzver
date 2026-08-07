@@ -742,7 +742,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1786021954300;
+const CATALOG_VERSION = 1786079942202;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -1315,6 +1315,26 @@ function bankHref(link){
   return link;   // жинхэнэ браузерт: kora.mn-тэй яг адил түүхий схем
 }
 
+// ── Төхөөрөмжийн лого (emoji биш SVG) ──
+// 🍎 emoji нь утас бүр дээр өөр өнгөтэй (iOS дээр улаан) гарч төөрөгдүүлдэг
+// тул мөнгөлөг силуэт SVG ашиглана. Android-д ногоон робот.
+const APPLE_SVG = '<svg viewBox="0 0 24 24" style="width:24px;height:24px;display:block;margin:0 auto 5px;" '
+  + 'fill="#d8dce4" xmlns="http://www.w3.org/2000/svg">'
+  + '<path d="M17.05 12.94c-.02-2.2 1.8-3.26 1.88-3.31-1.03-1.5-2.62-1.71-3.19-1.73-1.36-.14-2.65.8-3.34.8'
+  + '-.69 0-1.75-.78-2.88-.76-1.48.02-2.85.86-3.61 2.18-1.54 2.67-.39 6.62 1.11 8.79.73 1.06 1.6 2.25 2.74 2.21'
+  + '1.1-.04 1.52-.71 2.85-.71 1.33 0 1.71.71 2.88.69 1.19-.02 1.94-1.08 2.67-2.14.84-1.23 1.19-2.42 1.21-2.48'
+  + '-.03-.01-2.32-.89-2.34-3.54z"/>'
+  + '<path d="M14.94 6.35c.61-.74 1.02-1.77.91-2.79-.88.04-1.94.59-2.57 1.32-.56.65-1.05 1.7-.92 2.7.98.08 1.98-.5 2.58-1.23z"/>'
+  + '</svg>';
+
+const ANDROID_SVG = '<svg viewBox="0 0 24 24" style="width:24px;height:24px;display:block;margin:0 auto 5px;" '
+  + 'fill="#3ddc84" xmlns="http://www.w3.org/2000/svg">'
+  + '<path d="M6 9v8.5A1.5 1.5 0 007.5 19H9v2.5a1.5 1.5 0 003 0V19h2v2.5a1.5 1.5 0 003 0V19h1.5A1.5 1.5 0 0020 17.5V9H6z"/>'
+  + '<rect x="2.5" y="9" width="3" height="7.5" rx="1.5"/>'
+  + '<rect x="20.5" y="9" width="3" height="7.5" rx="1.5"/>'
+  + '<path d="M15.6 3.6l1-1.6a.3.3 0 00-.5-.3l-1 1.7a7.4 7.4 0 00-4.2 0l-1-1.7a.3.3 0 00-.5.3l1 1.6A6 6 0 006 8h14a6 6 0 00-4.4-4.4zM9.8 6.1a.6.6 0 110-1.2.6.6 0 010 1.2zm6.4 0a.6.6 0 110-1.2.6.6 0 010 1.2z"/>'
+  + '</svg>';
+
 // ══════════════════════════════════════════
 // ТӨЛБӨРИЙН БАЙДЛЫГ URL-Д ТЭМДЭГЛЭХ
 //
@@ -1334,8 +1354,10 @@ function rememberPayState(){
   }catch(e){}
 }
 
-// Хуудас ачаалахад ?pay= байвал тэр киноны төлбөрийг автоматаар нээнэ
-function restorePayFromUrl(){
+// Хуудас ачаалахад ?pay= байвал тэр киноны төлбөрийг автоматаар нээнэ.
+// ЧУХАЛ: сешн шалгалт (adopt + session-check) дуусахыг ХҮЛЭЭЖ БАЙЖ нээнэ —
+// эс бөгөөс төлбөрийн хаалга дараа нь ажиллаж, дөнгөж нээсэн хэсгийг хаадаг.
+async function restorePayFromUrl(){
   try{
     const p = new URLSearchParams(location.search);
     const pay = p.get('pay');
@@ -1346,8 +1368,28 @@ function restorePayFromUrl(){
     const gate = document.getElementById('welcomeGate');
     if(gate) gate.classList.add('hidden');
     localStorage.setItem(GATE_STATE_KEY, 'yes');
+
+    // Сешн холбоос эцэслэхийг хүлээнэ (ботын ?ms= түлхүүр байвал холбогдоно)
+    try{
+      await Promise.resolve(typeof _adoptPromise !== 'undefined' ? _adoptPromise : null);
+      await isSessionLinked();
+    }catch(e){}
+
     openBuyModal(id, cat);
     setTimeout(()=>{ selectPay('qpay'); }, 150);
+
+    // ?dev=ios байвал (Messenger доторх iPhone хэрэглэгч) утасны сонголтыг
+    // давтуулахгүй — шууд зурган зааврыг харуулна. Харин ГАДААД браузерт
+    // энэ хаяг нээгдвэл дотоод цонх биш тул банкны 22 icon шууд гарна.
+    if(p.get('dev') === 'ios' && isInAppBrowser()){
+      const wait = setInterval(()=>{
+        if(document.getElementById('qpayDevicePick')){
+          clearInterval(wait);
+          pickPayDevice('ios');
+        }
+      }, 300);
+      setTimeout(()=>clearInterval(wait), 12000);
+    }
   }catch(e){}
 }
 
@@ -1535,10 +1577,10 @@ async function createQpayInvoice(){
           +   '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
           +     '<button onclick="pickPayDevice(\'ios\')" style="padding:14px 8px;border:1.5px solid var(--border);'
           +     'border-radius:12px;background:var(--card);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">'
-          +       '<div style="font-size:22px;margin-bottom:4px;">🍎</div>iPhone</button>'
+          +       APPLE_SVG + 'iPhone</button>'
           +     '<button onclick="pickPayDevice(\'android\')" style="padding:14px 8px;border:1.5px solid var(--border);'
           +     'border-radius:12px;background:var(--card);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">'
-          +       '<div style="font-size:22px;margin-bottom:4px;">🤖</div>Samsung, бусад</button>'
+          +       ANDROID_SVG + 'Samsung, бусад</button>'
           +   '</div>'
           + '</div>'
           + '<div id="qpayAndroidPane" style="display:none;">'
@@ -1561,6 +1603,26 @@ async function createQpayInvoice(){
 // Сонголтоо буцаах боломжтой байлгахын тулд сонгогч мөрийг үлдээж,
 // зөвхөн идэвхтэй товчийг тодруулна.
 function pickPayDevice(kind){
+  // ── iPhone: ЖИНХЭНЭ ШИЛЖИЛТ хийнэ ──
+  // Messenger-ийн "Open in external browser" нь хуудасны АНХ АЧААЛСАН
+  // хаягийг нээдэг тул history.replaceState-ээр нэмсэн ?pay= параметр
+  // дамждаггүй байсан (Safari-д нүүр хуудас нээгдэж, кино алга болдог).
+  // Тиймээс ?pay=&cat=&dev=ios хаяг руу бодитоор шилжинэ — тэгвэл
+  // гадаад браузер ЯГ ТЭР хаягийг нээж, төлбөр шууд сэргэнэ.
+  if(kind === 'ios'){
+    try{
+      const u = new URL(location.href);
+      const id = window._lastBuyMovieId;
+      if(id !== undefined && id !== null) u.searchParams.set('pay', String(id));
+      u.searchParams.set('cat', String(currentCat || 0));
+      if(u.searchParams.get('dev') !== 'ios'){
+        u.searchParams.set('dev', 'ios');
+        location.href = u.toString();   // бодит шилжилт → хаяг бүртгэгдэнэ
+        return;
+      }
+    }catch(e){}
+  }
+
   const pick = document.getElementById('qpayDevicePick');
   const ios  = document.getElementById('qpayIphonePane');
   const and  = document.getElementById('qpayAndroidPane');
