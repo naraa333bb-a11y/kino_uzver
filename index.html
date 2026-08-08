@@ -742,7 +742,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1786082779546;
+const CATALOG_VERSION = 1786204125839;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -1377,19 +1377,8 @@ async function restorePayFromUrl(){
 
     openBuyModal(id, cat);
     setTimeout(()=>{ selectPay('qpay'); }, 150);
-
-    // ?dev=ios байвал (Messenger доторх iPhone хэрэглэгч) утасны сонголтыг
-    // давтуулахгүй — шууд зурган зааврыг харуулна. Харин ГАДААД браузерт
-    // энэ хаяг нээгдвэл дотоод цонх биш тул банкны 22 icon шууд гарна.
-    if(p.get('dev') === 'ios' && isInAppBrowser()){
-      const wait = setInterval(()=>{
-        if(document.getElementById('qpayDevicePick')){
-          clearInterval(wait);
-          pickPayDevice('ios');
-        }
-      }, 300);
-      setTimeout(()=>clearInterval(wait), 12000);
-    }
+    // Утасны төрлийг одоо автоматаар таньдаг тул нэмэлт алхам хэрэггүй —
+    // гадаад браузерт 22 банк, дотоод цонхонд зохих хувилбар өөрөө гарна.
   }catch(e){}
 }
 
@@ -1572,27 +1561,37 @@ async function createQpayInvoice(){
               + 'эсвэл банкаа сонгоно уу</p>' + bankListHtml(null);
       } else {
         const androidHref = data.short_url ? escapeToBrowserUrl(data.short_url) : null;
-        html += ''
-          + '<div id="qpayDevicePick" style="margin:14px 0 4px;">'
-          +   '<p style="font-size:11.5px;color:var(--muted);text-align:center;margin:0 0 8px;">'
-          +     'Утасныхаа төрлийг сонгоно уу</p>'
-          +   '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'
-          +     '<button onclick="pickPayDevice(\'ios\')" style="padding:14px 8px;border:1.5px solid var(--border);'
-          +     'border-radius:12px;background:var(--card);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">'
-          +       APPLE_SVG + 'iPhone</button>'
-          +     '<button onclick="pickPayDevice(\'android\')" style="padding:14px 8px;border:1.5px solid var(--border);'
-          +     'border-radius:12px;background:var(--card);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">'
-          +       ANDROID_SVG + 'Samsung, бусад</button>'
-          +   '</div>'
-          + '</div>'
-          + '<div id="qpayAndroidPane" style="display:none;">'
-          +   '<p style="font-size:11px;color:var(--muted);text-align:center;margin:10px 0 6px;">'
-          +     'банкаа сонгоход гадаад браузерт QPay нээгдэнэ</p>'
-          +   bankListHtml(androidHref)
-          + '</div>'
-          // iPhone нь шууд qpay.mn руу шилждэг тул энэ хэсэг зөвхөн
-          // short_url ирээгүй ховор тохиолдолд нөөц болно
-          + '<div id="qpayIphonePane" style="display:none;">' + iosGuideHtml() + '</div>';
+        // ── УТСЫГ АВТОМАТААР ТАНИНА ──
+        // Хөтөч өөрөө ямар төхөөрөмж дээр ажиллаж байгаагаа хэлдэг тул
+        // хэрэглэгчээс асуух шаардлагагүй. Буруу таньсан ховор тохиолдолд
+        // доорх жижиг холбоосоор нөгөө хувилбар руу шилжинэ.
+        if(isAndroid()){
+          html += '<p style="font-size:11px;color:var(--muted);text-align:center;margin:12px 0 6px;">'
+                + 'банкаа сонгоход гадаад браузерт QPay нээгдэнэ</p>'
+                + bankListHtml(androidHref);
+        } else {
+          // iPhone: нэг тод товч — гүүр хуудас руу (тэнд монгол зурган заавар)
+          html += '<a href="pay.html?u=' + encodeURIComponent(data.short_url || '') + '" '
+                + 'style="display:block;margin:14px 0 6px;padding:14px;border-radius:12px;'
+                + 'background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;'
+                + 'font-size:14px;font-weight:700;text-align:center;text-decoration:none;">'
+                + '🏦 Банкны аппаар төлөх</a>';
+        }
+        html += '<p style="text-align:center;margin:8px 0 0;">'
+              + '<a href="javascript:void(0)" onclick="togglePayDevice()" '
+              + 'style="font-size:10.5px;color:var(--muted);text-decoration:underline;">'
+              + 'Ажиллахгүй байна уу? Өөр аргаар үзэх</a></p>'
+          // ── НӨӨЦ ХЭСЭГ ──
+          // Автомат таних буруу ажилласан ховор тохиолдолд нөгөө аргыг
+          // үзүүлнэ. Хэвийн үед хаалттай байна.
+          + '<div id="qpayAltPane" style="display:none;margin-top:10px;'
+          + 'border-top:1px solid var(--border);padding-top:10px;">'
+          + (isAndroid()
+              ? iosGuideHtml()
+              : '<p style="font-size:11px;color:var(--muted);text-align:center;margin:0 0 6px;">'
+                + 'банкаа сонгоход гадаад браузерт QPay нээгдэнэ</p>'
+                + bankListHtml(androidHref))
+          + '</div>';
       }
     }
     area.innerHTML = html || '<p class="pay-note">Invoice үүссэн боловч QR ирсэнгүй — дахин оролдоно уу.</p>';
@@ -1603,41 +1602,13 @@ async function createQpayInvoice(){
   }
 }
 
-// Утасны төрөл сонгоход тухайн хувилбарыг харуулна.
-// Сонголтоо буцаах боломжтой байлгахын тулд сонгогч мөрийг үлдээж,
-// зөвхөн идэвхтэй товчийг тодруулна.
-function pickPayDevice(kind){
-  // ── iPhone: ШУУД QPAY-ИЙН ХУУДАС РУУ ──
-  // Нэхэмжлэл (QR, гүйлгээний утга) аль хэдийн үүссэн байдаг тул iPhone
-  // товч нь банкны icon дарсантай ЯГ ИЖИЛ утгатай: QPay-ийн өөрийн
-  // төлбөрийн хуудсыг (s.qpay.mn) нээнэ. Тэр хуудсан дээр ⋯ → "Open in
-  // external browser" дарахад QPay-ийн 22 банкны жагсаалт гарч, банкаа
-  // сонгоход апп руу шууд үсэрнэ.
-  //
-  // Өөрийн сайт руу буцаахгүй — хэрэглэгч кино, төлбөрөө дахин
-  // сонгох шаардлагагүй.
-  // qpay.mn-ий хар дэлгэц дээр бид заавар нэмж чадахгүй (тэдний хуудас).
-  // Тиймээс дундуур ӨӨРИЙН гүүр хуудсыг (pay.html) тавина:
-  //   · Messenger дотор  → монгол 2 алхамт зурган заавар харагдана
-  //   · Гадаад браузерт  → qpay.mn руу өөрөө шууд үсэрч 22 банк гарна
-  // Ингэснээр хэрэглэгч "ажиллахгүй юм байна" гэж гацахгүй.
-  if(kind === 'ios' && window._qpayShortUrl){
-    location.href = 'pay.html?u=' + encodeURIComponent(window._qpayShortUrl);
-    return;
-  }
-
-  const pick = document.getElementById('qpayDevicePick');
-  const ios  = document.getElementById('qpayIphonePane');
-  const and  = document.getElementById('qpayAndroidPane');
-  if(!pick || !ios || !and) return;
-  const btns = pick.querySelectorAll('button');
-  btns.forEach((b, i) => {
-    const active = (i === 0 && kind === 'ios') || (i === 1 && kind === 'android');
-    b.style.borderColor = active ? 'var(--accent2)' : 'var(--border)';
-    b.style.background  = active ? 'rgba(255,56,96,.12)' : 'var(--card)';
-  });
-  ios.style.display = (kind === 'ios')     ? '' : 'none';
-  and.style.display = (kind === 'android') ? '' : 'none';
+// Автомат таних буруу ажилласан үед нөгөө аргыг нээж/хаана.
+// Хэвийн үед хэрэглэгч үүнийг хэзээ ч дарахгүй.
+function togglePayDevice(){
+  const alt = document.getElementById('qpayAltPane');
+  if(!alt) return;
+  alt.style.display = (alt.style.display === 'none') ? '' : 'none';
+  if(alt.style.display === '') alt.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
 // 1+1 кино сонгоогүй үед 3 секундын мэдэгдэл
