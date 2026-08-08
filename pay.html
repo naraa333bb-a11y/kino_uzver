@@ -16,6 +16,15 @@
   .load{text-align:center;padding:60px 0;color:#6b7280;font-size:14px}
   .err{text-align:center;padding:40px 0;color:#b91c1c;font-size:14px}
   svg{width:100%;height:auto;display:block}
+
+  /* ── Жинхэнэ ⋯ товч руу заасан том хуруу ──
+     Хуудасны цагаан талбарын баруун дээд буланд, хэрэглэгчийн БОДИТ
+     браузерын ⋯ товч руу дээш заана. Мокап доторх хуруунаас том. */
+  .realhand{position:fixed;top:2px;right:8px;z-index:50;text-align:center;
+            pointer-events:none;animation:up 1.4s ease-in-out infinite}
+  .realhand .em{font-size:40px;line-height:1;display:block}
+  .realhand .lb{display:block;font-size:9.5px;font-weight:700;color:#dc2626;margin-top:-2px}
+  @keyframes up{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 </style>
 </head>
 <body>
@@ -41,14 +50,12 @@
     return;
   }
 
-  // ── ГАДААД БРАУЗЕР: шууд QPay руу ──
   if(!isInApp()){
     root.innerHTML = '<div class="load">✅ Банкны жагсаалт руу шилжиж байна…</div>';
     location.replace(target);
     return;
   }
 
-  // ── Android дотоод цонх: intent:// -ээр гадаад браузер руу ──
   if(isAndroid()){
     var bare = target.replace(/^https?:\/\//, '');
     root.innerHTML = '<div class="load">✅ Браузер нээж байна…</div>';
@@ -58,7 +65,6 @@
 
   // ══════════════════════════════════════════
   // iPhone дотоод цонх: 3 УТАС ЗЭРЭГЦЭЭ
-  // Дэлгэцийн ойролцоогоор 70%-ийг эзлэхээр өндөр харьцаатай.
   // ══════════════════════════════════════════
   var host = location.hostname;
 
@@ -77,14 +83,12 @@
          + inner;
   }
 
-  // 3-р дэлгэцийн банкны сүлжээ — QPay-ийн бодит логонууд
   function bankGrid(x, y, w){
     var s = '', cols = 3, pad = 8, gap = 6;
     var cell = (w - pad*2 - gap*(cols-1)) / cols;
     for(var i = 0; i < LOGOS.length; i++){
       var c = i % cols, r = Math.floor(i / cols);
-      var bx = x + pad + c * (cell + gap);
-      var by = y + r * (cell + gap);
+      var bx = x + pad + c * (cell + gap), by = y + r * (cell + gap);
       s += '<rect x="' + bx + '" y="' + by + '" width="' + cell + '" height="' + cell
          + '" rx="6" fill="#fff"/>'
          + '<image href="' + LOGOS[i] + '" x="' + (bx+1.5) + '" y="' + (by+1.5) + '" '
@@ -93,43 +97,36 @@
     return s;
   }
 
-  // 1-р дэлгэцийн жижиг банкны сүлжээ (манай сайт)
-  function miniGrid(x, y, w){
-    var s = '', cols = 3, pad = 12, gap = 6;
-    var cell = (w - pad*2 - gap*(cols-1)) / cols;
-    for(var i = 0; i < 9; i++){
-      var c = i % cols, r = Math.floor(i / cols);
-      var bx = x + pad + c * (cell + gap), by = y + r * (cell + gap);
-      s += '<rect x="' + bx + '" y="' + by + '" width="' + cell + '" height="' + cell
-         + '" rx="5" fill="#fff"/>'
-         + '<image href="' + LOGOS[i] + '" x="' + (bx+1) + '" y="' + (by+1) + '" '
-         + 'width="' + (cell-2) + '" height="' + (cell-2) + '" preserveAspectRatio="xMidYMid meet"/>';
-    }
-    return s;
-  }
-
-  var PW = 112, PH = 360, PY = 34;
-  var X1 = 2, X2 = 124, X3 = 246;
+  // Утаснууд — хооронд нь 16px цагаан зай (улаан сум тэнд багтана)
+  var PW = 108, PH = 360, PY = 34;
+  var X1 = 2, X2 = 126, X3 = 250;
   var MID = PY + PH/2;
 
+  // Хоёр утасны хоорондох цагаан зайд багтах жижиг улаан сум
+  function arrow(fromX, toX){
+    return '<path d="M' + fromX + ' ' + MID + ' L' + toX + ' ' + MID + '" '
+         + 'stroke="#dc2626" stroke-width="2.2" fill="none" marker-end="url(#ah)"/>';
+  }
+
   root.innerHTML =
-    '<h1>QPay төлөх заавар</h1>'
+    '<div class="realhand"><span class="em">👆</span><span class="lb">эндээс</span></div>'
+  + '<h1>QPay төлөх заавар</h1>'
   + '<p class="sub">Доорх 3 алхмыг дагана уу</p>'
   + '<svg viewBox="0 0 360 412" xmlns="http://www.w3.org/2000/svg">'
   +   '<defs><style>'
   +     '.n{font:800 11px -apple-system,sans-serif;fill:#fff}'
   +     '.cap{font:700 9.5px -apple-system,sans-serif;fill:#dc2626}'
-  +     '.b{font:500 6.5px -apple-system,sans-serif;fill:#d1d5db}'
-  +     '.d{font:500 5.5px -apple-system,sans-serif;fill:#9ca3af}'
-  +     '.m{font:600 6.2px -apple-system,sans-serif;fill:#e5e7eb}'
+  +     '.b{font:500 6.3px -apple-system,sans-serif;fill:#d1d5db}'
+  +     '.d{font:500 5.4px -apple-system,sans-serif;fill:#9ca3af}'
+  +     '.m{font:600 6.1px -apple-system,sans-serif;fill:#e5e7eb}'
   +     '@keyframes pp{0%,100%{opacity:.5}50%{opacity:1}}'
   +     '.pulse{animation:pp 1.3s ease-in-out infinite}'
   +   '</style>'
-  +   '<marker id="ah" markerWidth="8" markerHeight="8" refX="6.5" refY="4" orient="auto">'
-  +     '<path d="M0 0 L8 4 L0 8 z" fill="#dc2626"/></marker>'
+  +   '<marker id="ah" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">'
+  +     '<path d="M0 0 L6 3 L0 6 z" fill="#dc2626"/></marker>'
   +   '</defs>'
 
-  // ───── 1: ⋯ дарах ─────
+  // ───── 1: ⋯ дарах (хуудас нь хоосон, хар хэвээр) ─────
   +   '<circle cx="' + (X1+9) + '" cy="10" r="8.5" fill="#dc2626"/>'
   +   '<text x="' + (X1+9) + '" y="13.5" text-anchor="middle" class="n">1</text>'
   +   '<text x="' + (X1+22) + '" y="13.5" class="cap">⋯ дарна</text>'
@@ -140,16 +137,9 @@
       + '<text x="' + (X1+PW/2) + '" y="' + (PY+38) + '" text-anchor="middle" class="d">Messenger</text>'
       + '<text x="' + (X1+PW-16) + '" y="' + (PY+34) + '" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">⋯</text>'
       + '<ellipse class="pulse" cx="' + (X1+PW-16) + '" cy="' + (PY+30) + '" rx="15" ry="13" fill="none" stroke="#dc2626" stroke-width="2.4"/>'
-      + '<text x="' + (X1+PW-16) + '" y="' + (PY+62) + '" text-anchor="middle" font-size="15">👆</text>'
-      + '<rect x="' + (X1+30) + '" y="' + (PY+78) + '" width="52" height="52" rx="6" fill="#fff"/>'
-      + '<text x="' + (X1+PW/2) + '" y="' + (PY+106) + '" text-anchor="middle" font-size="22">▦</text>'
-      + '<text x="' + (X1+PW/2) + '" y="' + (PY+144) + '" text-anchor="middle" class="d">эсвэл банкаа сонгоно уу</text>'
-      + miniGrid(X1, PY+152, PW)
-      + '<rect x="' + (X1+16) + '" y="' + (PY+270) + '" width="' + (PW-32) + '" height="6" rx="3" fill="#1f2937"/>'
-      + '<rect x="' + (X1+16) + '" y="' + (PY+284) + '" width="' + (PW-50) + '" height="6" rx="3" fill="#1f2937"/>')
+      + '<text x="' + (X1+PW-16) + '" y="' + (PY+64) + '" text-anchor="middle" font-size="16">👆</text>')
 
-  +   '<path d="M' + (X1+PW+3) + ' ' + MID + ' L' + (X2-5) + ' ' + MID + '" '
-  +     'stroke="#dc2626" stroke-width="2.6" fill="none" marker-end="url(#ah)"/>'
+  +   arrow(X1+PW+4, X2-4)
 
   // ───── 2: цэснээс сонгох ─────
   +   '<circle cx="' + (X2+9) + '" cy="10" r="8.5" fill="#dc2626"/>'
@@ -157,23 +147,21 @@
   +   '<text x="' + (X2+22) + '" y="13.5" class="cap">Open in external</text>'
   +   phone(X2, PY, PW, PH,
         '<rect x="' + (X2+5) + '" y="' + (PY+14) + '" width="' + (PW-10) + '" height="26" rx="7" fill="#1f2937" opacity=".45"/>'
-      + '<rect x="' + (X2+22) + '" y="' + (PY+52) + '" width="68" height="68" rx="6" fill="#1f2937" opacity=".35"/>'
       + '<rect x="' + (X2+8) + '" y="' + (PY+140) + '" width="' + (PW-16) + '" height="176" rx="10" fill="#1f2937"/>'
-      + '<text x="' + (X2+17) + '" y="' + (PY+162) + '" class="m">🔗 Copy link</text>'
-      + '<line x1="' + (X2+13) + '" y1="' + (PY+172) + '" x2="' + (X2+PW-13) + '" y2="' + (PY+172) + '" stroke="#374151"/>'
+      + '<text x="' + (X2+16) + '" y="' + (PY+162) + '" class="m">🔗 Copy link</text>'
+      + '<line x1="' + (X2+12) + '" y1="' + (PY+172) + '" x2="' + (X2+PW-12) + '" y2="' + (PY+172) + '" stroke="#374151"/>'
       + '<text x="' + (X2+PW/2) + '" y="' + (PY+192) + '" text-anchor="middle" font-size="13">👇</text>'
-      + '<rect x="' + (X2+12) + '" y="' + (PY+198) + '" width="' + (PW-24) + '" height="26" rx="6" fill="#1e3a5f"/>'
-      + '<text x="' + (X2+18) + '" y="' + (PY+214) + '" fill="#93c5fd" font-size="5.9" font-weight="700">🌐 Open in external browser</text>'
-      + '<line x1="' + (X2+13) + '" y1="' + (PY+234) + '" x2="' + (X2+PW-13) + '" y2="' + (PY+234) + '" stroke="#374151"/>'
-      + '<text x="' + (X2+17) + '" y="' + (PY+252) + '" class="m">⚙️ Settings</text>'
-      + '<line x1="' + (X2+13) + '" y1="' + (PY+264) + '" x2="' + (X2+PW-13) + '" y2="' + (PY+264) + '" stroke="#374151"/>'
-      + '<text x="' + (X2+17) + '" y="' + (PY+282) + '" class="m">🔄 Reload</text>'
-      + '<line x1="' + (X2+13) + '" y1="' + (PY+294) + '" x2="' + (X2+PW-13) + '" y2="' + (PY+294) + '" stroke="#374151"/>'
-      + '<text x="' + (X2+17) + '" y="' + (PY+310) + '" class="m">🔍 Find in page</text>'
-      + '<rect class="pulse" x="' + (X2+9) + '" y="' + (PY+195) + '" width="' + (PW-18) + '" height="32" rx="8" fill="none" stroke="#dc2626" stroke-width="2.4"/>')
+      + '<rect x="' + (X2+11) + '" y="' + (PY+198) + '" width="' + (PW-22) + '" height="26" rx="6" fill="#1e3a5f"/>'
+      + '<text x="' + (X2+17) + '" y="' + (PY+214) + '" fill="#93c5fd" font-size="5.8" font-weight="700">🌐 Open in external browser</text>'
+      + '<line x1="' + (X2+12) + '" y1="' + (PY+234) + '" x2="' + (X2+PW-12) + '" y2="' + (PY+234) + '" stroke="#374151"/>'
+      + '<text x="' + (X2+16) + '" y="' + (PY+252) + '" class="m">⚙️ Settings</text>'
+      + '<line x1="' + (X2+12) + '" y1="' + (PY+264) + '" x2="' + (X2+PW-12) + '" y2="' + (PY+264) + '" stroke="#374151"/>'
+      + '<text x="' + (X2+16) + '" y="' + (PY+282) + '" class="m">🔄 Reload</text>'
+      + '<line x1="' + (X2+12) + '" y1="' + (PY+294) + '" x2="' + (X2+PW-12) + '" y2="' + (PY+294) + '" stroke="#374151"/>'
+      + '<text x="' + (X2+16) + '" y="' + (PY+310) + '" class="m">🔍 Find in page</text>'
+      + '<rect class="pulse" x="' + (X2+8) + '" y="' + (PY+195) + '" width="' + (PW-16) + '" height="32" rx="8" fill="none" stroke="#dc2626" stroke-width="2.4"/>')
 
-  +   '<path d="M' + (X2+PW+3) + ' ' + MID + ' L' + (X3-5) + ' ' + MID + '" '
-  +     'stroke="#dc2626" stroke-width="2.6" fill="none" marker-end="url(#ah)"/>'
+  +   arrow(X2+PW+4, X3-4)
 
   // ───── 3: QPay-ийн банкны жагсаалт ─────
   +   '<circle cx="' + (X3+9) + '" cy="10" r="8.5" fill="#dc2626"/>'
@@ -184,7 +172,7 @@
       + '<text x="' + (X3+PW/2) + '" y="' + (PY+41) + '" text-anchor="middle" class="d">Most accepted payment gateway</text>'
       + '<line x1="' + (X3+8) + '" y1="' + (PY+50) + '" x2="' + (X3+PW-8) + '" y2="' + (PY+50) + '" stroke="#374151"/>'
       + bankGrid(X3, PY+60, PW)
-      + '<rect class="pulse" x="' + (X3+6) + '" y="' + (PY+58) + '" width="32" height="32" rx="7" fill="none" stroke="#dc2626" stroke-width="2.4"/>')
+      + '<rect class="pulse" x="' + (X3+6) + '" y="' + (PY+58) + '" width="31" height="31" rx="7" fill="none" stroke="#dc2626" stroke-width="2.4"/>')
   + '</svg>';
 })();
 </script>
