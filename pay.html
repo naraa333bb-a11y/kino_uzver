@@ -3,17 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Банкаар төлөх — Кино үзвэр</title>
+<title>QPay төлөх заавар — Кино үзвэр</title>
 <style>
   *{box-sizing:border-box}
   html,body{height:100%}
-  body{margin:0;padding:14px 12px;background:#fff;color:#111827;
+  body{margin:0;padding:16px 10px;background:#fff;color:#111827;
        font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.4;
        display:flex;flex-direction:column;justify-content:center}
-  .wrap{max-width:440px;margin:0 auto;width:100%}
-  h1{font-size:17px;margin:0 0 3px;text-align:center}
-  p.sub{font-size:12px;color:#6b7280;text-align:center;margin:0 0 12px}
-  .foot{font-size:11.5px;color:#6b7280;text-align:center;margin-top:12px;line-height:1.5}
+  .wrap{max-width:460px;margin:0 auto;width:100%}
+  h1{font-size:18px;margin:0 0 4px;text-align:center}
+  p.sub{font-size:12.5px;color:#6b7280;text-align:center;margin:0 0 14px}
   .load{text-align:center;padding:60px 0;color:#6b7280;font-size:14px}
   .err{text-align:center;padding:40px 0;color:#b91c1c;font-size:14px}
   svg{width:100%;height:auto;display:block}
@@ -59,37 +58,33 @@
 
   // ══════════════════════════════════════════
   // iPhone дотоод цонх: 3 УТАС ЗЭРЭГЦЭЭ
-  //
-  // Гурван алхмыг гар утасны бүтэн дэлгэц шиг мокапаар харуулж, улаан
-  // сумаар холбоно. Босоо биш ХӨНДЛӨН байрлуулснаар нэг дэлгэцэд багтаж,
-  // хэрэглэгч гүйлгэх шаардлагагүй.
+  // Дэлгэцийн ойролцоогоор 70%-ийг эзлэхээр өндөр харьцаатай.
   // ══════════════════════════════════════════
   var host = location.hostname;
 
-  // QPay-ийн бодит банкны логонууд (3-р дэлгэцэд)
   var LOGOS = [
     'khanbank','tdbbank','socialpay','state_3','xacbank','capitronbank',
-    'bogdbank','nibank.jpeg','most','transbank','mbank','arig'
+    'bogdbank','nibank.jpeg','most','transbank','mbank','arig',
+    'ckbank','monpay','tokipay','hipay','sono','payon'
   ].map(function(n){
     return 'https://qpay.mn/q/logo/' + (n.indexOf('.') > 0 ? n : n + '.png');
   });
 
-  // Нэг утасны хүрээ зурна
   function phone(x, y, w, h, inner){
-    return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="12" '
+    return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="14" '
          + 'fill="#0f1115" stroke="#d1d5db" stroke-width="1.5"/>'
-         + '<rect x="' + (x + w/2 - 12) + '" y="' + (y + 4) + '" width="24" height="3.5" rx="1.75" fill="#374151"/>'
+         + '<rect x="' + (x + w/2 - 13) + '" y="' + (y + 5) + '" width="26" height="3.5" rx="1.75" fill="#374151"/>'
          + inner;
   }
 
-  // 3-р дэлгэцийн банкны сүлжээ (бодит логотой)
+  // 3-р дэлгэцийн банкны сүлжээ — QPay-ийн бодит логонууд
   function bankGrid(x, y, w){
-    var s = '', cols = 3, pad = 7, gap = 5;
+    var s = '', cols = 3, pad = 8, gap = 6;
     var cell = (w - pad*2 - gap*(cols-1)) / cols;
     for(var i = 0; i < LOGOS.length; i++){
       var c = i % cols, r = Math.floor(i / cols);
       var bx = x + pad + c * (cell + gap);
-      var by = y + r * (cell + gap + 5);
+      var by = y + r * (cell + gap);
       s += '<rect x="' + bx + '" y="' + by + '" width="' + cell + '" height="' + cell
          + '" rx="6" fill="#fff"/>'
          + '<image href="' + LOGOS[i] + '" x="' + (bx+1.5) + '" y="' + (by+1.5) + '" '
@@ -98,20 +93,35 @@
     return s;
   }
 
-  var PW = 104, PH = 196;            // утасны хэмжээ
-  var X1 = 4, X2 = 128, X3 = 252;    // 3 утасны байрлал
-  var PY = 30;
+  // 1-р дэлгэцийн жижиг банкны сүлжээ (манай сайт)
+  function miniGrid(x, y, w){
+    var s = '', cols = 3, pad = 12, gap = 6;
+    var cell = (w - pad*2 - gap*(cols-1)) / cols;
+    for(var i = 0; i < 9; i++){
+      var c = i % cols, r = Math.floor(i / cols);
+      var bx = x + pad + c * (cell + gap), by = y + r * (cell + gap);
+      s += '<rect x="' + bx + '" y="' + by + '" width="' + cell + '" height="' + cell
+         + '" rx="5" fill="#fff"/>'
+         + '<image href="' + LOGOS[i] + '" x="' + (bx+1) + '" y="' + (by+1) + '" '
+         + 'width="' + (cell-2) + '" height="' + (cell-2) + '" preserveAspectRatio="xMidYMid meet"/>';
+    }
+    return s;
+  }
+
+  var PW = 112, PH = 360, PY = 34;
+  var X1 = 2, X2 = 124, X3 = 246;
+  var MID = PY + PH/2;
 
   root.innerHTML =
-    '<h1>Банкны аппаараа төлөх</h1>'
+    '<h1>QPay төлөх заавар</h1>'
   + '<p class="sub">Доорх 3 алхмыг дагана уу</p>'
-  + '<svg viewBox="0 0 360 250" xmlns="http://www.w3.org/2000/svg">'
+  + '<svg viewBox="0 0 360 412" xmlns="http://www.w3.org/2000/svg">'
   +   '<defs><style>'
   +     '.n{font:800 11px -apple-system,sans-serif;fill:#fff}'
   +     '.cap{font:700 9.5px -apple-system,sans-serif;fill:#dc2626}'
   +     '.b{font:500 6.5px -apple-system,sans-serif;fill:#d1d5db}'
   +     '.d{font:500 5.5px -apple-system,sans-serif;fill:#9ca3af}'
-  +     '.m{font:600 6px -apple-system,sans-serif;fill:#e5e7eb}'
+  +     '.m{font:600 6.2px -apple-system,sans-serif;fill:#e5e7eb}'
   +     '@keyframes pp{0%,100%{opacity:.5}50%{opacity:1}}'
   +     '.pulse{animation:pp 1.3s ease-in-out infinite}'
   +   '</style>'
@@ -119,60 +129,63 @@
   +     '<path d="M0 0 L8 4 L0 8 z" fill="#dc2626"/></marker>'
   +   '</defs>'
 
-  // ───── 1-р утас: ⋯ дарах ─────
-  +   '<circle cx="' + (X1+9) + '" cy="9" r="8.5" fill="#dc2626"/>'
-  +   '<text x="' + (X1+9) + '" y="12.5" text-anchor="middle" class="n">1</text>'
-  +   '<text x="' + (X1+22) + '" y="12.5" class="cap">⋯ дарна</text>'
+  // ───── 1: ⋯ дарах ─────
+  +   '<circle cx="' + (X1+9) + '" cy="10" r="8.5" fill="#dc2626"/>'
+  +   '<text x="' + (X1+9) + '" y="13.5" text-anchor="middle" class="n">1</text>'
+  +   '<text x="' + (X1+22) + '" y="13.5" class="cap">⋯ дарна</text>'
   +   phone(X1, PY, PW, PH,
-        '<rect x="' + (X1+5) + '" y="' + (PY+12) + '" width="' + (PW-10) + '" height="26" rx="6" fill="#1f2937"/>'
-      + '<text x="' + (X1+13) + '" y="' + (PY+29) + '" class="b" font-size="8">✕</text>'
-      + '<text x="' + (X1+PW/2) + '" y="' + (PY+24) + '" text-anchor="middle" class="b">🔒 ' + host + '</text>'
-      + '<text x="' + (X1+PW/2) + '" y="' + (PY+33) + '" text-anchor="middle" class="d">Messenger</text>'
-      + '<text x="' + (X1+PW-14) + '" y="' + (PY+29) + '" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">⋯</text>'
-      + '<ellipse class="pulse" cx="' + (X1+PW-14) + '" cy="' + (PY+25) + '" rx="13" ry="11" fill="none" stroke="#dc2626" stroke-width="2.2"/>'
-      + '<text x="' + (X1+PW-14) + '" y="' + (PY+52) + '" text-anchor="middle" font-size="14">👆</text>'
-      + '<rect x="' + (X1+10) + '" y="' + (PY+64) + '" width="' + (PW-20) + '" height="5" rx="2.5" fill="#1f2937"/>'
-      + '<rect x="' + (X1+10) + '" y="' + (PY+74) + '" width="' + (PW-34) + '" height="5" rx="2.5" fill="#1f2937"/>'
-      + '<rect x="' + (X1+10) + '" y="' + (PY+90) + '" width="' + (PW-20) + '" height="46" rx="6" fill="#161a22"/>'
-      + '<rect x="' + (X1+10) + '" y="' + (PY+142) + '" width="' + (PW-20) + '" height="5" rx="2.5" fill="#1f2937"/>')
+        '<rect x="' + (X1+5) + '" y="' + (PY+14) + '" width="' + (PW-10) + '" height="30" rx="7" fill="#1f2937"/>'
+      + '<text x="' + (X1+14) + '" y="' + (PY+33) + '" class="b" font-size="8">✕</text>'
+      + '<text x="' + (X1+PW/2) + '" y="' + (PY+27) + '" text-anchor="middle" class="b">🔒 ' + host + '</text>'
+      + '<text x="' + (X1+PW/2) + '" y="' + (PY+38) + '" text-anchor="middle" class="d">Messenger</text>'
+      + '<text x="' + (X1+PW-16) + '" y="' + (PY+34) + '" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">⋯</text>'
+      + '<ellipse class="pulse" cx="' + (X1+PW-16) + '" cy="' + (PY+30) + '" rx="15" ry="13" fill="none" stroke="#dc2626" stroke-width="2.4"/>'
+      + '<text x="' + (X1+PW-16) + '" y="' + (PY+62) + '" text-anchor="middle" font-size="15">👆</text>'
+      + '<rect x="' + (X1+30) + '" y="' + (PY+78) + '" width="52" height="52" rx="6" fill="#fff"/>'
+      + '<text x="' + (X1+PW/2) + '" y="' + (PY+106) + '" text-anchor="middle" font-size="22">▦</text>'
+      + '<text x="' + (X1+PW/2) + '" y="' + (PY+144) + '" text-anchor="middle" class="d">эсвэл банкаа сонгоно уу</text>'
+      + miniGrid(X1, PY+152, PW)
+      + '<rect x="' + (X1+16) + '" y="' + (PY+270) + '" width="' + (PW-32) + '" height="6" rx="3" fill="#1f2937"/>'
+      + '<rect x="' + (X1+16) + '" y="' + (PY+284) + '" width="' + (PW-50) + '" height="6" rx="3" fill="#1f2937"/>')
 
-  +   '<path d="M' + (X1+PW+4) + ' ' + (PY+PH/2) + ' L' + (X2-6) + ' ' + (PY+PH/2) + '" '
-  +     'stroke="#dc2626" stroke-width="2.5" fill="none" marker-end="url(#ah)"/>'
+  +   '<path d="M' + (X1+PW+3) + ' ' + MID + ' L' + (X2-5) + ' ' + MID + '" '
+  +     'stroke="#dc2626" stroke-width="2.6" fill="none" marker-end="url(#ah)"/>'
 
-  // ───── 2-р утас: цэснээс сонгох ─────
-  +   '<circle cx="' + (X2+9) + '" cy="9" r="8.5" fill="#dc2626"/>'
-  +   '<text x="' + (X2+9) + '" y="12.5" text-anchor="middle" class="n">2</text>'
-  +   '<text x="' + (X2+22) + '" y="12.5" class="cap">Open in external</text>'
+  // ───── 2: цэснээс сонгох ─────
+  +   '<circle cx="' + (X2+9) + '" cy="10" r="8.5" fill="#dc2626"/>'
+  +   '<text x="' + (X2+9) + '" y="13.5" text-anchor="middle" class="n">2</text>'
+  +   '<text x="' + (X2+22) + '" y="13.5" class="cap">Open in external</text>'
   +   phone(X2, PY, PW, PH,
-        '<rect x="' + (X2+5) + '" y="' + (PY+12) + '" width="' + (PW-10) + '" height="16" rx="5" fill="#1f2937" opacity=".5"/>'
-      + '<rect x="' + (X2+8) + '" y="' + (PY+34) + '" width="' + (PW-16) + '" height="110" rx="8" fill="#1f2937"/>'
-      + '<text x="' + (X2+16) + '" y="' + (PY+46) + '" class="m">🔗 Copy link</text>'
-      + '<line x1="' + (X2+12) + '" y1="' + (PY+52) + '" x2="' + (X2+PW-12) + '" y2="' + (PY+52) + '" stroke="#374151"/>'
-      // 👇 тодруулсан мөрийн ЯГ ДЭЭР, доош заасан
-      + '<text x="' + (X2+PW/2) + '" y="' + (PY+66) + '" text-anchor="middle" font-size="11">👇</text>'
-      + '<rect x="' + (X2+11) + '" y="' + (PY+71) + '" width="' + (PW-22) + '" height="19" rx="5" fill="#1e3a5f"/>'
-      + '<text x="' + (X2+16) + '" y="' + (PY+83) + '" fill="#93c5fd" font-size="5.6" font-weight="700">🌐 Open in external browser</text>'
-      + '<line x1="' + (X2+12) + '" y1="' + (PY+96) + '" x2="' + (X2+PW-12) + '" y2="' + (PY+96) + '" stroke="#374151"/>'
-      + '<text x="' + (X2+16) + '" y="' + (PY+108) + '" class="m">⚙️ Settings</text>'
-      + '<line x1="' + (X2+12) + '" y1="' + (PY+116) + '" x2="' + (X2+PW-12) + '" y2="' + (PY+116) + '" stroke="#374151"/>'
-      + '<text x="' + (X2+16) + '" y="' + (PY+130) + '" class="m">🔄 Reload</text>'
-      + '<rect class="pulse" x="' + (X2+8) + '" y="' + (PY+69) + '" width="' + (PW-16) + '" height="23" rx="7" fill="none" stroke="#dc2626" stroke-width="2.2"/>')
+        '<rect x="' + (X2+5) + '" y="' + (PY+14) + '" width="' + (PW-10) + '" height="26" rx="7" fill="#1f2937" opacity=".45"/>'
+      + '<rect x="' + (X2+22) + '" y="' + (PY+52) + '" width="68" height="68" rx="6" fill="#1f2937" opacity=".35"/>'
+      + '<rect x="' + (X2+8) + '" y="' + (PY+140) + '" width="' + (PW-16) + '" height="176" rx="10" fill="#1f2937"/>'
+      + '<text x="' + (X2+17) + '" y="' + (PY+162) + '" class="m">🔗 Copy link</text>'
+      + '<line x1="' + (X2+13) + '" y1="' + (PY+172) + '" x2="' + (X2+PW-13) + '" y2="' + (PY+172) + '" stroke="#374151"/>'
+      + '<text x="' + (X2+PW/2) + '" y="' + (PY+192) + '" text-anchor="middle" font-size="13">👇</text>'
+      + '<rect x="' + (X2+12) + '" y="' + (PY+198) + '" width="' + (PW-24) + '" height="26" rx="6" fill="#1e3a5f"/>'
+      + '<text x="' + (X2+18) + '" y="' + (PY+214) + '" fill="#93c5fd" font-size="5.9" font-weight="700">🌐 Open in external browser</text>'
+      + '<line x1="' + (X2+13) + '" y1="' + (PY+234) + '" x2="' + (X2+PW-13) + '" y2="' + (PY+234) + '" stroke="#374151"/>'
+      + '<text x="' + (X2+17) + '" y="' + (PY+252) + '" class="m">⚙️ Settings</text>'
+      + '<line x1="' + (X2+13) + '" y1="' + (PY+264) + '" x2="' + (X2+PW-13) + '" y2="' + (PY+264) + '" stroke="#374151"/>'
+      + '<text x="' + (X2+17) + '" y="' + (PY+282) + '" class="m">🔄 Reload</text>'
+      + '<line x1="' + (X2+13) + '" y1="' + (PY+294) + '" x2="' + (X2+PW-13) + '" y2="' + (PY+294) + '" stroke="#374151"/>'
+      + '<text x="' + (X2+17) + '" y="' + (PY+310) + '" class="m">🔍 Find in page</text>'
+      + '<rect class="pulse" x="' + (X2+9) + '" y="' + (PY+195) + '" width="' + (PW-18) + '" height="32" rx="8" fill="none" stroke="#dc2626" stroke-width="2.4"/>')
 
-  +   '<path d="M' + (X2+PW+4) + ' ' + (PY+PH/2) + ' L' + (X3-6) + ' ' + (PY+PH/2) + '" '
-  +     'stroke="#dc2626" stroke-width="2.5" fill="none" marker-end="url(#ah)"/>'
+  +   '<path d="M' + (X2+PW+3) + ' ' + MID + ' L' + (X3-5) + ' ' + MID + '" '
+  +     'stroke="#dc2626" stroke-width="2.6" fill="none" marker-end="url(#ah)"/>'
 
-  // ───── 3-р утас: QPay-ийн банкны жагсаалт ─────
-  +   '<circle cx="' + (X3+9) + '" cy="9" r="8.5" fill="#dc2626"/>'
-  +   '<text x="' + (X3+9) + '" y="12.5" text-anchor="middle" class="n">3</text>'
-  +   '<text x="' + (X3+22) + '" y="12.5" class="cap">Банкаа сонгоно</text>'
+  // ───── 3: QPay-ийн банкны жагсаалт ─────
+  +   '<circle cx="' + (X3+9) + '" cy="10" r="8.5" fill="#dc2626"/>'
+  +   '<text x="' + (X3+9) + '" y="13.5" text-anchor="middle" class="n">3</text>'
+  +   '<text x="' + (X3+22) + '" y="13.5" class="cap">Банкаа сонгоно</text>'
   +   phone(X3, PY, PW, PH,
-        '<text x="' + (X3+PW/2) + '" y="' + (PY+24) + '" text-anchor="middle" fill="#0ea5e9" font-size="11" font-weight="800">QPay</text>'
-      + '<line x1="' + (X3+8) + '" y1="' + (PY+31) + '" x2="' + (X3+PW-8) + '" y2="' + (PY+31) + '" stroke="#374151"/>'
-      + bankGrid(X3, PY+38, PW)
-      + '<rect class="pulse" x="' + (X3+6) + '" y="' + (PY+37) + '" width="30" height="30" rx="7" fill="none" stroke="#dc2626" stroke-width="2.2"/>')
-  + '</svg>'
-  + '<p class="foot">Браузерт нээгдмэгц банкны жагсаалт өөрөө гарна.<br>'
-  + 'Банкаа сонгоход аппруу шууд орно.</p>';
+        '<text x="' + (X3+PW/2) + '" y="' + (PY+30) + '" text-anchor="middle" fill="#0ea5e9" font-size="13" font-weight="800">QPay</text>'
+      + '<text x="' + (X3+PW/2) + '" y="' + (PY+41) + '" text-anchor="middle" class="d">Most accepted payment gateway</text>'
+      + '<line x1="' + (X3+8) + '" y1="' + (PY+50) + '" x2="' + (X3+PW-8) + '" y2="' + (PY+50) + '" stroke="#374151"/>'
+      + bankGrid(X3, PY+60, PW)
+      + '<rect class="pulse" x="' + (X3+6) + '" y="' + (PY+58) + '" width="32" height="32" rx="7" fill="none" stroke="#dc2626" stroke-width="2.4"/>')
+  + '</svg>';
 })();
 </script>
 </body>
