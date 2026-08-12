@@ -742,7 +742,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1786518061280;
+const CATALOG_VERSION = 1786518438907;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -4328,6 +4328,19 @@ function dzDeselect(){
   if(DZ_SEL){ DZ_SEL.classList.remove('dz-picked'); DZ_SEL.removeAttribute('contenteditable'); }
   DZ_SEL = null;
   document.getElementById('dz-props').style.display = 'none';
+  const h = document.getElementById('dz-handle');
+  if(h) h.style.display = 'none';
+}
+
+// Зөөсөн байрлалыг анхны байдалд нь буцаана
+function dzResetPos(){
+  if(!DZ_SEL) return;
+  const cs = getComputedStyle(DZ_SEL);
+  dzRecord(DZ_SEL, 'style', 'left', cs.left, '0px');
+  dzRecord(DZ_SEL, 'style', 'top',  cs.top,  '0px');
+  DZ_SEL.style.left = '0px';
+  DZ_SEL.style.top  = '0px';
+  dzPlaceHandle();
 }
 
 // ── Элемент сонгох ──
@@ -4356,6 +4369,7 @@ function dzClick(e){
   document.getElementById('dz-linkwrap').style.display = isLink ? '' : 'none';
   document.getElementById('dz-imgwrap').style.display  = isImg  ? '' : 'none';
   if(isLink) document.getElementById('dz-href').value = DZ_SEL.getAttribute('href') || '';
+  dzPlaceHandle();   // хэмжээ өөрчлөх булангийн цэгийг байрлуулна
 }
 function dzHex(c){
   const m = String(c).match(/\d+/g);
@@ -4475,6 +4489,136 @@ function dzReplaceImage(){
   dzSetAttr('src', u);
 }
 
+// ══════════════════════════════════════════
+// ЗӨӨХ, ХЭМЖЭЭ ӨӨРЧЛӨХ, ӨНГӨ ХУУЛАХ
+//
+// Зөөхдөө position:relative + left/top ашиглана — ингэснээр хуудасны
+// бүтэц эвдрэхгүй, зөвхөн тухайн зүйл шилжинэ. Хэмжээг width/height-аар
+// өөрчилнө. Утга бүр чирэлт дуусахад л patch болж бүртгэгдэнэ (чирэх
+// бүрд бус) тул жагсаалт цэвэрхэн хэвээр байна.
+// ══════════════════════════════════════════
+let DZ_DRAG = null;      // {mode:'move'|'size', startX, startY, ...}
+let DZ_CLIP = null;      // хуулсан өнгө {color, bg}
+
+function dzHandle(){
+  let h = document.getElementById('dz-handle');
+  if(!h){
+    h = document.createElement('div');
+    h.id = 'dz-handle';
+    h.style.cssText = 'position:absolute;width:16px;height:16px;border-radius:4px;'
+      + 'background:#4361ee;border:2px solid #fff;cursor:nwse-resize;z-index:100001;'
+      + 'display:none;box-shadow:0 2px 6px rgba(0,0,0,.4)';
+    h.addEventListener('pointerdown', dzSizeStart);
+    document.body.appendChild(h);
+  }
+  return h;
+}
+function dzPlaceHandle(){
+  const h = dzHandle();
+  if(!DZ_SEL || !DZ_ON){ h.style.display = 'none'; return; }
+  const r = DZ_SEL.getBoundingClientRect();
+  h.style.display = '';
+  h.style.left = (r.right + scrollX - 8) + 'px';
+  h.style.top  = (r.bottom + scrollY - 8) + 'px';
+}
+
+// ── Зөөх ──
+function dzMoveStart(e){
+  if(!DZ_ON || !DZ_SEL || e.target !== DZ_SEL) return;
+  if(e.target.closest('#dz-panel') || e.target.closest('#dz-fab')) return;
+  const cs = getComputedStyle(DZ_SEL);
+  if(cs.position === 'static') DZ_SEL.style.position = 'relative';
+  DZ_DRAG = { mode:'move', x:e.clientX, y:e.clientY,
+              l: parseFloat(cs.left) || 0, t: parseFloat(cs.top) || 0,
+              fromL: cs.left, fromT: cs.top };
+  e.preventDefault();
+}
+function dzSizeStart(e){
+  if(!DZ_SEL) return;
+  const r = DZ_SEL.getBoundingClientRect();
+  const cs = getComputedStyle(DZ_SEL);
+  DZ_DRAG = { mode:'size', x:e.clientX, y:e.clientY, w:r.width, h:r.height,
+              fromW: cs.width, fromH: cs.height };
+  e.preventDefault(); e.stopPropagation();
+}
+function dzDragMove(e){
+  if(!DZ_DRAG || !DZ_SEL) return;
+  const dx = e.clientX - DZ_DRAG.x, dy = e.clientY - DZ_DRAG.y;
+  if(DZ_DRAG.mode === 'move'){
+    DZ_SEL.style.setProperty('left', (DZ_DRAG.l + dx) + 'px', 'important');
+    DZ_SEL.style.setProperty('top',  (DZ_DRAG.t + dy) + 'px', 'important');
+  } else {
+    DZ_SEL.style.setProperty('width',  Math.max(20, DZ_DRAG.w + dx) + 'px', 'important');
+    DZ_SEL.style.setProperty('height', Math.max(20, DZ_DRAG.h + dy) + 'px', 'important');
+  }
+  dzPlaceHandle();
+  e.preventDefault();
+}
+function dzDragEnd(){
+  if(!DZ_DRAG || !DZ_SEL){ DZ_DRAG = null; return; }
+  if(DZ_DRAG.mode === 'move'){
+    dzRecord(DZ_SEL, 'style', 'position', 'static', 'relative');
+    dzRecord(DZ_SEL, 'style', 'left', DZ_DRAG.fromL, DZ_SEL.style.left);
+    dzRecord(DZ_SEL, 'style', 'top',  DZ_DRAG.fromT, DZ_SEL.style.top);
+  } else {
+    dzRecord(DZ_SEL, 'style', 'width',  DZ_DRAG.fromW, DZ_SEL.style.width);
+    dzRecord(DZ_SEL, 'style', 'height', DZ_DRAG.fromH, DZ_SEL.style.height);
+  }
+  DZ_DRAG = null;
+}
+
+// ── Хэмжээг товчоор ──
+function dzScale(mult){
+  if(!DZ_SEL) return;
+  const r = DZ_SEL.getBoundingClientRect();
+  const cs = getComputedStyle(DZ_SEL);
+  const fw = cs.width, fh = cs.height, ffs = cs.fontSize;
+  // !important-гүй бол сайтын CSS дарж давамгайлдаг тул setProperty ашиглана
+  DZ_SEL.style.setProperty('width',  Math.max(20, r.width  * mult) + 'px', 'important');
+  DZ_SEL.style.setProperty('height', Math.max(20, r.height * mult) + 'px', 'important');
+  const fs = parseFloat(cs.fontSize) || 14;
+  DZ_SEL.style.setProperty('font-size', Math.max(7, fs * mult) + 'px', 'important');
+  dzRecord(DZ_SEL, 'style', 'width',  fw,  DZ_SEL.style.width);
+  dzRecord(DZ_SEL, 'style', 'height', fh,  DZ_SEL.style.height);
+  dzRecord(DZ_SEL, 'style', 'font-size', ffs, DZ_SEL.style.fontSize);
+  dzPlaceHandle();
+}
+
+// ── Байрлалыг товчоор нарийн тохируулах ──
+function dzNudge(dx, dy){
+  if(!DZ_SEL) return;
+  const cs = getComputedStyle(DZ_SEL);
+  if(cs.position === 'static'){
+    DZ_SEL.style.position = 'relative';
+    dzRecord(DZ_SEL, 'style', 'position', 'static', 'relative');
+  }
+  const l = (parseFloat(cs.left) || 0) + dx;
+  const t = (parseFloat(cs.top)  || 0) + dy;
+  DZ_SEL.style.setProperty('left', l + 'px', 'important');
+  DZ_SEL.style.setProperty('top',  t + 'px', 'important');
+  dzRecord(DZ_SEL, 'style', 'left', cs.left, l + 'px');
+  dzRecord(DZ_SEL, 'style', 'top',  cs.top,  t + 'px');
+  dzPlaceHandle();
+}
+
+// ── Өнгө хуулах / буулгах ──
+function dzCopyColor(){
+  if(!DZ_SEL){ alert('Эхлээд элемент сонгоно уу'); return; }
+  const cs = getComputedStyle(DZ_SEL);
+  DZ_CLIP = { color: cs.color, bg: cs.backgroundColor };
+  const b = document.getElementById('dz-clip');
+  if(b) b.textContent = '📋 ' + dzHex(cs.color) + ' / ' + dzHex(cs.backgroundColor);
+}
+function dzPasteColor(what){
+  if(!DZ_SEL){ alert('Эхлээд элемент сонгоно уу'); return; }
+  if(!DZ_CLIP){ alert('Эхлээд өнгө хуулна уу'); return; }
+  if(what === 'text' || what === 'both') dzSetStyle('color', DZ_CLIP.color);
+  if(what === 'bg'   || what === 'both') dzSetStyle('background-color', DZ_CLIP.bg);
+  const cs = getComputedStyle(DZ_SEL);
+  document.getElementById('dz-color').value = dzHex(cs.color);
+  document.getElementById('dz-bg').value    = dzHex(cs.backgroundColor);
+}
+
 // ── Жагсаалт ──
 function dzRenderList(){
   const box = document.getElementById('dz-list');
@@ -4563,6 +4707,32 @@ function dzInit(){
   +     '<input type="text" id="dz-href" onchange="dzSetAttr(\'href\',this.value)"></div>'
   +   '<div id="dz-imgwrap" style="display:none">'
   +     '<button class="dz-btn" style="background:#2a3557" onclick="dzReplaceImage()">🖼 Зургийг солих</button></div>'
+  // ── Зөөх ба хэмжээ ──
+  +   '<label>Зөөх (эсвэл шууд чирнэ)</label>'
+  +   '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;">'
+  +     '<span></span>'
+  +     '<button class="dz-btn" style="margin:0;padding:5px" onclick="dzNudge(0,-4)">↑</button>'
+  +     '<span></span>'
+  +     '<button class="dz-btn" style="margin:0;padding:5px" onclick="dzNudge(-4,0)">←</button>'
+  +     '<button class="dz-btn" style="margin:0;padding:5px;background:#2a3557" onclick="dzResetPos()">⟲</button>'
+  +     '<button class="dz-btn" style="margin:0;padding:5px" onclick="dzNudge(4,0)">→</button>'
+  +     '<span></span>'
+  +     '<button class="dz-btn" style="margin:0;padding:5px" onclick="dzNudge(0,4)">↓</button>'
+  +     '<span></span>'
+  +   '</div>'
+  +   '<label>Хэмжээ (булангийн цэгээр ч чирнэ)</label>'
+  +   '<div style="display:flex;gap:5px">'
+  +     '<button class="dz-btn" style="flex:1;margin:0" onclick="dzScale(1.12)">➕ Томруулах</button>'
+  +     '<button class="dz-btn" style="flex:1;margin:0" onclick="dzScale(0.89)">➖ Жижигрүүлэх</button>'
+  +   '</div>'
+  // ── Өнгө хуулах ──
+  +   '<label>Өнгө хуулах</label>'
+  +   '<div id="dz-clip" style="font-size:10px;color:#7a86a8;margin-bottom:4px">хоосон</div>'
+  +   '<div style="display:flex;gap:5px;flex-wrap:wrap">'
+  +     '<button class="dz-btn" style="flex:1;min-width:66px;margin:0;background:#2a3557" onclick="dzCopyColor()">📋 Хуулах</button>'
+  +     '<button class="dz-btn" style="flex:1;min-width:66px;margin:0" onclick="dzPasteColor(\'text\')">🖌 Бичиг</button>'
+  +     '<button class="dz-btn" style="flex:1;min-width:66px;margin:0" onclick="dzPasteColor(\'bg\')">🖌 Дэвсгэр</button>'
+  +   '</div>'
   +   '<div style="display:flex;gap:6px">'
   +     '<button class="dz-btn" style="background:#5c4a1a;flex:1" onclick="dzHide()">🚫 Нуух</button>'
   +     '<button class="dz-btn" style="background:#7a2233;flex:1" onclick="dzRemove()">🗑 Устгах</button>'
@@ -4587,6 +4757,12 @@ function dzInit(){
   document.body.appendChild(p);
 
   document.addEventListener('click', dzClick, true);
+  // Чирж зөөх / хэмжээ өөрчлөх
+  document.addEventListener('pointerdown', dzMoveStart, true);
+  document.addEventListener('pointermove', dzDragMove, true);
+  document.addEventListener('pointerup',   dzDragEnd,   true);
+  window.addEventListener('scroll', dzPlaceHandle, true);
+  window.addEventListener('resize', dzPlaceHandle);
 
   try{
     const saved = JSON.parse(localStorage.getItem('toorxon_design') || '[]');
