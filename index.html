@@ -742,7 +742,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1786517729443;
+const CATALOG_VERSION = 1786518061280;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -4269,6 +4269,9 @@ function dzApply(list){
     if(p.kind === 'text') el.textContent = p.to;
     else if(p.kind === 'style') el.style.setProperty(p.prop, p.to, 'important');
     else if(p.kind === 'hide') el.style.display = 'none';
+    else if(p.kind === 'attr') el.setAttribute(p.prop, p.to);
+    else if(p.kind === 'remove') el.remove();
+    else if(p.kind === 'add') el.insertAdjacentHTML('afterend', p.to);
   });
 }
 
@@ -4346,6 +4349,13 @@ function dzClick(e){
   document.getElementById('dz-bg').value    = dzHex(cs.backgroundColor);
   document.getElementById('dz-size').value  = parseFloat(cs.fontSize) || 14;
   document.getElementById('dz-radius').value= parseFloat(cs.borderRadius) || 0;
+  document.getElementById('dz-pad').value   = parseFloat(cs.paddingTop) || 0;
+  // Холбоос болон зурагны нэмэлт хэсгүүдийг зөвхөн тохирох үед харуулна
+  const isLink = DZ_SEL.tagName === 'A' || DZ_SEL.hasAttribute('href');
+  const isImg  = DZ_SEL.tagName === 'IMG';
+  document.getElementById('dz-linkwrap').style.display = isLink ? '' : 'none';
+  document.getElementById('dz-imgwrap').style.display  = isImg  ? '' : 'none';
+  if(isLink) document.getElementById('dz-href').value = DZ_SEL.getAttribute('href') || '';
 }
 function dzHex(c){
   const m = String(c).match(/\d+/g);
@@ -4373,6 +4383,98 @@ function dzHide(){
   dzDeselect();
 }
 
+// ── Бүрмөсөн устгах (нуухаас ялгаатай) ──
+function dzRemove(){
+  if(!DZ_SEL) return;
+  if(!confirm('Энэ хэсгийг бүрмөсөн устгах уу?')) return;
+  const el = DZ_SEL;
+  dzRecord(el, 'remove', '', el.outerHTML.slice(0, 200), '');
+  dzDeselect();
+  el.remove();
+}
+
+// ── Холбоос (href) солих ──
+function dzSetAttr(prop, v){
+  if(!DZ_SEL) return;
+  const from = DZ_SEL.getAttribute(prop) || '';
+  DZ_SEL.setAttribute(prop, v);
+  dzRecord(DZ_SEL, 'attr', prop, from, v);
+}
+
+// ══════════════════════════════════════════
+// ШИНЭ ЗҮЙЛ НЭМЭХ
+// Сонгосон элементийн ДАРАА шинэ зүйл оруулна. Оруулсан HTML нь
+// patch болж бүртгэгдэх тул Claude үүнийг жинхэнэ кодонд буулгана.
+// ══════════════════════════════════════════
+function dzInsert(html, tailbar){
+  const anchor = DZ_SEL || document.querySelector('.wrap') || document.body;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  const node = tmp.firstElementChild;
+  if(!node) return;
+  anchor.insertAdjacentElement('afterend', node);
+  DZ_PATCHES.push({
+    sel: dzPath(anchor), kind: 'add', prop: 'afterend',
+    from: '', to: html, label: tailbar, at: new Date().toISOString()
+  });
+  dzSaveLocal(); dzRenderList();
+  DZ_SEL = node; node.classList.add('dz-picked');
+}
+
+function dzAddButton(){
+  const t = prompt('Товчны бичвэр:', 'Дэлгэрэнгүй');
+  if(t === null) return;
+  const href = prompt('Холбоос (хоосон орхиж болно):', '') || '#';
+  dzInsert(
+    '<a href="' + href + '" style="display:block;margin:10px 0;padding:12px;border-radius:10px;'
+    + 'background:var(--accent);color:#fff;font-weight:700;text-align:center;text-decoration:none;">'
+    + t + '</a>', 'товч: ' + t);
+}
+
+function dzAddText(){
+  const t = prompt('Бичвэр:', 'Шинэ текст');
+  if(t === null) return;
+  dzInsert('<p style="margin:10px 0;font-size:13px;color:var(--text);line-height:1.6;">'
+    + t + '</p>', 'текст: ' + t.slice(0, 22));
+}
+
+// Зураг — файлаас (base64) эсвэл хаягаар
+function dzAddImage(){
+  const how = confirm('Зургийн ХАЯГ бичих үү?\n\nOK = хаяг бичнэ\nCancel = файлаас сонгоно');
+  if(how){
+    const u = prompt('Зургийн хаяг (https://...):', '');
+    if(!u) return;
+    dzInsert('<img src="' + u + '" style="display:block;width:100%;border-radius:12px;margin:10px 0;">',
+             'зураг (хаяг)');
+    return;
+  }
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*';
+  inp.onchange = () => {
+    const f = inp.files && inp.files[0];
+    if(!f) return;
+    if(f.size > 300 * 1024){
+      alert('Зураг 300 KB-аас бага байх ёстой.\nОдоо: ' + Math.round(f.size/1024) + ' KB');
+      return;
+    }
+    const rd = new FileReader();
+    rd.onload = () => {
+      dzInsert('<img src="' + rd.result + '" style="display:block;width:100%;border-radius:12px;margin:10px 0;">',
+               'зураг: ' + f.name);
+    };
+    rd.readAsDataURL(f);
+  };
+  inp.click();
+}
+
+// Байгаа зургийг солих
+function dzReplaceImage(){
+  if(!DZ_SEL || DZ_SEL.tagName !== 'IMG'){ alert('Эхлээд зураг дээр дарж сонгоно уу'); return; }
+  const u = prompt('Шинэ зургийн хаяг:', DZ_SEL.getAttribute('src') || '');
+  if(u === null) return;
+  dzSetAttr('src', u);
+}
+
 // ── Жагсаалт ──
 function dzRenderList(){
   const box = document.getElementById('dz-list');
@@ -4381,7 +4483,7 @@ function dzRenderList(){
   box.innerHTML = DZ_PATCHES.map((p,i) =>
       '<div style="display:flex;gap:6px;align-items:center;padding:5px 0;border-bottom:1px solid #26304a;">'
     + '<span style="flex:1;font-size:10.5px;color:#c7d2e8;overflow:hidden;">'
-    + (p.kind === 'text' ? '📝 ' : p.kind === 'hide' ? '🚫 ' : '🎨 ')
+    + ({ text:'📝 ', hide:'🚫 ', remove:'🗑 ', add:'➕ ', attr:'🔗 ' }[p.kind] || '🎨 ')
     + (p.kind === 'style' ? p.prop + ' → ' + p.to : (p.label || p.sel).slice(0,26))
     + '</span>'
     + '<button onclick="dzUndo(' + i + ')" style="border:0;background:#2a3557;color:#eef3fb;'
@@ -4396,6 +4498,15 @@ function dzUndo(i){
     if(p.kind === 'text') el.textContent = p.from;
     else if(p.kind === 'style') el.style.removeProperty(p.prop);
     else if(p.kind === 'hide') el.style.display = '';
+    else if(p.kind === 'attr') el.setAttribute(p.prop, p.from);
+    else if(p.kind === 'add' && el.nextElementSibling) el.nextElementSibling.remove();
+  }
+  // 'remove' — устгасан зүйлийг буцаахын тулд хуудсаа дахин ачаална
+  if(p.kind === 'remove'){
+    DZ_PATCHES.splice(i,1); dzSaveLocal();
+    alert('Устгасныг буцаахын тулд хуудсыг дахин ачаална');
+    location.reload();
+    return;
   }
   DZ_PATCHES.splice(i,1);
   dzSaveLocal(); dzRenderList();
@@ -4446,7 +4557,26 @@ function dzInit(){
   +     '<input type="number" id="dz-size" min="7" max="60" oninput="dzSetStyle(\'font-size\',this.value+\'px\')">'
   +   '<label>Булангийн дугуйрал (px)</label>'
   +     '<input type="number" id="dz-radius" min="0" max="50" oninput="dzSetStyle(\'border-radius\',this.value+\'px\')">'
-  +   '<button class="dz-btn" style="background:#7a2233" onclick="dzHide()">🚫 Энэ хэсгийг нуух</button>'
+  +   '<label>Дотор зай (px)</label>'
+  +     '<input type="number" id="dz-pad" min="0" max="60" oninput="dzSetStyle(\'padding\',this.value+\'px\')">'
+  +   '<div id="dz-linkwrap" style="display:none"><label>Холбоос (href)</label>'
+  +     '<input type="text" id="dz-href" onchange="dzSetAttr(\'href\',this.value)"></div>'
+  +   '<div id="dz-imgwrap" style="display:none">'
+  +     '<button class="dz-btn" style="background:#2a3557" onclick="dzReplaceImage()">🖼 Зургийг солих</button></div>'
+  +   '<div style="display:flex;gap:6px">'
+  +     '<button class="dz-btn" style="background:#5c4a1a;flex:1" onclick="dzHide()">🚫 Нуух</button>'
+  +     '<button class="dz-btn" style="background:#7a2233;flex:1" onclick="dzRemove()">🗑 Устгах</button>'
+  +   '</div>'
+  + '</div>'
+  // ── ШИНЭ ЗҮЙЛ НЭМЭХ ──
+  + '<div style="border-top:1px solid #2a3557;margin-top:10px;padding-top:8px">'
+  +   '<div style="font-size:10.5px;color:#98a5c0;margin-bottom:5px">'
+  +     'Сонгосон зүйлийн ДАРАА нэмэх</div>'
+  +   '<div style="display:flex;gap:5px;flex-wrap:wrap">'
+  +     '<button class="dz-btn" style="flex:1;min-width:72px;margin-top:0" onclick="dzAddButton()">➕ Товч</button>'
+  +     '<button class="dz-btn" style="flex:1;min-width:72px;margin-top:0" onclick="dzAddText()">➕ Текст</button>'
+  +     '<button class="dz-btn" style="flex:1;min-width:72px;margin-top:0" onclick="dzAddImage()">➕ Зураг</button>'
+  +   '</div>'
   + '</div>'
   + '<div style="border-top:1px solid #2a3557;margin-top:10px;padding-top:8px">'
   +   '<div style="font-size:10.5px;color:#98a5c0;margin-bottom:4px">Хийсэн засварууд</div>'
