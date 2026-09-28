@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Тагтаа HUB</title>
+<style>
+:root{--bg:#0d1526;--card:#161f36;--card2:#1d2745;--border:#2a3557;--text:#eef3fb;--muted:#98a5c0;--accent:#4361ee;--accent2:#5b8def;--gold:#fbbf24;--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444;}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100%;font-size:14px}
+a{color:var(--accent2)}
+button{font:inherit;cursor:pointer}
+input,select,textarea{font:inherit;background:var(--card2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 10px;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent2)}
+.btn{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:9px 14px;font-weight:600}
+.btn:hover{background:var(--accent2)}
+.btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn.sm{padding:5px 10px;font-size:12px}
+.btn.ok{background:var(--ok)}.btn.bad{background:var(--bad)}.btn.warn{background:var(--warn);color:#111}
+.btn:disabled{opacity:.5;cursor:default}
+.hide{display:none!important}
+.muted{color:var(--muted)}
+.mono{font-family:Consolas,monospace;font-size:12px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+.grid{display:grid;gap:12px}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600}
+.pill.paid{background:rgba(34,197,94,.15);color:#4ade80}
+.pill.pending{background:rgba(245,158,11,.15);color:#fbbf24}
+.pill.cancelled{background:rgba(239,68,68,.15);color:#f87171}
+.pill.on{background:rgba(34,197,94,.15);color:#4ade80}.pill.test{background:rgba(245,158,11,.15);color:#fbbf24}.pill.off{background:rgba(239,68,68,.15);color:#f87171}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--border);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+tr:hover td{background:rgba(255,255,255,.02)}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#111a30;border:1px solid var(--border);padding:10px 16px;border-radius:10px;z-index:99;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+
+/* ── Нэвтрэх ── */
+#login{min-height:100vh;display:grid;place-items:center;padding:20px}
+#login .card{width:100%;max-width:380px}
+#login h1{font-size:22px;margin-bottom:4px}
+
+/* ── Нүүр: бизнесийн картууд ── */
+#home{max-width:1000px;margin:0 auto;padding:28px 16px}
+.bizgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:18px}
+.biz{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 18px;cursor:pointer;transition:.15s;position:relative;overflow:hidden}
+.biz:hover{transform:translateY(-2px);border-color:var(--accent2)}
+.biz .ic{font-size:38px;line-height:1}
+.biz .nm{font-size:17px;font-weight:700;margin-top:10px}
+.biz .kd{font-size:12px;color:var(--muted);margin-top:2px}
+.biz .bar{position:absolute;left:0;top:0;height:4px;width:100%}
+.biz.add{border-style:dashed;display:grid;place-items:center;color:var(--muted);min-height:130px}
+
+/* ── Панел ── */
+#panel{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+#side{background:var(--card);border-right:1px solid var(--border);padding:16px 12px;position:sticky;top:0;height:100vh;overflow:auto}
+#side .brand{display:flex;align-items:center;gap:10px;padding:6px 8px 16px;border-bottom:1px solid var(--border);margin-bottom:10px}
+#side .brand .ic{font-size:26px}
+#side .brand .nm{font-weight:700}
+#side .brand .kd{font-size:11px;color:var(--muted)}
+.nav a{display:flex;gap:10px;align-items:center;padding:9px 10px;border-radius:9px;color:var(--text);text-decoration:none;margin-bottom:2px}
+.nav a:hover{background:var(--card2)}
+.nav a.on{background:var(--accent);color:#fff}
+.nav .sec{font-size:10px;color:var(--muted);letter-spacing:.08em;margin:14px 10px 6px}
+#main{padding:22px 24px;max-width:1200px}
+#main h2{font-size:20px;margin-bottom:14px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+.kpi .l{font-size:12px;color:var(--muted)}
+.kpi .v{font-size:22px;font-weight:700;margin-top:4px}
+.kpi .s{font-size:11px;color:var(--muted);margin-top:2px}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tabs button{background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:99px;padding:5px 12px;font-size:12px}
+.tabs button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+label.f{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;z-index:50;padding:16px}
+.modal .card{width:100%;max-width:520px;max-height:90vh;overflow:auto}
+.itemgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.item{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.item img{width:100%;aspect-ratio:3/2;object-fit:cover;background:var(--card2)}
+.item .b{padding:10px}
+.item .t{font-weight:600}
+.item .p{color:var(--gold);font-weight:700;margin-top:2px}
+#topbtn{display:none}
+@media(max-width:800px){
+  #panel{grid-template-columns:1fr}
+  #side{position:fixed;left:-260px;width:250px;z-index:40;transition:.2s}
+  #side.open{left:0}
+  #topbtn{display:inline-block;margin-bottom:12px}
+  #main{padding:16px;overflow-x:hidden}
+  .grid{grid-template-columns:1fr!important}
+  .kpis{grid-template-columns:1fr 1fr}
+  .kpi .v{font-size:18px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ НЭВТРЭХ ══ -->
+<div id="login">
+  <div class="card">
+    <h1>🕊 Тагтаа HUB</h1>
+    <p class="muted" style="margin-bottom:16px">Бүх бизнесийн нэг удирдлага</p>
+    <label class="f">Нууц үг</label>
+    <input type="password" id="pw" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn" style="width:100%;margin-top:12px" onclick="doLogin()">Нэвтрэх</button>
+    <p id="loginErr" class="muted" style="margin-top:10px;color:var(--bad)"></p>
+  </div>
+</div>
+
+<!-- ══ НҮҮР ══ -->
+<div id="home" class="hide">
+  <div class="row" style="justify-content:space-between">
+    <div><h1 style="font-size:24px">🕊 Тагтаа HUB</h1><p class="muted">Бизнесээ сонгоно уу</p></div>
+    <div class="row">
+      <button class="btn ghost sm" onclick="openBizEditor()">✏️ Бизнесүүд</button>
+      <button class="btn ghost sm" onclick="doLogout()">Гарах</button>
+    </div>
+  </div>
+  <div class="bizgrid" id="bizgrid"></div>
+</div>
+
+<!-- ══ ПАНЕЛ ══ -->
+<div id="panel" class="hide">
+  <aside id="side">
+    <div class="brand">
+      <div class="ic" id="sIc">🎬</div>
+      <div><div class="nm" id="sNm">—</div><div class="kd" id="sKd"></div></div>
+    </div>
+    <div class="nav" id="nav"></div>
+    <div style="margin-top:18px;padding:0 10px" class="muted" id="sSite"></div>
+    <div style="margin-top:14px;padding:0 6px" class="row">
+      <button class="btn ghost sm" onclick="goHome()">← Бүх бизнес</button>
+      <button class="btn ghost sm" onclick="doLogout()">Гарах</button>
+    </div>
+  </aside>
+  <main id="main">
+    <button id="topbtn" class="btn ghost sm" onclick="document.getElementById('side').classList.toggle('open')">☰ Цэс</button>
+    <div id="view"></div>
+  </main>
+</div>
+
+<div id="modalHost"></div>
+<div id="toast" class="toast hide"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// Тагтаа HUB — нэг нэвтрэлт, олон бизнес. Бүх өгөгдөл Worker (KV) дээр.
+// ═══════════════════════════════════════════════════════
+const WORKER = 'https://kinobot.naraa333bb.workers.dev';
+const S = { tok: null, biz: [], cur: null, page: 'dash', orders: null, items: null, cfg: null, bot: null, range: '7d' };
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = n => (Math.round(Number(n) || 0)).toLocaleString('mn-MN') + '₮';
+const fdt = s => { if (!s) return '—'; const d = new Date(s); if (isNaN(d)) return s; return d.toLocaleString('mn-MN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }); };
+function toast(m, bad) { const t = $('toast'); t.textContent = m; t.style.borderColor = bad ? 'var(--bad)' : 'var(--border)'; t.classList.remove('hide'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.add('hide'), 2600); }
+
+async function api(path, body, method) {
+  const h = { 'Content-Type': 'application/json' };
+  if (S.tok) h['X-Hub-Token'] = S.tok;
+  const res = await fetch(WORKER + path, { method: method || (body ? 'POST' : 'GET'), headers: h, body: body ? JSON.stringify(body) : undefined });
+  if (res.status === 401) { if (S.tok) { S.tok = null; localStorage.removeItem('hub_tok'); showLogin(); toast('Нэвтрэлт дууссан — дахин нэвтэрнэ үү', true); } throw new Error('unauthorized'); }
+  const j = await res.json().catch(() => ({ ok: false, error: 'JSON биш хариу' }));
+  if (!j.ok && j.error) throw new Error(j.error);
+  return j;
+}
+
+// ── Нэвтрэлт ──
+function showLogin() { $('login').classList.remove('hide'); $('home').classList.add('hide'); $('panel').classList.add('hide'); }
+async function doLogin() {
+  $('loginErr').textContent = '';
+  try {
+    const j = await api('/hub/login', { pass: $('pw').value });
+    S.tok = j.token; localStorage.setItem('hub_tok', j.token); $('pw').value = '';
+    await boot();
+  } catch(e) { $('loginErr').textContent = e.message === 'unauthorized' ? 'Нууц үг буруу' : e.message; }
+}
+async function doLogout() { try { await api('/hub/logout', {}); } catch(e) {} S.tok = null; localStorage.removeItem('hub_tok'); showLogin(); }
+
+async function boot() {
+  const j = await api('/hub/me');
+  S.biz = j.biz;
+  if (!j.hubPassSet) toast('⚠ HUB нууц үг тавиагүй — Тохиргоо хэсгээс тавина уу');
+  const want = location.hash.replace('#', '');
+  const b = S.biz.find(x => x.id === want.split('/')[0]);
+  if (b) openBiz(b.id, want.split('/')[1]); else goHome();
+}
+
+// ── Нүүр ──
+function goHome() {
+  S.cur = null; location.hash = '';
+  $('login').classList.add('hide'); $('panel').classList.add('hide'); $('home').classList.remove('hide');
+  $('bizgrid').innerHTML = S.biz.map(b => `
+    <div class="biz" onclick="openBiz('${esc(b.id)}')">
+      <div class="bar" style="background:${esc(b.color || '#4361ee')}"></div>
+      <div class="ic">${esc(b.icon || '📦')}</div>
+      <div class="nm">${esc(b.name)}</div>
+      <div class="kd">${kindLabel(b.kind)}${b.site ? ' · ' + esc(b.site.replace(/^https?:\/\//, '').replace(/\/$/, '')) : ''}</div>
+    </div>`).join('') + `<div class="biz add" onclick="openBizEditor(true)">➕ Бизнес нэмэх</div>`;
+}
+function kindLabel(k) { return { kino: 'Кино', shop: 'Дэлгүүр', service: 'Үйлчилгээ' }[k] || k; }
+
+function openBizEditor(addNew) {
+  const list = JSON.parse(JSON.stringify(S.biz));
+  if (addNew) list.push({ id: '', name: '', icon: '🛍', kind: 'shop', site: '', color: '#4361ee', pageId: '' });
+  const rows = () => list.map((b, i) => `
+    <div class="card" style="padding:12px;margin-bottom:10px">
+      <div class="formgrid">
+        <div><label class="f">Код (латин)</label><input value="${esc(b.id)}" ${b.kind === 'kino' ? 'disabled' : ''} oninput="BE[${i}].id=this.value"></div>
+        <div><label class="f">Нэр</label><input value="${esc(b.name)}" oninput="BE[${i}].name=this.value"></div>
+        <div><label class="f">Эможи</label><input value="${esc(b.icon)}" oninput="BE[${i}].icon=this.value"></div>
+        <div><label class="f">Төрөл</label><select ${b.kind === 'kino' ? 'disabled' : ''} onchange="BE[${i}].kind=this.value">
+          <option value="shop" ${b.kind === 'shop' ? 'selected' : ''}>Дэлгүүр</option>
+          <option value="service" ${b.kind === 'service' ? 'selected' : ''}>Үйлчилгээ</option>
+          <option value="kino" ${b.kind === 'kino' ? 'selected' : ''}>Кино</option></select></div>
+        <div><label class="f">Сайт</label><input value="${esc(b.site || '')}" oninput="BE[${i}].site=this.value"></div>
+        <div><label class="f">Өнгө</label><input type="color" value="${esc(b.color || '#4361ee')}" oninput="BE[${i}].color=this.value" style="height:38px;padding:2px"></div>
+        <div><label class="f">FB пэйж ID</label><input value="${esc(b.pageId || '')}" oninput="BE[${i}].pageId=this.value"></div>
+      </div>
+      ${b.kind !== 'kino' ? `<button class="btn bad sm" style="margin-top:8px" onclick="BE.splice(${i},1);rerenderBE()">Устгах</button>` : ''}
+    </div>`).join('');
+  window.BE = list;
+  window.rerenderBE = () => { $('beRows').innerHTML = rows(); };
+  modal(`<h3 style="margin-bottom:12px">Бизнесүүд</h3><div id="beRows">${rows()}</div>
+    <div class="row" style="justify-content:flex-end;margin-top:6px">
+      <button class="btn ghost" onclick="closeModal()">Болих</button>
+      <button class="btn" onclick="saveBiz()">Хадгалах</button></div>`);
+}
+async function saveBiz() {
+  try { const j = await api('/hub/biz', { list: window.BE }); S.biz = j.list; closeModal(); goHome(); toast('Хадгалагдлаа'); }
+  catch(e) { toast(e.message, true); }
+}
+function modal(html) { $('modalHost').innerHTML = `<div class="modal" onclick="if(event.target===this)closeModal()"><div class="card">${html}</div></div>`; }
+function closeModal() { $('modalHost').innerHTML = ''; }
+
+// ── Панел ──
+const PAGES = [
+  { sec: 'ҮЙЛ АЖИЛЛАГАА' },
+  { id: 'dash', ic: '📊', nm: 'Самбар' },
+  { id: 'orders', ic: '🛒', nm: 'Захиалга' },
+  { id: 'revenue', ic: '💰', nm: 'Орлого' },
+  { id: 'customers', ic: '👤', nm: 'Хэрэглэгчид' },
+  { sec: 'КОНТЕНТ' },
+  { id: 'items', ic: '📦', nm: 'Бараа' },
+  { sec: 'СИСТЕМ' },
+  { id: 'bot', ic: '🤖', nm: 'Messenger бот' },
+  { id: 'cfg', ic: '⚙️', nm: 'Тохиргоо' }
+];
+function openBiz(id, page) {
+  const b = S.biz.find(x => x.id === id); if (!b) return goHome();
+  S.cur = b; S.orders = null; S.items = null; S.cfg = null; S.bot = null;
+  $('login').classList.add('hide'); $('home').classList.add('hide'); $('panel').classList.remove('hide');
+  $('sIc').textContent = b.icon || '📦'; $('sNm').textContent = b.name; $('sKd').textContent = kindLabel(b.kind);
+  $('sSite').innerHTML = b.site ? `<a href="${esc(b.site)}" target="_blank" rel="noreferrer">🌐 ${esc(b.site.replace(/^https?:\/\//, ''))}</a>` + (b.kind === 'kino' ? `<br><a href="${esc(b.site)}?admin=2020" target="_blank" rel="noreferrer">🛠 Сайтын админ</a>` : '') : '';
+  go(page || 'dash');
+}
+function go(page) {
+  S.page = page; location.hash = S.cur.id + '/' + page;
+  $('nav').innerHTML = PAGES.map(p => p.sec ? `<div class="sec">${p.sec}</div>` : `<a href="#" class="${p.id === page ? 'on' : ''}" onclick="go('${p.id}');return false">${p.ic} ${p.nm}</a>`).join('');
+  $('side').classList.remove('open');
+  ({ dash: vDash, orders: vOrders, revenue: vRevenue, customers: vCustomers, items: vItems, bot: vBot, cfg: vCfg }[page] || vDash)();
+}
+function setView(h) { $('view').innerHTML = h; }
+function loading(t) { setView(`<p class="muted">⏳ ${t || 'Ачаалж байна…'}</p>`); }
+
+async function loadOrders(fresh) {
+  if (S.orders && !fresh) return S.orders;
+  const j = await api(`/hub/orders?biz=${S.cur.id}${fresh ? '&fresh=1' : ''}`);
+  S.orders = j.orders; return S.orders;
+}
+
+// Хугацааны шүүлт — ажлын өдөр 06:00→24:00 (Sheets-тэй адил)
+function rangeStart(r) {
+  const d = new Date(); d.setHours(6, 0, 0, 0); if (new Date() < d) d.setDate(d.getDate() - 1);
+  if (r === 'today') return d;
+  if (r === 'yday') { d.setDate(d.getDate() - 1); return d; }
+  if (r === '7d') { d.setDate(d.getDate() - 6); return d; }
+  if (r === 'month') { d.setDate(1); return d; }
+  return new Date(0);
+}
+function rangeEnd(r) { if (r !== 'yday') return new Date(8.64e15); const d = rangeStart('today'); return d; }
+function inRange(o, r) { const t = new Date(o.paidAt || o.createdAt); return t >= rangeStart(r) && t < rangeEnd(r); }
+function rangeTabs(cb) {
+  const R = [['today', 'Өнөөдөр'], ['yday', 'Өчигдөр'], ['7d', '7 хоног'], ['month', 'Энэ сар'], ['all', 'Бүх цаг']];
+  return `<div class="tabs">${R.map(([k, l]) => `<button class="${S.range === k ? 'on' : ''}" onclick="S.range='${k}';${cb}()">${l}</button>`).join('')}</div>`;
+}
+
+// ── Самбар ──
+async function vDash() {
+  loading();
+  try {
+    const os = await loadOrders();
+    const paid = os.filter(o => o.status === 'paid');
+    const inR = paid.filter(o => inRange(o, S.range));
+    const sum = a => a.reduce((s, o) => s + (o.paidAmount ?? o.amount ?? 0), 0);
+    const today = paid.filter(o => inRange(o, 'today')), month = paid.filter(o => inRange(o, 'month'));
+    const pend = os.filter(o => o.status === 'pending');
+    const fails = os.filter(o => o.status === 'paid' && !o.delivered && o.method === 'qpay');
+    const top = {}; inR.forEach(o => { top[o.item] = (top[o.item] || 0) + 1; });
+    const topList = Object.entries(top).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    setView(`<h2>📊 ${esc(S.cur.name)} — Самбар</h2>
+      ${rangeTabs('vDash')}
+      <div class="kpis">
+        <div class="kpi"><div class="l">Орлого (${rangeName()})</div><div class="v">${fmt(sum(inR))}</div><div class="s">${inR.length} төлсөн захиалга</div></div>
+        <div class="kpi"><div class="l">Өнөөдөр</div><div class="v">${fmt(sum(today))}</div><div class="s">${today.length} захиалга</div></div>
+        <div class="kpi"><div class="l">Энэ сар</div><div class="v">${fmt(sum(month))}</div><div class="s">${month.length} захиалга</div></div>
+        <div class="kpi"><div class="l">Хүлээгдэж буй</div><div class="v">${pend.length}</div><div class="s">төлбөр төлөгдөөгүй</div></div>
+        <div class="kpi" style="${fails.length ? 'border-color:var(--bad)' : ''}"><div class="l">Хүргэгдээгүй</div><div class="v">${fails.length}</div><div class="s">төлсөн ч линк очоогүй</div></div>
+      </div>
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <div class="card"><h3 style="margin-bottom:8px">🔥 Их зарагдсан</h3>
+          ${topList.length ? `<table>${topList.map(([n, c]) => `<tr><td>${esc(n)}</td><td style="text-align:right">${c}</td></tr>`).join('')}</table>` : '<p class="muted">Энэ хугацаанд борлуулалт алга</p>'}</div>
+        <div class="card"><h3 style="margin-bottom:8px">🕒 Сүүлийн захиалгууд</h3>
+          <table>${os.slice(0, 8).map(o => `<tr><td>${esc(o.item)}</td><td>${fmt(o.amount)}</td><td><span class="pill ${o.status}">${stLabel(o.status)}</span></td><td class="muted">${fdt(o.createdAt)}</td></tr>`).join('') || '<tr><td class="muted">Захиалга алга</td></tr>'}</table>
+          <p style="margin-top:8px"><a href="#" onclick="go('orders');return false">Бүгдийг харах →</a></p></div>
+      </div>`);
+  } catch(e) { setView(`<p style="color:var(--bad)">${esc(e.message)}</p>`); }
+}
+function rangeName() { return { today: 'өнөөдөр', yday: 'өчигдөр', '7d': '7 хоног', month: 'энэ сар', all: 'бүх цаг' }[S.range]; }
+function stLabel(s) { return { paid: 'Төлсөн', pending: 'Хүлээгдэж буй', cancelled: 'Цуцалсан' }[s] || s; }
+
+// ── Захиалга ──
+let ordFilter = 'all';
+async function vOrders(fresh) {
+  loading();
+  try {
+    const os = await loadOrders(fresh);
+    const list = os.filter(o => ordFilter === 'all' || (ordFilter === 'undelivered' ? (o.status === 'paid' && !o.delivered) : o.status === ordFilter));
+    const isKino = S.cur.kind === 'kino';
+    setView(`<div class="row" style="justify-content:space-between"><h2>🛒 Захиалга</h2>
+      <div class="row">${isKino ? '' : '<button class="btn sm" onclick="newOrder()">+ Захиалга үүсгэх</button>'}<button class="btn ghost sm" onclick="vOrders(true)">🔄 Шинэчлэх</button></div></div>
+      <div class="tabs">${[['all', 'Бүгд'], ['pending', 'Хүлээгдэж буй'], ['paid', 'Төлсөн'], ['undelivered', 'Хүргэгдээгүй'], ['cancelled', 'Цуцалсан']].map(([k, l]) => `<button class="${ordFilter === k ? 'on' : ''}" onclick="ordFilter='${k}';vOrders()">${l}</button>`).join('')}</div>
+      <div class="card" style="padding:0;overflow:auto"><table>
+        <tr><th>Огноо</th><th>${isKino ? 'Кино' : 'Бараа'}</th><th>Дүн</th><th>Төлөв</th><th>${isKino ? 'Гүйлгээний утга' : 'Харилцагч'}</th><th>${isKino ? 'Хүргэлт' : 'Арга'}</th><th></th></tr>
+        ${list.map(o => `<tr>
+          <td class="muted">${fdt(o.createdAt)}${o.paidAt ? `<br><span style="color:#4ade80">✓ ${fdt(o.paidAt)}</span>` : ''}</td>
+          <td>${esc(o.item)}${o.free && o.free.length ? ` <span class="muted">+${o.free.join(',')}</span>` : ''}</td>
+          <td>${fmt(o.paidAmount ?? o.amount)}</td>
+          <td><span class="pill ${o.status}">${stLabel(o.status)}</span></td>
+          <td class="mono">${esc(isKino ? o.txn : (o.customer || '—'))}${!isKino && o.note ? `<br><span class="muted">${esc(o.note)}</span>` : ''}</td>
+          <td>${isKino ? (o.delivered ? '<span style="color:#4ade80">✓ илгээсэн</span>' : o.status === 'paid' ? `<span style="color:var(--bad)">✗ ${esc(o.deliveryError || 'очоогүй')}</span>` : '<span class="muted">—</span>') : esc(o.method)}</td>
+          <td>${isKino ? `<button class="btn ghost sm" onclick="resend('${esc(o.txn)}')">Шалгах/илгээх</button>` :
+            (o.status === 'pending' ? `<button class="btn ok sm" onclick="setOrder('${o.id}','paid')">Төлсөн</button> <button class="btn ghost sm" onclick="setOrder('${o.id}','cancelled')">Цуцлах</button>` : '')}</td>
+        </tr>`).join('') || '<tr><td colspan="7" class="muted">Захиалга алга</td></tr>'}
+      </table></div>
+      <p class="muted" style="margin-top:8px">${isKino ? 'Дансаар төлсөн (гар) захиалгууд Google Sheets-ийн «Данс» хуудсанд байна.' : ''} Нийт ${list.length}</p>`);
+  } catch(e) { setView(`<p style="color:var(--bad)">${esc(e.message)}</p>`); }
+}
+async function resend(txn) {
+  if (!confirm('QPay-аас төлбөрийг шалгаад, төлөгдсөн бол кино линкийг Messenger-ээр (дахин) илгээх үү?\n' + txn)) return;
+  try { const j = await api(`/hub/resend?biz=${S.cur.id}`, { txn }); const r = j.result || {};
+    toast(r.note || (r.qpayPaid ? 'Төлөгдсөн' : 'QPay дээр төлөгдөөгүй'), !r.qpayPaid); vOrders(true); }
+  catch(e) { toast(e.message, true); }
+}
+function newOrder() {
+  const its = (S.items || []).filter(i => i.active);
+  modal(`<h3 style="margin-bottom:12px">Шинэ захиалга</h3>
+    <div class="formgrid">
+      <div><label class="f">Бараа/үйлчилгээ</label><input id="noItem" list="noList"><datalist id="noList">${its.map(i => `<option value="${esc(i.title)}">`).join('')}</datalist></div>
+      <div><label class="f">Дүн</label><input id="noAmt" type="number"></div>
+      <div><label class="f">Харилцагч (нэр/утас)</label><input id="noCust"></div>
+      <div><label class="f">Төлбөрийн арга</label><select id="noMeth"><option value="qpay">QPay</option><option value="bank">Данс</option><option value="cash">Бэлэн</option></select></div>
+    </div>
+    <label class="f" style="margin-top:8px">Тэмдэглэл</label><textarea id="noNote" rows="2"></textarea>
+    <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn ghost" onclick="closeModal()">Болих</button><button class="btn" onclick="createOrder()">Үүсгэх</button></div>`);
+  $('noItem').addEventListener('change', () => { const it = its.find(i => i.title === $('noItem').value); if (it && !$('noAmt').value) $('noAmt').value = it.price; });
+}
+async function createOrder() {
+  try { await api(`/hub/order?biz=${S.cur.id}`, { item: $('noItem').value, amount: $('noAmt').value, customer: $('noCust').value, method: $('noMeth').value, note: $('noNote').value });
+    closeModal(); toast('Захиалга үүслээ'); vOrders(true); } catch(e) { toast(e.message, true); }
+}
+async function setOrder(id, status) {
+  try { await api(`/hub/order?biz=${S.cur.id}`, { id, status }); toast('Шинэчлэгдлээ'); vOrders(true); } catch(e) { toast(e.message, true); }
+}
+
+// ── Орлого ──
+async function vRevenue() {
+  loading();
+  try {
+    const os = (await loadOrders()).filter(o => o.status === 'paid' && inRange(o, S.range));
+    const amt = o => o.paidAmount ?? o.amount ?? 0;
+    const total = os.reduce((s, o) => s + amt(o), 0);
+    const byM = {}; os.forEach(o => { byM[o.method] = (byM[o.method] || 0) + amt(o); });
+    // Ажлын өдөр = 06:00-аас; огноог ЛОКАЛ цагаар гаргана (toISOString нь UTC тул буруу өдөр өгдөг)
+    const dayKey = d => { d = new Date(d); d.setHours(d.getHours() - 6); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+    const byDay = {}; os.forEach(o => { const k = dayKey(o.paidAt || o.createdAt); byDay[k] = byDay[k] || { n: 0, s: 0 }; byDay[k].n++; byDay[k].s += amt(o); });
+    const byItem = {}; os.forEach(o => { byItem[o.item] = byItem[o.item] || { n: 0, s: 0 }; byItem[o.item].n++; byItem[o.item].s += amt(o); });
+    const days = Object.entries(byDay).sort((a, b) => b[0].localeCompare(a[0]));
+    const max = Math.max(1, ...days.map(d => d[1].s));
+    setView(`<h2>💰 Орлого</h2>${rangeTabs('vRevenue')}
+      <div class="kpis">
+        <div class="kpi"><div class="l">Нийт орлого</div><div class="v">${fmt(total)}</div><div class="s">${os.length} захиалга</div></div>
+        <div class="kpi"><div class="l">⚡ QPay (автомат)</div><div class="v">${fmt(byM.qpay || 0)}</div></div>
+        <div class="kpi"><div class="l">🏦 Данс / бусад</div><div class="v">${fmt((byM.bank || 0) + (byM.cash || 0) + (byM.manual || 0))}</div></div>
+        <div class="kpi"><div class="l">Дундаж захиалга</div><div class="v">${fmt(os.length ? total / os.length : 0)}</div></div>
+      </div>
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <div class="card"><h3 style="margin-bottom:8px">Өдрөөр</h3>
+          ${days.map(([d, v]) => `<div style="margin:6px 0"><div class="row" style="justify-content:space-between;font-size:12px"><span>${d}</span><span>${fmt(v.s)} · ${v.n}</span></div><div style="height:6px;background:var(--card2);border-radius:4px"><div style="height:6px;width:${Math.round(v.s / max * 100)}%;background:var(--accent);border-radius:4px"></div></div></div>`).join('') || '<p class="muted">Орлого алга</p>'}</div>
+        <div class="card"><h3 style="margin-bottom:8px">${S.cur.kind === 'kino' ? 'Кино' : 'Бараа'} тус бүрээр</h3>
+          <table>${Object.entries(byItem).sort((a, b) => b[1].s - a[1].s).map(([n, v]) => `<tr><td>${esc(n)}</td><td>${v.n}</td><td style="text-align:right">${fmt(v.s)}</td></tr>`).join('') || '<tr><td class="muted">—</td></tr>'}</table></div>
+      </div>
+      ${S.cur.kind === 'kino' ? '<p class="muted" style="margin-top:10px">Дансны шилжүүлгийн орлого Google Sheets-д бүртгэгддэг тул энд зөвхөн QPay харагдана.</p>' : ''}`);
+  } catch(e) { setView(`<p style="color:var(--bad)">${esc(e.message)}</p>`); }
+}
+
+// ── Хэрэглэгчид ──
+async function vCustomers() {
+  loading();
+  try {
+    const [c, os] = await Promise.all([api(`/hub/customers?biz=${S.cur.id}`), loadOrders()]);
+    const byPsid = {}; os.filter(o => o.psid).forEach(o => { byPsid[o.psid] = byPsid[o.psid] || { n: 0, s: 0 }; if (o.status === 'paid') { byPsid[o.psid].n++; byPsid[o.psid].s += (o.paidAmount ?? o.amount); } });
+    const all = new Map();
+    c.chats.forEach(x => all.set(x.psid, { ...x }));
+    Object.keys(byPsid).forEach(p => { if (!all.has(p)) all.set(p, { psid: p, turns: 0, last: '' }); });
+    const rows = [...all.values()].map(x => ({ ...x, buys: byPsid[x.psid]?.n || 0, spent: byPsid[x.psid]?.s || 0 })).sort((a, b) => b.spent - a.spent || b.turns - a.turns);
+    const custs = os.filter(o => o.customer).map(o => o.customer);
+    setView(`<h2>👤 Хэрэглэгчид</h2>
+      <div class="kpis"><div class="kpi"><div class="l">Чат нээсэн</div><div class="v">${c.chats.length}</div><div class="s">сүүлийн 2 хоног</div></div>
+        <div class="kpi"><div class="l">Худалдан авагч</div><div class="v">${Object.values(byPsid).filter(v => v.n).length + new Set(custs).size}</div></div></div>
+      <div class="card" style="padding:0;overflow:auto"><table><tr><th>PSID / Харилцагч</th><th>Худалдан авалт</th><th>Зарцуулсан</th><th>Сүүлийн мессеж</th></tr>
+        ${rows.map(x => `<tr><td class="mono">${esc(x.psid)}</td><td>${x.buys}</td><td>${fmt(x.spent)}</td><td class="muted">${esc(x.last)}</td></tr>`).join('')}
+        ${[...new Set(custs)].map(n => `<tr><td>${esc(n)}</td><td>${os.filter(o => o.customer === n && o.status === 'paid').length}</td><td>${fmt(os.filter(o => o.customer === n && o.status === 'paid').reduce((s, o) => s + o.amount, 0))}</td><td class="muted">гар захиалга</td></tr>`).join('')}
+        ${!rows.length && !custs.length ? '<tr><td colspan="4" class="muted">Хэрэглэгч алга</td></tr>' : ''}</table></div>`);
+  } catch(e) { setView(`<p style="color:var(--bad)">${esc(e.message)}</p>`); }
+}
+
+// ── Бараа ──
+async function vItems() {
+  loading();
+  try {
+    const j = await api(`/hub/items?biz=${S.cur.id}`);
+    if (j.readonly) {
+      const cats = Object.fromEntries((j.categories || []).map(c => [c.id, c.label || c.name]));
+      setView(`<div class="row" style="justify-content:space-between"><h2>📦 Кино каталог</h2><a class="btn sm" href="${esc(S.cur.site)}?admin=2020" target="_blank" rel="noreferrer">🛠 Сайтын админд засах</a></div>
+        <p class="muted" style="margin-bottom:10px">Каталог сайтын кодоос уншигдана (шинэчилсэн: ${fdt(j.updatedAt)}). Нэмэх/засахыг сайтын админ панелаас хийнэ.</p>
+        <div class="card" style="padding:0;overflow:auto"><table><tr><th>Код</th><th>Нэр</th><th>Ангилал</th><th>Үнэ</th></tr>
+        ${(j.movies || []).map(m => `<tr><td class="mono">${esc(m.code || m.id || '')}</td><td>${esc(m.title || m.name || '')}</td><td class="muted">${esc(cats[m.cat] ?? cats[m.category] ?? m.cat ?? '')}</td><td>${fmt(m.price)}</td></tr>`).join('') || '<tr><td colspan="4" class="muted">Каталог хоосон — Worker-ийн /refresh дуудаагүй байж магадгүй</td></tr>'}</table></div>`);
+      return;
+    }
+    S.items = j.items;
+    setView(`<div class="row" style="justify-content:space-between"><h2>📦 Бараа / үйлчилгээ</h2><button class="btn sm" onclick="editItem()">+ Нэмэх</button></div>
+      <div class="itemgrid">${S.items.map((it, i) => `<div class="item" style="${it.active ? '' : 'opacity:.5'}">
+        ${it.image ? `<img src="${esc(it.image)}" alt="">` : ''}
+        <div class="b"><div class="t">${esc(it.title)}</div><div class="p">${fmt(it.price)}</div>
+          <div class="muted" style="font-size:12px;margin-top:4px">${esc(it.desc)}</div>
+          ${it.keyword ? `<div class="muted" style="font-size:11px;margin-top:4px">💬 түлхүүр: <b>${esc(it.keyword)}</b></div>` : ''}
+          <div class="row" style="margin-top:8px"><button class="btn ghost sm" onclick="editItem(${i})">Засах</button><button class="btn ghost sm" onclick="S.items[${i}].active=!S.items[${i}].active;saveItems()">${it.active ? 'Нуух' : 'Нээх'}</button><button class="btn bad sm" onclick="if(confirm('Устгах уу?')){S.items.splice(${i},1);saveItems()}">✕</button></div></div></div>`).join('') || '<p class="muted">Бараа алга — эхний бараагаа нэмнэ үү.</p>'}</div>`);
+  } catch(e) { setView(`<p style="color:var(--bad)">${esc(e.message)}</p>`); }
+}
+function editItem(i) {
+  const it = i != null ? S.items[i] : { title: '', price: '', desc: '', keyword: '', image: '', active: true };
+  modal(`<h3 style="margin-bottom:12px">${i != null ? 'Бараа засах' : 'Шинэ бараа'}</h3>
+    <label class="f">Нэр</label><input id="itT" value="${esc(it.title)}">
+    <div class="formgrid" style="margin-top:8px"><div><label class="f">Үнэ</label><input id="itP" type="number" value="${esc(it.price)}"></div>
+    <div><label class="f">💬 Messenger түлхүүр үг</label><input id="itK" value="${esc(it.keyword)}" placeholder="ж: 7"></div></div>
+    <label class="f" style="margin-top:8px">Тайлбар</label><textarea id="itD" rows="3">${esc(it.desc)}</textarea>
+    <label class="f" style="margin-top:8px">Зургийн URL</label><input id="itI" value="${esc(it.image)}">
+    <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn ghost" onclick="closeModal()">Болих</button><button class="btn" onclick="commitItem(${i != null ? i : -1})">Хадгалах</button></div>`);
+}
+function commitItem(i) {
+  const it = { ...(i >= 0 ? S.items[i] : { active: true }), title: $('itT').value, price: $('itP').value, keyword: $('itK').value, desc: $('itD').value, image: $('itI').value };
+  if (!it.title) return toast('Нэр хоосон', true);
+  if (i >= 0) S.items[i] = it; else S.items.push(it);
+  closeModal(); saveItems();
+}
+async function saveItems() {
+  try { const j = await api(`/hub/items?biz=${S.cur.id}`, { items: S.items }); S.items = j.items; toast('Хадгалагдлаа'); vItems(); } catch(e) { toast(e.message, true); }
+}
+
+// ── Бот ──
+async function vBot() {
+  loading();
+  try {
+    const j = await api(`/hub/bot?biz=${S.cur.id}`);
+    setView(`<h2>🤖 Messenger бот</h2>
+      <div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:8px">Горим <span class="pill ${j.botMode}">${j.botMode}</span></h3>
+        <div class="row">${[['on', '🟢 Бүгдэд хариулна'], ['test', '🟡 Зөвхөн тест PSID'], ['off', '🔴 Унтраасан']].map(([k, l]) => `<button class="btn ${j.botMode === k ? '' : 'ghost'} sm" onclick="setBot('${k}')">${l}</button>`).join('')}</div>
+        <p class="muted" style="margin-top:8px">«off» үед ч төлбөр төлөгдсөн кино линк илгээгдсээр байна. Тест PSID: ${(j.allowedPsids || []).map(esc).join(', ') || '—'}</p></div>
+      <div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:8px">Холбогдсон пэйжүүд</h3>
+        <table><tr><th>Ангилал</th><th>Нэр</th><th>Пэйж ID</th><th>Токен</th></tr>
+        ${(j.pages || []).map(p => `<tr><td>${esc(p.cat)}</td><td>${esc(p.name)}</td><td class="mono">${esc(p.pageId || '—')}</td><td class="mono">${esc(p.token)}</td></tr>`).join('') || '<tr><td colspan="4" class="muted">Пэйж бүртгэлгүй</td></tr>'}</table>
+        <p class="muted" style="margin-top:8px">Токен солих нь нууцлалын шалтгаанаар зөвхөн сайтын админ панелаас (allowTokens) хийгдэнэ.</p></div>
+      <div class="card"><div class="row" style="justify-content:space-between"><h3>Оношилгоо</h3><button class="btn ghost sm" onclick="runDiag()">▶ Шалгах</button></div><pre id="diag" class="mono muted" style="white-space:pre-wrap;margin-top:8px"></pre></div>`);
+  } catch(e) { setView(`<p style="color:var(--bad)">${esc(e.message)}</p>`); }
+}
+async function setBot(m) { try { await api(`/hub/bot?biz=${S.cur.id}`, { botMode: m }); toast('Горим: ' + m); vBot(); } catch(e) { toast(e.message, true); } }
+async function runDiag() { $('diag').textContent = '⏳…'; try { const j = await api(`/hub/diag?biz=${S.cur.id}`); $('diag').textContent = JSON.stringify(j.diag, null, 2); } catch(e) { $('diag').textContent = e.message; } }
+
+// ── Тохиргоо ──
+async function vCfg() {
+  loading();
+  try {
+    const j = await api(`/hub/cfg?biz=${S.cur.id}`); const c = j.cfg; S.cfg = c;
+    setView(`<h2>⚙️ Тохиргоо</h2>
+      <div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:8px">🔐 HUB нууц үг ${c.hubPassSet ? '<span class="pill paid">тавьсан</span>' : '<span class="pill pending">тавиагүй</span>'}</h3>
+        <div class="row"><input id="hp" type="password" placeholder="Шинэ нууц үг (≥6)" style="max-width:280px"><button class="btn sm" onclick="setHubPass()">Хадгалах</button></div></div>
+      ${S.cur.kind === 'kino' ? `
+      <div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:8px">🏦 Дансны мэдээлэл (баримт шалгахад)</h3>
+        <div class="formgrid"><div><label class="f">Банк</label><input id="bkB" value="${esc(c.bankInfo.bankName || '')}"></div><div><label class="f">Данс</label><input id="bkN" value="${esc(c.bankInfo.accountNumber || '')}"></div><div><label class="f">Эзэмшигч</label><input id="bkO" value="${esc(c.bankInfo.accountName || '')}"></div></div>
+        <button class="btn sm" style="margin-top:8px" onclick="saveBank()">Хадгалах</button></div>
+      <div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:8px">💳 QPay merchant</h3>
+        <table><tr><th>Нэр</th><th>Username</th><th>Invoice code</th><th>Идэвхтэй</th></tr>${(c.qpayMerchants || []).map(m => `<tr><td>${esc(m.name)}</td><td class="mono">${esc(m.username)}</td><td class="mono">${esc(m.invoiceCode)}</td><td>${m.active ? '✓' : ''}</td></tr>`).join('') || '<tr><td colspan="4" class="muted">Бүртгэлгүй</td></tr>'}</table>
+        <p class="muted" style="margin-top:6px">Нууц үг нуугдсан. Солих бол сайтын админ панел → Cloudflare таб.</p></div>
+      <div class="card"><h3 style="margin-bottom:8px">Бусад</h3>
+        <p>Gemini key: <span class="mono">${esc(c.geminiKey || '—')}</span></p>
+        <p>Sheets webhook: <span class="mono">${esc(c.sheetsWebhook || '—')}</span></p>
+        <p>Дизайн засварын patch: ${c.designPatches}</p></div>` : `<div class="card"><p class="muted">Энэ бизнест тусгай тохиргоо одоогоор алга. Пэйж ID: ${esc(S.cur.pageId || '—')}</p></div>`}`);
+  } catch(e) { setView(`<p style="color:var(--bad)">${esc(e.message)}</p>`); }
+}
+async function setHubPass() { const p = $('hp').value; if (p.length < 6) return toast('Нууц үг ≥6 тэмдэгт', true); try { await api(`/hub/cfg?biz=${S.cur.id}`, { hubPass: p }); toast('Нууц үг солигдлоо'); vCfg(); } catch(e) { toast(e.message, true); } }
+async function saveBank() { try { await api(`/hub/cfg?biz=${S.cur.id}`, { bankInfo: { bankName: $('bkB').value, accountNumber: $('bkN').value, accountName: $('bkO').value } }); toast('Хадгалагдлаа'); } catch(e) { toast(e.message, true); } }
+
+// ── Эхлэл ──
+(async () => {
+  S.tok = localStorage.getItem('hub_tok');
+  if (S.tok) { try { await boot(); return; } catch(e) {} }
+  showLogin();
+})();
+window.addEventListener('hashchange', () => { if (!S.tok) return; const [b, p] = location.hash.replace('#', '').split('/'); if (!b) { if (S.cur) goHome(); } else if (!S.cur || S.cur.id !== b) openBiz(b, p); else if (p && p !== S.page) go(p); });
+</script>
+</body>
+</html>
