@@ -5061,6 +5061,7 @@ function accStyle(){
   + '.acc-pl .pl-end{position:absolute;inset:0;z-index:6;display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(0,0,0,.82);color:#fff;text-align:center;padding:20px;animation:accpop .6s ease}'
   + '.acc-pl.ended .pl-end{display:flex}.acc-pl.ended video{filter:brightness(.25);transition:filter 1.2s}.acc-pl.ended .pl-center,.acc-pl.ended .pl-bar,.acc-pl.ended .pl-tap{display:none!important}'
   + '.acc-pl .pl-end-s{font-size:clamp(16px,2.6vw,22px);font-weight:700;color:#fff;max-width:520px;line-height:1.45}'
+  + '.acc-pl .pl-wm{position:absolute;z-index:4;pointer-events:none;font:600 clamp(11px,1.4vw,15px) var(--font);color:rgba(255,255,255,.22);letter-spacing:.12em;text-shadow:0 0 2px rgba(0,0,0,.5);transition:left 2s,top 2s;user-select:none}'
   + '#acc-badge{display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;border:1px solid var(--border);background:var(--card2);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}'
   + '#acc-badge.plan{border-color:var(--gold);color:var(--gold)}'
   + '#acc-menu{position:fixed;top:60px;right:12px;z-index:1200;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:6px;min-width:190px;box-shadow:0 10px 30px rgba(0,0,0,.5)}'
@@ -5520,8 +5521,15 @@ function accMountPlayer(container, j, code, inline){
     +     '<button class="pl-btn pl-pip" title="Мини дэлгэц">⧉</button>'
     +     '<button class="pl-btn pl-fs" title="Бүтэн дэлгэц (F)">⛶</button></div>'
     + '</div><div class="pl-spin"></div>'
-    + '<div class="pl-end"><div class="pl-end-s">Та үргэлжлүүлж үзэх бол<br>доорх төлбөрийн хэрэгслээс сонгоно уу</div></div>';
+    + '<div class="pl-end"><div class="pl-end-s">Та үргэлжлүүлж үзэх бол<br>доорх төлбөрийн хэрэгслээс сонгоно уу</div></div>'
+    + '<div class="pl-wm"></div>';
   container.innerHTML = ''; container.appendChild(p);
+  // Динамик watermark: үзэгчийн дугаар бүдэг, 25 сек тутам байрлал солино (дэлгэц бичлэг хэнийх нь мэдэгдэнэ)
+  if(!(ACC.rules && ACC.rules.watermark === false) && ACC.phone){
+    const wm = p.querySelector('.pl-wm'); wm.textContent = ACC.phone;
+    const move = () => { wm.style.left = (8 + Math.random() * 70) + '%'; wm.style.top = (8 + Math.random() * 74) + '%'; };
+    move(); const wt = setInterval(() => { if(!document.body.contains(p)) return clearInterval(wt); move(); }, 25000);
+  }
   const v = p.querySelector('video');
   accAttachSource(v, j).catch(() => accNotice('⚠ Тоглуулагч ачаалахад алдаа гарлаа', 5000));
   v.addEventListener('error', () => { if(!ACC._prevEnded) accNotice('⚠ Видео ачаалахад алдаа гарлаа. Дахин оролдоно уу.', 5000); });
