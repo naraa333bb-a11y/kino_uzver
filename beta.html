@@ -4295,7 +4295,10 @@ window.addEventListener('DOMContentLoaded', function(){
   // URL ?admin=2020 байвал admin panel-г DOM-д нэмж, харин ?admin=2020 үгүй бол
   // template нь render хийгдэхгүй — Ctrl+U-д admin код харагдахгүй
   const params = new URLSearchParams(window.location.search);
-  if(params.get('admin')==='2020'){
+  // 2026-09-30: сайтын дотоод админ панел ХААГДСАН — каталог, кино, тохиргоо
+  // бүгд HUB (hub.html)-аас удирдагдана, сайт /catalog-оос уншина.
+  // Хуучин кодыг ?admin=2020&legacy=1 гэж л нээнэ (яаралтай нөөц).
+  if(params.get('admin')==='2020' && params.get('legacy')==='1'){
     const dataEl = document.getElementById('admin-panel-data');
     if(dataEl){
       // Base64 decode хийж admin HTML-г DOM-д нэмнэ
@@ -5465,10 +5468,30 @@ function accRelabelTiles(){
   if(typeof renderGroupPrices === 'function'){ const _g = renderGroupPrices; renderGroupPrices = function(){ const x = _g.apply(this, arguments); accRelabelTiles(); return x; }; }
 })();
 
+// ── КАТАЛОГИЙГ WORKER-ООС ТАТАХ (эх үнэн = KV; HTML доторх өгөгдөл зөвхөн нөөц) ──
+// HUB-аас кино нэмэх/засахад сайт дахин deploy хийлгүй шинэчлэгдэнэ.
+async function accLoadCatalog(){
+  try{
+    const r = await fetch(ACC_URL + '/catalog', { cache: 'no-cache' });
+    const j = await r.json();
+    if(!j.ok || !Array.isArray(j.movies)) return false;
+    if(j.plans && j.plans.length){ ACC.plans = j.plans; }
+    // Талбарын нэрс сайтын хуучин бүтэцтэй ижил (id, name, price, cat, cover, trailer, eps, lang)
+    MOVIES = j.movies.map(m => ({ ...m, price: m.price }));
+    if(j.categories && j.categories.length) CATEGORIES = j.categories;
+    window.CATALOG_LIVE_VERSION = j.version || 0;
+    if(typeof renderTabsAndPanels === 'function') renderTabsAndPanels();
+    if(typeof renderGrids === 'function') renderGrids();
+    accFmtBadges();
+    return true;
+  }catch(e){ return false; }
+}
+
 async function accInit(){
   accStyle(); accLoadLocal(); accRenderBadge();
+  await accLoadCatalog();
   try{ const p = await accApi('/acc/plans'); if(p.ok){ ACC.plans = p.plans; ACC.rules = p.rules; } }catch(e){}
-  accRelabelTiles(); accRenderHero();
+  accRelabelTiles(); accRenderHero(); accFmtBadges();
   if(accLogged()){
     const me = await accRefreshMe();
     if(me) accRenderBanner(false);
