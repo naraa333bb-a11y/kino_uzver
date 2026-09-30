@@ -256,12 +256,12 @@ function openBiz(id, page) {
   S.cur = b; S.orders = null; S.items = null; S.cfg = null; S.bot = null;
   $('login').classList.add('hide'); $('home').classList.add('hide'); $('panel').classList.remove('hide');
   $('sIc').textContent = b.icon || '📦'; $('sNm').textContent = b.name; $('sKd').textContent = kindLabel(b.kind);
-  $('sSite').innerHTML = b.site ? `<a href="${esc(b.site)}" target="_blank" rel="noreferrer">🌐 ${esc(b.site.replace(/^https?:\/\//, ''))}</a>` + (b.kind === 'kino' ? `<br><a href="${esc(b.site)}?admin=2020" target="_blank" rel="noreferrer">🛠 Сайтын админ</a>` : '') : '';
+  $('sSite').innerHTML = b.site ? `<a href="${esc(b.site)}" target="_blank" rel="noreferrer">🌐 ${esc(b.site.replace(/^https?:\/\//, ''))}</a>` : '';
   go(page || 'dash');
 }
 function go(page) {
   S.page = page; location.hash = S.cur.id + '/' + page;
-  $('nav').innerHTML = PAGES.filter(p => !p.kino || S.cur.kind === 'kino').map(p => p.sec ? `<div class="sec">${p.sec}</div>` : `<a href="#" class="${p.id === page ? 'on' : ''}" onclick="go('${p.id}');return false">${p.ic} ${p.nm}</a>`).join('');
+  $('nav').innerHTML = PAGES.filter(p => !p.kino || S.cur.kind === 'kino').map(p => p.sec ? `<div class="sec">${p.sec}</div>` : `<a href="#" class="${p.id === page ? 'on' : ''}" onclick="go('${p.id}');return false">${p.id === 'items' && S.cur.kind === 'kino' ? '🎬 Кино' : p.ic + ' ' + p.nm}</a>`).join('');
   $('side').classList.remove('open');
   ({ dash: vDash, orders: vOrders, revenue: vRevenue, customers: vCustomers, accusers: vAccUsers, accorders: vAccOrders, items: vItems, bot: vBot, cfg: vCfg }[page] || vDash)();
 }
@@ -505,15 +505,8 @@ async function accConfirm(oid, reject) {
 async function vItems() {
   loading();
   try {
+    if (S.cur.kind === 'kino') return vKino();
     const j = await api(`/hub/items?biz=${S.cur.id}`);
-    if (j.readonly) {
-      const cats = Object.fromEntries((j.categories || []).map(c => [c.id, c.label || c.name]));
-      setView(`<div class="row" style="justify-content:space-between"><h2>📦 Кино каталог</h2><a class="btn sm" href="${esc(S.cur.site)}?admin=2020" target="_blank" rel="noreferrer">🛠 Сайтын админд засах</a></div>
-        <p class="muted" style="margin-bottom:10px">Каталог сайтын кодоос уншигдана (шинэчилсэн: ${fdt(j.updatedAt)}). Нэмэх/засахыг сайтын админ панелаас хийнэ.</p>
-        <div class="card" style="padding:0;overflow:auto"><table><tr><th>Код</th><th>Нэр</th><th>Ангилал</th><th>Үнэ</th></tr>
-        ${(j.movies || []).map(m => `<tr><td class="mono">${esc(m.code || m.id || '')}</td><td>${esc(m.title || m.name || '')}</td><td class="muted">${esc(cats[m.cat] ?? cats[m.category] ?? m.cat ?? '')}</td><td>${fmt(m.price)}</td></tr>`).join('') || '<tr><td colspan="4" class="muted">Каталог хоосон — Worker-ийн /refresh дуудаагүй байж магадгүй</td></tr>'}</table></div>`);
-      return;
-    }
     S.items = j.items;
     setView(`<div class="row" style="justify-content:space-between"><h2>📦 Бараа / үйлчилгээ</h2><button class="btn sm" onclick="editItem()">+ Нэмэх</button></div>
       <div class="itemgrid">${S.items.map((it, i) => `<div class="item" style="${it.active ? '' : 'opacity:.5'}">
@@ -542,6 +535,187 @@ function commitItem(i) {
 }
 async function saveItems() {
   try { const j = await api(`/hub/items?biz=${S.cur.id}`, { items: S.items }); S.items = j.items; toast('Хадгалагдлаа'); vItems(); } catch(e) { toast(e.message, true); }
+}
+
+// ═══════════════════════════════════════════════════════
+// КИНО КАТАЛОГ — KV эх үнэн; хадгалмагц сайт (/catalog) шууд шинэчлэгдэнэ.
+// Видео → R2 multipart (25MB хэсгээр, явцтай), постер → видеоны кадраас
+// автоматаар эсвэл өөрийн зураг → R2 (/media/img/…).
+// ═══════════════════════════════════════════════════════
+const K = { movies: [], cats: [], hasR2: false, mediaBase: '', filter: 'all', q: '' };
+const PART_SIZE = 25 * 1024 * 1024;
+const kCode = id => 'M' + String(id).padStart(2, '0');
+const kCat = id => (K.cats.find(c => c.id === id) || {}).label || '—';
+function kThumb(m) { return m.cover ? `<img src="${esc(m.cover)}" alt="" style="width:46px;height:64px;object-fit:cover;border-radius:6px;background:var(--card2)" onerror="this.style.visibility='hidden'">` : `<div style="width:46px;height:64px;border-radius:6px;background:var(--card2)"></div>`; }
+
+async function kLoad() {
+  const j = await api(`/hub/catalog?biz=${S.cur.id}`);
+  K.movies = j.movies || []; K.cats = j.categories || []; K.hasR2 = !!j.hasR2; K.mediaBase = j.mediaBase || '';
+  return j;
+}
+async function vKino() {
+  loading();
+  try {
+    await kLoad();
+    const list = K.movies.filter(m => (K.filter === 'all' || String(m.cat) === K.filter) && (!K.q || m.name.toLowerCase().includes(K.q.toLowerCase())));
+    setView(`<div class="row" style="justify-content:space-between"><h2>🎬 Кино</h2>
+        <div class="row"><button class="btn ghost sm" onclick="kCatsModal()">Ангилал</button><button class="btn sm" onclick="kEdit()">+ Кино нэмэх</button></div></div>
+      ${K.hasR2 ? '' : '<div class="card" style="border-color:var(--warn);margin-bottom:12px;font-size:12px">⚠ Worker-т R2 binding (<b>MOVIES_R2</b>) алга — видео/постер upload ажиллахгүй. Cloudflare → R2 → bucket үүсгэ → Worker → Settings → Bindings → R2 → нэр MOVIES_R2.</div>'}
+      <div class="kpis"><div class="kpi"><div class="l">Нийт кино</div><div class="v">${K.movies.length}</div></div>
+        <div class="kpi"><div class="l">Видеотой</div><div class="v">${K.movies.filter(m => m.video).length}</div><div class="s">${K.movies.filter(m => !m.video).length} видеогүй</div></div>
+        <div class="kpi"><div class="l">Нуусан</div><div class="v">${K.movies.filter(m => !m.active).length}</div></div></div>
+      <div class="tabs"><button class="${K.filter === 'all' ? 'on' : ''}" onclick="K.filter='all';vKino()">Бүгд</button>${K.cats.map(c => `<button class="${K.filter === String(c.id) ? 'on' : ''}" onclick="K.filter='${c.id}';vKino()">${esc(c.label)}</button>`).join('')}
+        <input placeholder="Нэрээр хайх…" value="${esc(K.q)}" style="max-width:180px;margin-left:auto" oninput="K.q=this.value" onkeydown="if(event.key==='Enter')vKino()"></div>
+      <div class="card" style="padding:0;overflow:auto"><table><tr><th></th><th>Кино</th><th>Ангилал</th><th>Үнэ</th><th>Видео</th><th>Төлөв</th><th></th></tr>
+        ${list.map((m, i) => `<tr style="${m.active ? '' : 'opacity:.5'}">
+          <td>${kThumb(m)}</td>
+          <td><b>${esc(m.name)}</b><br><span class="muted mono" style="font-size:11px">${kCode(m.id)} · ${m.lang === 'sub' ? 'SUB' : 'DUB'}${m.eps ? ' · ' + esc(m.eps) : ''}</span></td>
+          <td>${esc(kCat(m.cat))}</td><td>${fmt(m.price)}</td>
+          <td>${m.video ? (m.video.startsWith('r2://') ? '<span class="pill paid">R2</span>' : '<span class="pill pending" title="' + esc(m.video) + '">линк</span>') : '<span class="pill cancelled">алга</span>'}</td>
+          <td>${m.active ? '<span class="pill paid">нээлттэй</span>' : '<span class="pill cancelled">нуусан</span>'}</td>
+          <td style="white-space:nowrap"><button class="btn ghost sm" onclick="kEdit(${m.id})">Засах</button> <button class="btn ghost sm" title="Эхэнд авчрах (Сүүлд нэмэгдсэн)" onclick="kTop(${m.id})">↑</button></td></tr>`).join('') || '<tr><td colspan="7" class="muted">Кино алга</td></tr>'}</table></div>
+      <p class="muted" style="margin-top:8px">Жагсаалтын дараалал = сайт дээрх дараалал. Эхний 5 (Бусад-аас бусад) «Сүүлд нэмэгдсэн» тойрогт орно.</p>`);
+  } catch(e) { setView(`<p style="color:var(--bad)">${esc(e.message)}</p>`); }
+}
+async function kSaveAll(msg) {
+  const j = await api(`/hub/catalog?biz=${S.cur.id}`, { movies: K.movies, categories: K.cats });
+  if (!j.ok) throw new Error(j.error || 'Хадгалж чадсангүй');
+  toast(msg || 'Хадгалагдлаа — сайт шинэчлэгдлээ');
+}
+async function kTop(id) {
+  const i = K.movies.findIndex(m => m.id === id); if (i < 0) return;
+  const [m] = K.movies.splice(i, 1); K.movies.unshift(m);
+  try { await kSaveAll('Эхэнд авчирлаа'); vKino(); } catch(e) { toast(e.message, true); }
+}
+function kEdit(id) {
+  const m = id != null ? { ...K.movies.find(x => x.id === id) } : { id: (K.movies.reduce((s, x) => Math.max(s, x.id), 0) + 1), name: '', price: 15000, cat: K.cats[0] ? K.cats[0].id : 0, cover: '', trailer: '', eps: '', lang: 'dub', video: '', active: true, _new: true };
+  K.edit = m;
+  modal(`<h3 style="margin-bottom:12px">${m._new ? 'Шинэ кино' : 'Кино засах'} <span class="muted mono" style="font-size:12px">${kCode(m.id)}</span></h3>
+    <label class="f">Нэр</label><input id="k_name" value="${esc(m.name)}">
+    <div class="formgrid" style="margin-top:8px">
+      <div><label class="f">Ангилал</label><select id="k_cat">${K.cats.map(c => `<option value="${c.id}" ${c.id === m.cat ? 'selected' : ''}>${esc(c.label)}</option>`).join('')}</select></div>
+      <div><label class="f">Үнэ (₮)</label><input id="k_price" type="number" value="${m.price}"></div>
+      <div><label class="f">Хэл</label><select id="k_lang"><option value="dub" ${m.lang !== 'sub' ? 'selected' : ''}>DUB — дубляж</option><option value="sub" ${m.lang === 'sub' ? 'selected' : ''}>SUB — хадмал</option></select></div>
+      <div><label class="f">Анги (мэдээлэл)</label><input id="k_eps" value="${esc(m.eps || '')}" placeholder="1 анги"></div>
+    </div>
+    <label class="f" style="margin-top:8px">Трейлер (YouTube/URL, заавал биш)</label><input id="k_trailer" value="${esc(m.trailer || '')}">
+
+    <div class="card" style="margin-top:12px;padding:12px"><b style="font-size:13px">🎞 Видео</b>
+      <div id="k_vid_state" class="muted" style="font-size:12px;margin:4px 0 8px">${m.video ? (m.video.startsWith('r2://') ? '✓ R2: ' + esc(m.video.slice(5)) : '✓ Линк: ' + esc(m.video)) : 'Видео алга'}</div>
+      <div class="row"><label class="btn ghost sm" style="cursor:pointer">📤 Файл сонгох (mp4)<input type="file" id="k_vfile" accept="video/mp4,video/*" style="display:none" onchange="kVideoChosen(this)"></label>
+        <input id="k_vurl" placeholder="эсвэл https://… линк" value="${m.video && !m.video.startsWith('r2://') ? esc(m.video) : ''}" style="flex:1;min-width:160px" oninput="K.edit.video=this.value.trim();$('k_vid_state').textContent=this.value?'Линк: '+this.value:'Видео алга'"></div>
+      <div id="k_prog" class="hide" style="margin-top:8px"><div style="height:8px;background:var(--card2);border-radius:4px;overflow:hidden"><div id="k_bar" style="height:8px;width:0;background:var(--accent);transition:.2s"></div></div><div id="k_ptxt" class="muted" style="font-size:11px;margin-top:4px"></div></div>
+    </div>
+    <div class="card" style="margin-top:10px;padding:12px"><b style="font-size:13px">🖼 Постер</b>
+      <div class="row" style="margin-top:8px;align-items:flex-start">
+        <img id="k_cover_prev" src="${esc(m.cover || '')}" style="width:80px;height:112px;object-fit:cover;border-radius:6px;background:var(--card2)" onerror="this.style.visibility='hidden'">
+        <div style="flex:1;min-width:180px">
+          <div class="row" style="gap:6px"><label class="btn ghost sm" style="cursor:pointer">📤 Зураг<input type="file" id="k_ifile" accept="image/*" style="display:none" onchange="kImageChosen(this)"></label>
+            <button class="btn ghost sm" id="k_frame_btn" onclick="kCaptureFrame()" ${m.video && m.video.startsWith('r2://') && !K._vfile ? 'disabled title="Видео файлыг дахин сонгосон үед л кадраас авна"' : ''}>🎯 Видеоны кадраас</button></div>
+          <input id="k_cover" placeholder="эсвэл зургийн URL" value="${esc(m.cover || '')}" style="margin-top:6px" oninput="K.edit.cover=this.value.trim();$('k_cover_prev').src=this.value;$('k_cover_prev').style.visibility='visible'">
+          <p class="muted" style="font-size:11px;margin-top:4px">Видео сонгоход постер автоматаар кадраас үүснэ (солиж болно).</p></div></div>
+    </div>
+    <label class="f" style="margin-top:10px;display:flex;align-items:center;gap:8px"><input type="checkbox" id="k_active" ${m.active ? 'checked' : ''} style="width:auto"> Сайт дээр харагдана</label>
+    <div class="row" style="justify-content:space-between;margin-top:14px">
+      <div>${m._new ? '' : `<button class="btn bad sm" onclick="kDelete(${m.id})">Устгах</button>`}</div>
+      <div class="row"><button class="btn ghost" onclick="kCancelEdit()">Болих</button><button class="btn" id="k_save" onclick="kCommit()">Хадгалах</button></div></div>`);
+}
+function kCancelEdit() { K._vfile = null; closeModal(); }
+async function kCommit() {
+  const m = K.edit;
+  m.name = $('k_name').value.trim(); m.cat = Number($('k_cat').value); m.price = Number($('k_price').value) || 0;
+  m.lang = $('k_lang').value; m.eps = $('k_eps').value.trim(); m.trailer = $('k_trailer').value.trim(); m.active = $('k_active').checked;
+  if (!m.video) m.video = $('k_vurl').value.trim();
+  if (!m.cover) m.cover = $('k_cover').value.trim();
+  if (!m.name) return toast('Нэр хоосон', true);
+  if (K._vfile && !(m.video || '').startsWith('r2://')) {
+    // Видео файл сонгосон ч байршуулаагүй бол одоо байршуулна
+    try { await kUploadVideo(K._vfile); } catch(e) { return toast('Видео: ' + e.message, true); }
+  }
+  delete m._new;
+  const i = K.movies.findIndex(x => x.id === m.id);
+  if (i >= 0) K.movies[i] = m; else K.movies.unshift(m);
+  try { await kSaveAll(); K._vfile = null; closeModal(); vKino(); } catch(e) { toast(e.message, true); }
+}
+async function kDelete(id) {
+  if (!confirm('Энэ киног каталогоос устгах уу? (R2 дахь файл хэвээр үлдэнэ)')) return;
+  K.movies = K.movies.filter(m => m.id !== id);
+  try { await kSaveAll('Устгагдлаа'); closeModal(); vKino(); } catch(e) { toast(e.message, true); }
+}
+// ── Upload ──
+function kProg(pct, txt) { $('k_prog').classList.remove('hide'); $('k_bar').style.width = pct + '%'; $('k_ptxt').textContent = txt; }
+function kVideoChosen(inp) {
+  const f = inp.files && inp.files[0]; if (!f) return;
+  K._vfile = f; K.edit.video = '';
+  $('k_vid_state').textContent = '📁 ' + f.name + ' · ' + (f.size / 1048576).toFixed(0) + ' MB — «Хадгалах» дарахад байршуулна';
+  $('k_frame_btn').disabled = false; $('k_frame_btn').removeAttribute('title');
+  if (!K.edit.cover) kCaptureFrame();   // постер автоматаар
+}
+function kImageChosen(inp) {
+  const f = inp.files && inp.files[0]; if (!f) return;
+  kUploadImage(f, f.name.replace(/\.[^.]+$/, '')).catch(e => toast('Зураг: ' + e.message, true));
+}
+async function kUploadImage(blob, base) {
+  if (!K.hasR2) throw new Error('R2 binding алга');
+  const name = (base || 'p' + K.edit.id).replace(/[^a-zA-Z0-9_-]/g, '_') + '_' + Date.now() + '.jpg';
+  const res = await fetch(`${WORKER}/hub/upload/image?biz=${S.cur.id}&name=${encodeURIComponent(name)}`, { method: 'POST', headers: { 'X-Hub-Token': S.tok, 'Content-Type': blob.type || 'image/jpeg' }, body: blob });
+  const j = await res.json(); if (!j.ok) throw new Error(j.error || 'upload');
+  K.edit.cover = j.url; $('k_cover').value = j.url; $('k_cover_prev').src = j.url; $('k_cover_prev').style.visibility = 'visible';
+  toast('Постер байршлаа');
+}
+// Видео файлаас кадар авч (2:3 харьцаагаар тайрч) постер үүсгэнэ
+async function kCaptureFrame() {
+  const f = K._vfile; if (!f) return toast('Эхлээд видео файл сонгоно уу', true);
+  const url = URL.createObjectURL(f); const v = document.createElement('video'); v.muted = true; v.playsInline = true; v.src = url;
+  try {
+    await new Promise((ok, no) => { v.onloadedmetadata = ok; v.onerror = () => no(new Error('Видео уншигдсангүй')); });
+    v.currentTime = Math.min(Math.max(v.duration * 0.12, 3), v.duration - 1);
+    await new Promise((ok, no) => { v.onseeked = ok; v.onerror = () => no(new Error('seek')); });
+    const W = 600, H = 900, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
+    const vw = v.videoWidth, vh = v.videoHeight, sc = Math.max(W / vw, H / vh), dw = vw * sc, dh = vh * sc;
+    g.drawImage(v, (W - dw) / 2, (H - dh) / 2, dw, dh);
+    const blob = await new Promise(ok => c.toBlob(ok, 'image/jpeg', 0.86));
+    await kUploadImage(blob, 'frame_' + K.edit.id);
+  } catch(e) { toast('Кадар: ' + e.message, true); } finally { URL.revokeObjectURL(url); }
+}
+async function kUploadVideo(f) {
+  if (!K.hasR2) throw new Error('R2 binding алга');
+  const safe = f.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const name = kCode(K.edit.id) + '_' + Date.now() + '_' + safe;
+  $('k_save').disabled = true; kProg(0, 'Бэлдэж байна…');
+  const init = await api(`/hub/upload/init?biz=${S.cur.id}`, { name, type: f.type || 'video/mp4' });
+  if (!init.ok) throw new Error(init.error);
+  const parts = []; const total = Math.ceil(f.size / PART_SIZE);
+  try {
+    for (let n = 1; n <= total; n++) {
+      const chunk = f.slice((n - 1) * PART_SIZE, n * PART_SIZE);
+      const j = await new Promise((ok, no) => {
+        const x = new XMLHttpRequest();
+        x.open('POST', `${WORKER}/hub/upload/part?biz=${S.cur.id}&key=${encodeURIComponent(init.key)}&uploadId=${encodeURIComponent(init.uploadId)}&part=${n}`);
+        x.setRequestHeader('X-Hub-Token', S.tok); x.setRequestHeader('Content-Type', 'application/octet-stream');
+        x.upload.onprogress = e => { if (e.lengthComputable) kProg(Math.round(((n - 1) * PART_SIZE + e.loaded) / f.size * 100), `Хэсэг ${n}/${total} · ${Math.round(((n - 1) * PART_SIZE + e.loaded) / 1048576)} / ${Math.round(f.size / 1048576)} MB`); };
+        x.onload = () => { try { const r = JSON.parse(x.responseText); r.ok ? ok(r) : no(new Error(r.error || 'part')); } catch(e) { no(new Error('part ' + n + ': ' + x.status)); } };
+        x.onerror = () => no(new Error('Сүлжээ (хэсэг ' + n + ')')); x.send(chunk);
+      });
+      parts.push({ partNumber: j.partNumber, etag: j.etag });
+    }
+    const done = await api(`/hub/upload/complete?biz=${S.cur.id}`, { key: init.key, uploadId: init.uploadId, parts });
+    if (!done.ok) throw new Error(done.error);
+    K.edit.video = done.video; kProg(100, '✓ Байршлаа · ' + Math.round(done.size / 1048576) + ' MB');
+    $('k_vid_state').textContent = '✓ R2: ' + init.key;
+  } catch(e) {
+    await api(`/hub/upload/abort?biz=${S.cur.id}`, { key: init.key, uploadId: init.uploadId }).catch(() => {});
+    throw e;
+  } finally { $('k_save').disabled = false; }
+}
+// ── Ангилал ──
+function kCatsModal() {
+  const rows = () => K.cats.map((c, i) => `<div class="row" style="margin-bottom:6px"><input value="${esc(c.label)}" placeholder="Нэр" oninput="K.cats[${i}].label=this.value;K.cats[${i}].name=this.value.toUpperCase()" style="flex:1"><span class="muted mono" style="font-size:11px">id ${c.id}</span><button class="btn bad sm" onclick="if(K.movies.some(m=>m.cat===${c.id}))return toast('Энэ ангилалд кино байна',true);K.cats.splice(${i},1);$('kc').innerHTML=kCatRows()">✕</button></div>`).join('');
+  window.kCatRows = rows;
+  modal(`<h3 style="margin-bottom:10px">Ангилал</h3><div id="kc">${rows()}</div>
+    <button class="btn ghost sm" onclick="K.cats.push({id:(K.cats.reduce((s,c)=>Math.max(s,c.id),0)+1),name:'ШИНЭ',label:'Шинэ'});$('kc').innerHTML=kCatRows()">+ Нэмэх</button>
+    <p class="muted" style="font-size:11px;margin-top:8px">Дараалал = сайтын таб дараалал. «Бусад» (id 1) тойрогт орохгүй.</p>
+    <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn ghost" onclick="closeModal()">Болих</button><button class="btn" onclick="kSaveAll().then(()=>{closeModal();vKino()}).catch(e=>toast(e.message,true))">Хадгалах</button></div>`);
 }
 
 // ── Бот ──
