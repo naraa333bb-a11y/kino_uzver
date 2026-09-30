@@ -662,7 +662,8 @@ async function kR2Browse(bucket, q) {
   host.innerHTML = `<div class="modal" style="z-index:60" onclick="if(event.target===this)this.remove()"><div class="card" style="max-width:640px"><p class="muted">Ачаалж байна…</p></div></div>`;
   try {
     const j = await api(`/hub/upload/list?biz=${S.cur.id}&bucket=${encodeURIComponent(bucket)}`);
-    const vids = j.objects.filter(o => /\.(mp4|m4v|mov|mkv|webm)$/i.test(o.key) && (!q || o.key.toLowerCase().includes(q.toLowerCase())));
+    const NOTVID = /\.(jpe?g|png|gif|webp|svg|ts|m4s|bin|key|txt|json|html?|srt|vtt|ass|m3u8|csv|zip|pdf)$/i;
+    const vids = j.objects.filter(o => !NOTVID.test(o.key) && !/\/$/.test(o.key) && (!q || o.key.toLowerCase().includes(q.toLowerCase())));
     const hls = j.objects.filter(o => /\/index\.m3u8$/.test(o.key));
     const day = d => { const x = new Date(d); return isNaN(x) ? '' : x.toLocaleDateString('mn-MN', { year: 'numeric', month: '2-digit', day: '2-digit' }); };
     host.innerHTML = `<div class="modal" style="z-index:60" onclick="if(event.target===this)this.remove()"><div class="card" style="max-width:640px">
@@ -693,7 +694,10 @@ async function kBulkImport(bucket) {
     const j = await api(`/hub/upload/list?biz=${S.cur.id}&bucket=${encodeURIComponent(BI.bucket)}`);
     const used = new Set(K.movies.map(m => m.video || ''));
     const refOf = o => (o.key.endsWith('index.m3u8') ? 'hls://' : 'r2://') + (BI.bucket ? '@' + BI.bucket + '/' : '') + (o.key.endsWith('index.m3u8') ? o.key.slice(0, -'index.m3u8'.length) : o.key);
-    BI.objs = j.objects.filter(o => /\.(mp4|m4v|mov|mkv|webm)$/i.test(o.key) || o.key.endsWith('index.m3u8')).map(o => ({ ...o, ref: refOf(o), used: used.has(refOf(o)), name: kNameFromKey(o.key) }));
+    // Видео = зураг/HLS хэсэг/түлхүүр/текст биш бүх файл (өргөтгөлгүй ч) — bucket-д .avi/.flv г.м. ч байж болно
+    const NOTVID = /\.(jpe?g|png|gif|webp|svg|ts|m4s|bin|key|txt|json|html?|srt|vtt|ass|m3u8|csv|zip|pdf)$/i;
+    BI.total = j.objects.length;
+    BI.objs = j.objects.filter(o => o.key.endsWith('index.m3u8') || (!NOTVID.test(o.key) && !/\/$/.test(o.key))).map(o => ({ ...o, ref: refOf(o), used: used.has(refOf(o)), name: kNameFromKey(o.key) }));
     kBulkRender();
   } catch(e) { modal(`<p style="color:var(--bad)">${esc(e.message)}</p><button class="btn ghost" onclick="closeModal()">Хаах</button>`); }
 }
