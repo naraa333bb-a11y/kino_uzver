@@ -5414,7 +5414,8 @@ async function accPlay(code){
     + '</span><button class="x" onclick="accClosePlayer()">✕</button></div>'
     + '<video controls playsinline autoplay controlsList="nodownload" oncontextmenu="return false"></video>';
   document.body.appendChild(p);
-  const v = p.querySelector('video'); v.src = j.src;
+  const v = p.querySelector('video');
+  accAttachSource(v, j).catch(() => accNotice('⚠ Тоглуулагч ачаалахад алдаа гарлаа', 5000));
   v.addEventListener('error', () => { if(!ACC._prevEnded) accNotice('⚠ Видео ачаалахад алдаа гарлаа. Дахин оролдоно уу.', 5000); });
   ACC._prevEnded = false;
   if(isPrev){
@@ -5445,8 +5446,33 @@ async function accPlay(code){
   if(ACC.me){ const m = ACC.me.movies.find(x => x.code === code); if(m && !m.until && j.until){ m.state = 'active'; m.until = j.until; } }
   accRenderBadge();
 }
+// Эх сурвалж залгах: mp4 → шууд; HLS → iPhone/Safari native, бусад нь hls.js (MSE)
+function accLoadHlsJs(){
+  if(window.Hls) return Promise.resolve();
+  if(ACC._hlsLoading) return ACC._hlsLoading;
+  ACC._hlsLoading = new Promise((ok, no) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js';
+    s.onload = ok; s.onerror = () => no(new Error('hls.js')); document.head.appendChild(s);
+  });
+  return ACC._hlsLoading;
+}
+async function accAttachSource(v, j){
+  if(ACC._hls){ try{ ACC._hls.destroy(); }catch(e){} ACC._hls = null; }
+  if(j.kind !== 'hls'){ v.src = j.src; return; }
+  if(v.canPlayType('application/vnd.apple.mpegurl')){ v.src = j.src; return; }   // iOS/Safari native HLS
+  await accLoadHlsJs();
+  if(window.Hls && Hls.isSupported()){
+    const h = new Hls({ maxBufferLength: 30, enableWorker: true });
+    h.on(Hls.Events.ERROR, (e, d) => { if(d && d.fatal && !ACC._prevEnded) accNotice('⚠ Дамжуулалтын алдаа: ' + (d.details || ''), 5000); });
+    h.loadSource(j.src); h.attachMedia(v); ACC._hls = h;
+    return;
+  }
+  v.src = j.src;   // сүүлчийн найдвар
+}
 async function accClosePlayer(){
   const p = document.getElementById('acc-player');
+  if(ACC._hls){ try{ ACC._hls.destroy(); }catch(e){} ACC._hls = null; }
   if(p){ const v = p.querySelector('video'); if(v){ v.pause(); v.removeAttribute('src'); v.load(); } p.remove(); }
   if(ACC.hb){ clearInterval(ACC.hb); ACC.hb = null; }
   try{ await accApi('/acc/stop', {}); }catch(e){}
