@@ -83,6 +83,8 @@ label.f{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
 .item .b{padding:10px}
 .item .t{font-weight:600}
 .item .p{color:var(--gold);font-weight:700;margin-top:2px}
+.acc-r2row{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer;font-size:13px}
+.acc-r2row:hover{background:var(--card2)}
 #topbtn{display:none}
 @media(max-width:800px){
   #panel{grid-template-columns:1fr}
@@ -633,6 +635,7 @@ function kEdit(id) {
       <div id="k_vid_state" class="muted" style="font-size:12px;margin:4px 0 8px">${m.video ? (m.video.startsWith('r2://') ? '✓ R2: ' + esc(m.video.slice(5)) : '✓ Линк: ' + esc(m.video)) : 'Видео алга'}</div>
       <div class="row"><label class="btn ghost sm" style="cursor:pointer">📤 Файл сонгох (mp4)<input type="file" id="k_vfile" accept="video/mp4,video/*" style="display:none" onchange="kVideoChosen(this)"></label>
         <label class="btn ghost sm" style="cursor:pointer" title="hls_pack.bat-аар бэлдсэн хавтас (index.m3u8, key.bin, seg_*.ts, poster.jpg)">📂 HLS хавтас 🔒<input type="file" id="k_hdir" webkitdirectory directory multiple style="display:none" onchange="kHlsChosen(this)"></label>
+        <button class="btn ghost sm" onclick="kR2Browse()" title="R2 bucket-д аль хэдийн байгаа файлаас сонгох">☁️ R2-оос сонгох</button>
         <input id="k_vurl" placeholder="эсвэл https://… линк" value="${m.video && !m.video.startsWith('r2://') ? esc(m.video) : ''}" style="flex:1;min-width:160px" oninput="K.edit.video=this.value.trim();$('k_vid_state').textContent=this.value?'Линк: '+this.value:'Видео алга'"></div>
       <div id="k_prog" class="hide" style="margin-top:8px"><div style="height:8px;background:var(--card2);border-radius:4px;overflow:hidden"><div id="k_bar" style="height:8px;width:0;background:var(--accent);transition:.2s"></div></div><div id="k_ptxt" class="muted" style="font-size:11px;margin-top:4px"></div></div>
     </div>
@@ -651,6 +654,36 @@ function kEdit(id) {
       <div class="row"><button class="btn ghost" onclick="kCancelEdit()">Болих</button><button class="btn" id="k_save" onclick="kCommit()">Хадгалах</button></div></div>`);
 }
 function kCancelEdit() { K._vfile = null; K._hfiles = null; closeModal(); }
+// ── R2-оос сонгох: 4 bucket, он сараар эрэмбэлсэн, хайлттай ──
+const R2_BUCKETS = [['tagtaa', 'tagtaa'], ['toorxon', 'toorxon'], ['galt-bambar', 'galt-bambar'], ['', 'tagtaa-kino (шинэ)']];
+async function kR2Browse(bucket, q) {
+  bucket = bucket ?? 'tagtaa'; q = q || '';
+  const host = document.getElementById('kr2host') || (() => { const d = document.createElement('div'); d.id = 'kr2host'; document.body.appendChild(d); return d; })();
+  host.innerHTML = `<div class="modal" style="z-index:60" onclick="if(event.target===this)this.remove()"><div class="card" style="max-width:640px"><p class="muted">Ачаалж байна…</p></div></div>`;
+  try {
+    const j = await api(`/hub/upload/list?biz=${S.cur.id}&bucket=${encodeURIComponent(bucket)}`);
+    const vids = j.objects.filter(o => /\.(mp4|m4v|mov|mkv|webm)$/i.test(o.key) && (!q || o.key.toLowerCase().includes(q.toLowerCase())));
+    const hls = j.objects.filter(o => /\/index\.m3u8$/.test(o.key));
+    const day = d => { const x = new Date(d); return isNaN(x) ? '' : x.toLocaleDateString('mn-MN', { year: 'numeric', month: '2-digit', day: '2-digit' }); };
+    host.innerHTML = `<div class="modal" style="z-index:60" onclick="if(event.target===this)this.remove()"><div class="card" style="max-width:640px">
+      <div class="row" style="justify-content:space-between"><h3>☁️ R2-оос сонгох</h3><button class="btn ghost sm" onclick="document.getElementById('kr2host').innerHTML=''">✕</button></div>
+      <div class="tabs" style="margin-top:10px">${R2_BUCKETS.map(([b, l]) => `<button class="${b === bucket ? 'on' : ''}" onclick="kR2Browse('${b}')">${l}</button>`).join('')}
+        <input placeholder="Нэрээр хайх…" value="${esc(q)}" style="max-width:200px;margin-left:auto" onkeydown="if(event.key==='Enter')kR2Browse('${bucket}',this.value)"></div>
+      <p class="muted" style="font-size:11px;margin-bottom:6px">${vids.length} видео${hls.length ? ' · ' + hls.length + ' HLS багц' : ''} · шинээс хуучин руу</p>
+      <div style="max-height:52vh;overflow:auto;border:1px solid var(--border);border-radius:10px">
+        ${hls.map(o => { const dir = o.key.slice(0, -'index.m3u8'.length); return `<div class="acc-r2row" onclick="kR2Pick('${esc(bucket)}','${esc(dir)}',true)"><span class="pill paid" style="margin-right:8px">HLS 🔒</span><b>${esc(dir.slice(0, -1))}</b><span class="muted" style="margin-left:auto;font-size:11px">${day(o.uploaded)}</span></div>`; }).join('')}
+        ${vids.map(o => `<div class="acc-r2row" onclick="kR2Pick('${esc(bucket)}','${esc(o.key)}',false)"><b style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">${esc(o.key)}</b><span class="muted" style="font-size:11px;white-space:nowrap">${(o.size / 1048576).toFixed(0)} MB · ${day(o.uploaded)}</span></div>`).join('') || '<p class="muted" style="padding:14px">Видео алга</p>'}
+      </div></div></div>`;
+  } catch(e) { host.innerHTML = ''; toast(e.message, true); }
+}
+function kR2Pick(bucket, key, isHls) {
+  const ref = (isHls ? 'hls://' : 'r2://') + (bucket ? '@' + bucket + '/' : '') + key;
+  K.edit.video = ref; K._vfile = null; K._hfiles = null;
+  $('k_vid_state').textContent = '✓ ' + (isHls ? 'HLS 🔒: ' : 'R2: ') + (bucket || 'tagtaa-kino') + ' / ' + key;
+  $('k_vurl').value = '';
+  document.getElementById('kr2host').innerHTML = '';
+  toast('Видео сонгогдлоо — «Хадгалах» дарна уу');
+}
 // ── HLS хавтас (hls_pack.bat-ийн гарц) ──
 function kHlsChosen(inp) {
   const files = [...(inp.files || [])].filter(f => /\.(m3u8|ts|bin|jpg|jpeg|png)$/i.test(f.name));
