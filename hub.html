@@ -348,7 +348,7 @@ async function vOrders(fresh) {
             (o.status === 'pending' ? `<button class="btn ok sm" onclick="setOrder('${o.id}','paid')">Төлсөн</button> <button class="btn ghost sm" onclick="setOrder('${o.id}','cancelled')">Цуцлах</button>` : '')}</td>
         </tr>`).join('') || '<tr><td colspan="7" class="muted">Захиалга алга</td></tr>'}
       </table></div>
-      <p class="muted" style="margin-top:8px">${isKino ? 'Дансаар төлсөн (гар) захиалгууд Google Sheets-ийн «Данс» хуудсанд байна.' : ''} Нийт ${list.length}</p>`);
+      <p class="muted" style="margin-top:8px">${isKino ? 'QPay, дансаар, гараар олгосон эрх — бүгд энд нэг дор. Дансны захиалгыг «Эрхийн захиалга» хэсгээс баталгаажуулна.' : ''} Нийт ${list.length}</p>`);
   } catch(e) { setView(`<p style="color:var(--bad)">${esc(e.message)}</p>`); }
 }
 async function resend(txn) {
@@ -405,7 +405,7 @@ async function vRevenue() {
         <div class="card"><h3 style="margin-bottom:8px">${S.cur.kind === 'kino' ? 'Кино' : 'Бараа'} тус бүрээр</h3>
           <table>${Object.entries(byItem).sort((a, b) => b[1].s - a[1].s).map(([n, v]) => `<tr><td>${esc(n)}</td><td>${v.n}</td><td style="text-align:right">${fmt(v.s)}</td></tr>`).join('') || '<tr><td class="muted">—</td></tr>'}</table></div>
       </div>
-      ${S.cur.kind === 'kino' ? '<p class="muted" style="margin-top:10px">Дансны шилжүүлгийн орлого Google Sheets-д бүртгэгддэг тул энд зөвхөн QPay харагдана.</p>' : ''}`);
+      ${S.cur.kind === 'kino' ? '<p class="muted" style="margin-top:10px">QPay автомат + дансаар (HUB-аас баталгаажуулсан) + гар бүртгэл бүгд нэгтгэгдсэн. Ажлын өдөр 06:00-аас тоологдоно.</p>' : ''}`);
   } catch(e) { setView(`<p style="color:var(--bad)">${esc(e.message)}</p>`); }
 }
 
@@ -448,7 +448,7 @@ async function vAccUsers() {
           <td>${u.plan ? `<span class="pill paid">👑 ${u.plan.daysLeft} хоног</span>` : '<span class="muted">—</span>'}</td>
           <td>${u.movies.length ? u.movies.map(m => `<span class="pill ${m.state === 'expired' ? 'cancelled' : m.state === 'active' ? 'paid' : 'pending'}" title="${m.state}">${esc(m.code)}${m.state === 'active' ? ' ' + m.hoursLeft + 'ц' : m.state === 'unplayed' ? ' ●' : ''}</span>`).join(' ') : '<span class="muted">—</span>'}</td>
           <td>${u.devices}/${u.maxDevices}</td>
-          <td><button class="btn ghost sm" onclick="accGrantModal('${esc(u.phone)}')">+ эрх</button></td></tr>`).join('') || '<tr><td colspan="5" class="muted">Бүртгэл алга</td></tr>'}</table></div>
+          <td style="white-space:nowrap"><button class="btn ghost sm" onclick="accUserModal('${esc(u.phone)}')">Дэлгэрэнгүй</button> <button class="btn ghost sm" onclick="accGrantModal('${esc(u.phone)}')">+ эрх</button></td></tr>`).join('') || '<tr><td colspan="5" class="muted">Бүртгэл алга</td></tr>'}</table></div>
       <div class="card" style="margin-top:14px"><h3 style="margin-bottom:8px">⚙️ Дүрэм, багцын үнэ</h3>
         <div class="formgrid">
           <div><label class="f">Дан кино — цаг (анх тоглуулснаас)</label><input id="r_mh" type="number" value="${rules.movieHours}"></div>
@@ -482,6 +482,30 @@ async function accGrant() {
   const body = { phone: $('g_ph').value, kind, code: $('g_code').value, days: $('g_days').value, months: $('g_months').value, note: $('g_note').value };
   if (kind === 'plan' && !body.days && !body.months) return toast('Хоног эсвэл сар оруулна уу', true);
   try { const j = await api(`/hub/acc-grant?biz=${S.cur.id}`, body); closeModal(); toast('Эрх олгогдлоо: ' + (j.me.plan ? '👑 ' + j.me.plan.daysLeft + ' хоног' : j.me.movies.map(m => m.code).join(', '))); vAccUsers(); } catch(e) { toast(e.message, true); }
+}
+// Нэг хэрэглэгч: төхөөрөмжүүд (гаргах), эрх, захиалгын түүх, үзсэн байрлал
+function devName(ua) { ua = String(ua || ''); if (/iPhone/i.test(ua)) return 'iPhone'; if (/iPad/i.test(ua)) return 'iPad'; if (/Android/i.test(ua)) return /FBAN|FB_IAB|Orca/i.test(ua) ? 'Android (Messenger/FB)' : 'Android'; if (/Windows/i.test(ua)) return 'Компьютер (Windows)'; if (/Macintosh/i.test(ua)) return 'Mac'; return 'Төхөөрөмж'; }
+async function accUserModal(phone) {
+  modal('<p class="muted">Ачаалж байна…</p>');
+  try {
+    const j = await api(`/hub/acc-user?biz=${S.cur.id}&phone=${phone}`); const u = j.user;
+    const mv = (K.movies && K.movies.length) ? K.movies : ((await kLoad()).movies || []);
+    const nm = code => { const m = mv.find(x => 'M' + String(x.id).padStart(2, '0') === code); return m ? m.name : code; };
+    const fs = s => { s = Math.floor(s || 0); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+    modal(`<div class="row" style="justify-content:space-between"><h3>📱 ${esc(u.phone)}</h3><span class="muted" style="font-size:12px">бүртгэл ${fdt(u.createdAt)}${u.psid ? ' · Messenger холбоотой' : ''}</span></div>
+      <div class="card" style="padding:12px;margin-top:10px"><b style="font-size:13px">Эрх</b>
+        <p style="margin-top:6px;font-size:13px">${u.plan ? `👑 Гишүүнчлэл — ${u.plan.daysLeft} хоног үлдсэн (${fdt(u.plan.until)} хүртэл)` : '<span class="muted">Гишүүнчлэл алга</span>'}</p>
+        ${u.movies.length ? `<table style="margin-top:6px">${u.movies.map(m => `<tr><td>${esc(nm(m.code))} <span class="muted mono" style="font-size:11px">${m.code}</span></td><td><span class="pill ${m.state === 'expired' ? 'cancelled' : m.state === 'active' ? 'paid' : 'pending'}">${m.state === 'active' ? m.hoursLeft + ' цаг үлдсэн' : m.state === 'unplayed' ? 'эхлүүлээгүй' : 'дууссан'}</span></td><td class="muted" style="font-size:11px">${u.positions && u.positions[m.code] ? '↺ ' + fs(u.positions[m.code]) : ''}</td></tr>`).join('')}</table>` : '<p class="muted" style="font-size:12px">Дан кино алга</p>'}</div>
+      <div class="card" style="padding:12px;margin-top:10px"><div class="row" style="justify-content:space-between"><b style="font-size:13px">Төхөөрөмж ${u.devices.length}/${u.maxDevices}</b>${u.devices.length ? `<button class="btn bad sm" onclick="accKick('${esc(u.phone)}','')">Бүгдийг гаргах</button>` : ''}</div>
+        ${u.devices.length ? `<table style="margin-top:6px">${u.devices.map(d => `<tr><td>${esc(devName(d.ua))}</td><td class="muted" style="font-size:11px">сүүлд ${fdt(d.last)}</td><td style="text-align:right"><button class="btn ghost sm" onclick="accKick('${esc(u.phone)}','${d.tok}')">Гаргах</button></td></tr>`).join('')}</table>` : '<p class="muted" style="font-size:12px;margin-top:6px">Нэвтэрсэн төхөөрөмж алга</p>'}</div>
+      <div class="card" style="padding:12px;margin-top:10px"><b style="font-size:13px">Захиалга ${j.orders.length}</b>
+        ${j.orders.length ? `<table style="margin-top:6px">${j.orders.slice(0, 20).map(o => `<tr><td class="muted" style="font-size:11px">${fdt(o.createdAt)}</td><td>${esc(o.title || o.code)}</td><td>${fmt(o.amount)}</td><td>${esc(o.method)}</td><td><span class="pill ${o.status === 'paid' ? 'paid' : o.status === 'rejected' ? 'cancelled' : 'pending'}">${esc(o.status)}</span></td></tr>`).join('')}</table>` : '<p class="muted" style="font-size:12px;margin-top:6px">—</p>'}</div>
+      <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn ghost" onclick="closeModal()">Хаах</button><button class="btn" onclick="closeModal();accGrantModal('${esc(u.phone)}')">+ Эрх олгох</button></div>`);
+  } catch(e) { modal(`<p style="color:var(--bad)">${esc(e.message)}</p><button class="btn ghost" onclick="closeModal()">Хаах</button>`); }
+}
+async function accKick(phone, tok) {
+  if (!confirm(tok ? 'Энэ төхөөрөмжийг гаргах уу?' : 'Бүх төхөөрөмжийг гаргах уу? (дахин дугаараа бичиж нэвтэрнэ)')) return;
+  try { await api(`/hub/acc-kick?biz=${S.cur.id}`, { phone, tok }); toast('Гаргалаа'); accUserModal(phone); } catch(e) { toast(e.message, true); }
 }
 let accOrdF = 'pending_manual';
 async function vAccOrders() {
@@ -607,6 +631,7 @@ function kEdit(id) {
     <div class="card" style="margin-top:12px;padding:12px"><b style="font-size:13px">🎞 Видео</b>
       <div id="k_vid_state" class="muted" style="font-size:12px;margin:4px 0 8px">${m.video ? (m.video.startsWith('r2://') ? '✓ R2: ' + esc(m.video.slice(5)) : '✓ Линк: ' + esc(m.video)) : 'Видео алга'}</div>
       <div class="row"><label class="btn ghost sm" style="cursor:pointer">📤 Файл сонгох (mp4)<input type="file" id="k_vfile" accept="video/mp4,video/*" style="display:none" onchange="kVideoChosen(this)"></label>
+        <label class="btn ghost sm" style="cursor:pointer" title="hls_pack.bat-аар бэлдсэн хавтас (index.m3u8, key.bin, seg_*.ts, poster.jpg)">📂 HLS хавтас 🔒<input type="file" id="k_hdir" webkitdirectory directory multiple style="display:none" onchange="kHlsChosen(this)"></label>
         <input id="k_vurl" placeholder="эсвэл https://… линк" value="${m.video && !m.video.startsWith('r2://') ? esc(m.video) : ''}" style="flex:1;min-width:160px" oninput="K.edit.video=this.value.trim();$('k_vid_state').textContent=this.value?'Линк: '+this.value:'Видео алга'"></div>
       <div id="k_prog" class="hide" style="margin-top:8px"><div style="height:8px;background:var(--card2);border-radius:4px;overflow:hidden"><div id="k_bar" style="height:8px;width:0;background:var(--accent);transition:.2s"></div></div><div id="k_ptxt" class="muted" style="font-size:11px;margin-top:4px"></div></div>
     </div>
@@ -624,7 +649,37 @@ function kEdit(id) {
       <div>${m._new ? '' : `<button class="btn bad sm" onclick="kDelete(${m.id})">Устгах</button>`}</div>
       <div class="row"><button class="btn ghost" onclick="kCancelEdit()">Болих</button><button class="btn" id="k_save" onclick="kCommit()">Хадгалах</button></div></div>`);
 }
-function kCancelEdit() { K._vfile = null; closeModal(); }
+function kCancelEdit() { K._vfile = null; K._hfiles = null; closeModal(); }
+// ── HLS хавтас (hls_pack.bat-ийн гарц) ──
+function kHlsChosen(inp) {
+  const files = [...(inp.files || [])].filter(f => /\.(m3u8|ts|bin|jpg|jpeg|png)$/i.test(f.name));
+  const idx = files.find(f => f.name === 'index.m3u8'), key = files.find(f => f.name === 'key.bin'), segs = files.filter(f => /\.ts$/i.test(f.name));
+  if (!idx || !segs.length) return toast('Хавтаст index.m3u8 + seg_*.ts байхгүй (hls_pack.bat-аар бэлдэнэ)', true);
+  K._hfiles = { idx, key, segs, poster: files.find(f => /^poster\.(jpg|jpeg|png)$/i.test(f.name)) || null };
+  K._vfile = null; K.edit.video = '';
+  const mb = segs.reduce((s, f) => s + f.size, 0) / 1048576;
+  $('k_vid_state').textContent = `📂 HLS: ${segs.length} хэсэг · ${mb.toFixed(0)} MB ${key ? '· 🔒 AES' : '· ⚠ шифрлэлгүй'} — «Хадгалах» дарахад байршуулна`;
+  // Үргэлжлэх хугацаа m3u8-аас
+  idx.text().then(t => { const d = [...t.matchAll(/#EXTINF:([\d.]+)/g)].reduce((s, m) => s + parseFloat(m[1]), 0); if (d > 0) { K.edit.duration = Math.round(d); $('k_duration').value = Math.round(d); } });
+  if (K._hfiles.poster && !K.edit.cover) kUploadImage(K._hfiles.poster, 'poster_' + K.edit.id).catch(e => toast('Постер: ' + e.message, true));
+}
+async function kUploadHls(h) {
+  if (!K.hasR2) throw new Error('R2 binding алга');
+  const code = kCode(K.edit.id); const prefix = `hls/${code}/`;
+  const all = [h.idx, ...(h.key ? [h.key] : []), ...h.segs.sort((a, b) => a.name.localeCompare(b.name))];
+  const total = all.reduce((s, f) => s + f.size, 0); let done = 0;
+  $('k_save').disabled = true; kProg(0, 'HLS байршуулж байна…');
+  try {
+    for (let i = 0; i < all.length; i++) {
+      const f = all[i];
+      const res = await fetch(`${WORKER}/hub/upload/file?biz=${S.cur.id}&key=${encodeURIComponent(prefix + f.name)}`, { method: 'POST', headers: { 'X-Hub-Token': S.tok, 'Content-Type': 'application/octet-stream' }, body: f });
+      const j = await res.json(); if (!j.ok) throw new Error(j.error || f.name);
+      done += f.size; kProg(Math.round(done / total * 100), `${i + 1}/${all.length} файл · ${Math.round(done / 1048576)} / ${Math.round(total / 1048576)} MB`);
+    }
+    K.edit.video = 'hls://' + prefix; kProg(100, '✓ HLS байршлаа (' + all.length + ' файл)');
+    $('k_vid_state').textContent = '✓ HLS 🔒: ' + prefix;
+  } finally { $('k_save').disabled = false; }
+}
 async function kCommit() {
   const m = K.edit;
   m.name = $('k_name').value.trim(); m.cat = Number($('k_cat').value); m.price = Number($('k_price').value) || 0;
@@ -633,7 +688,10 @@ async function kCommit() {
   if (!m.video) m.video = $('k_vurl').value.trim();
   if (!m.cover) m.cover = $('k_cover').value.trim();
   if (!m.name) return toast('Нэр хоосон', true);
-  if (K._vfile && !(m.video || '').startsWith('r2://')) {
+  if (K._hfiles && !(m.video || '').startsWith('hls://')) {
+    // HLS хавтас сонгосон бол бүх файлыг байршуулна
+    try { await kUploadHls(K._hfiles); } catch(e) { return toast('HLS: ' + e.message, true); }
+  } else if (K._vfile && !(m.video || '').startsWith('r2://')) {
     // Видео файл сонгосон ч байршуулаагүй бол одоо байршуулна
     try { await kUploadVideo(K._vfile); } catch(e) { return toast('Видео: ' + e.message, true); }
   }
