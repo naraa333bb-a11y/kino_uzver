@@ -499,7 +499,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
 
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style id="theme-editorial-forest">
 /* ══════════════════════════════════════════════════════════
    ЗАГВАР: Editorial бүтэц × Forest өнгө (2026-09-30 хэрэглэгчийн сонголт)
@@ -511,7 +511,7 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
   --text:#eef3ef;--muted:#8fa094;--accent:#2fbf71;--accent2:#2fbf71;--gold:#2fbf71;
   --accent-text:#06120b;--radius:6px;
   --font:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
-  --hfont:'Playfair Display',Georgia,'Times New Roman',serif;
+  --hfont:Inter,system-ui,-apple-system,'Segoe UI',sans-serif;
 }
 html,body{font-family:var(--font);}
 button,input,select,textarea{font-family:var(--font);}
@@ -530,7 +530,7 @@ button,input,select,textarea{font-family:var(--font);}
 .hero-img{opacity:1!important;filter:brightness(.55);}
 .hero-overlay{background:linear-gradient(to top,var(--bg) 0%,rgba(12,18,16,.2) 60%,transparent 100%);}
 .hero-text{padding:14px 18px 16px;}
-.hero-title{font:700 clamp(22px,6vw,30px)/1.15 var(--hfont);letter-spacing:-.01em;text-shadow:none;}
+.hero-title{font:800 clamp(22px,6vw,30px)/1.15 var(--hfont);letter-spacing:-.01em;text-shadow:none;}
 .hero-sub{font:400 12px var(--font);color:var(--muted);margin-top:6px;text-shadow:none;}
 /* таб — доогуур зураастай */
 .tabs-wrap{padding:6px 18px 0;}
@@ -571,7 +571,7 @@ button,input,select,textarea{font-family:var(--font);}
 .modal-title{font:600 12px var(--font);color:var(--muted);letter-spacing:.02em;text-transform:uppercase;}
 .modal-trailer{border-bottom:1px solid var(--border);}
 .modal-body{padding:16px 18px 22px;}
-.modal-movie-name{font:700 20px/1.2 var(--hfont);margin-bottom:6px;}
+.modal-movie-name{font:800 20px/1.2 var(--hfont);letter-spacing:-.01em;margin-bottom:6px;}
 .modal-price{font:800 18px var(--font);color:var(--text);margin-bottom:14px;}
 .modal-price::after{content:' · дан кино, 24 цаг';font:400 11px var(--font);color:var(--muted);}
 #buyModal.acc .modal-price[data-plan]::after{content:'';}
@@ -618,7 +618,7 @@ button,input,select,textarea{font-family:var(--font);}
 .acc-slide::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,var(--bg) 0%,rgba(12,18,16,.15) 55%,transparent 100%);}
 .acc-slide-t{position:absolute;left:18px;right:18px;bottom:16px;z-index:2;}
 .acc-slide-k{font:600 10px var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);}
-.acc-slide-n{font:700 clamp(20px,5.5vw,28px)/1.15 var(--hfont);color:var(--text);margin-top:4px;}
+.acc-slide-n{font:800 clamp(20px,5.5vw,28px)/1.15 var(--hfont);letter-spacing:-.01em;color:var(--text);margin-top:4px;}
 .acc-slide-p{font:500 12px var(--font);color:var(--muted);margin-top:4px;}
 .acc-dots{position:absolute;right:16px;bottom:14px;z-index:3;display:flex;gap:5px;}
 .acc-dots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.35);display:block;transition:.2s;}
@@ -5038,7 +5038,7 @@ function accStyle(){
   + '.acc-done{text-align:center;padding:22px 10px;font-size:16px;font-weight:800;color:#4ade80;animation:accpop .4s ease}'
   + '@keyframes accpop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}'
   + '.acc-acct{display:flex;align-items:stretch;gap:8px;margin-bottom:8px}.acc-acct .b{flex:0 1 auto;min-width:0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:7px 12px}'
-  + '.acc-acct .l{font-size:10px;color:var(--muted);white-space:nowrap}.acc-acct .v{font-size:15px;font-weight:800;color:#fff;font-family:Consolas,monospace;letter-spacing:.04em}'
+  + '.acc-acct .l{font-size:10px;color:var(--muted);white-space:nowrap}.acc-acct .v{font-size:15px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:.03em}'
   + '.acc-copy{flex:0 0 auto;padding:0 14px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;white-space:nowrap}'
   + '.acc-copy:hover{border-color:var(--accent);color:var(--text)}.acc-copy.ok{border-color:var(--accent);color:var(--accent)}'
   + '.acc-methods .acc-btn.on{border-color:var(--accent)}'
@@ -5049,7 +5049,7 @@ function accStyle(){
   + '.acc-poster-t{font-size:12px;color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;border-radius:99px;max-width:88%;text-align:center}'
   + '.acc-pl .pl-end{position:absolute;inset:0;z-index:6;display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(0,0,0,.82);color:#fff;text-align:center;padding:20px;animation:accpop .6s ease}'
   + '.acc-pl.ended .pl-end{display:flex}.acc-pl.ended video{filter:brightness(.25);transition:filter 1.2s}.acc-pl.ended .pl-center,.acc-pl.ended .pl-bar,.acc-pl.ended .pl-tap{display:none!important}'
-  + '.acc-pl .pl-end-t{font:700 18px var(--hfont,inherit)}.acc-pl .pl-end-s{font-size:13px;color:#cfd8d3;max-width:320px;line-height:1.5}'
+  + '.acc-pl .pl-end-s{font-size:clamp(16px,2.6vw,22px);font-weight:700;color:#fff;max-width:520px;line-height:1.45}'
   + '#acc-badge{display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;border:1px solid var(--border);background:var(--card2);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}'
   + '#acc-badge.plan{border-color:var(--gold);color:var(--gold)}'
   + '#acc-menu{position:fixed;top:60px;right:12px;z-index:1200;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:6px;min-width:190px;box-shadow:0 10px 30px rgba(0,0,0,.5)}'
@@ -5484,7 +5484,7 @@ function accMountPlayer(container, j, code, inline){
   // ── Өөрийн удирдлагатай тоглуулагч (Netflix маяг): ⏪10 ▶ 10⏩, явц, цаг, дуу, хурд, PiP, бүтэн дэлгэц ──
   p.innerHTML =
       '<div class="pl-top"><span class="pl-title">' + accEsc(accMovieName(code))
-    + (isPrev ? ' <span id="acc-prev-left" class="pl-badge">үнэгүй ' + Math.round(j.previewSec / 60) + ':00</span>' : (j.until ? ' <span class="pl-sub">' + accHours(j.until - Date.now()) + ' үлдлээ</span>' : ''))
+    + (isPrev ? '' : (j.until ? ' <span class="pl-sub">' + accHours(j.until - Date.now()) + ' үлдлээ</span>' : ''))
     + '</span><button class="pl-x" onclick="accClosePlayer()" title="Хаах (Esc)">✕</button></div>'
     + '<video playsinline autoplay controlsList="nodownload" oncontextmenu="return false"></video>'
     + '<div class="pl-tap pl-tap-l" data-skip="-10"><span>⏪ 10</span></div><div class="pl-tap pl-tap-r" data-skip="10"><span>10 ⏩</span></div>'
@@ -5497,7 +5497,7 @@ function accMountPlayer(container, j, code, inline){
     +     '<button class="pl-btn pl-pip" title="Мини дэлгэц">⧉</button>'
     +     '<button class="pl-btn pl-fs" title="Бүтэн дэлгэц (F)">⛶</button></div>'
     + '</div><div class="pl-spin"></div>'
-    + '<div class="pl-end"><div class="pl-end-t">Үнэгүй хэсэг дууслаа</div><div class="pl-end-s">Та үргэлжлүүлж үзэх бол доорх төлбөрийн хэрэгслээс сонгоно уу</div></div>';
+    + '<div class="pl-end"><div class="pl-end-s">Та үргэлжлүүлж үзэх бол<br>доорх төлбөрийн хэрэгслээс сонгоно уу</div></div>';
   container.innerHTML = ''; container.appendChild(p);
   const v = p.querySelector('video');
   accAttachSource(v, j).catch(() => accNotice('⚠ Тоглуулагч ачаалахад алдаа гарлаа', 5000));
@@ -5515,7 +5515,7 @@ function accMountPlayer(container, j, code, inline){
       try{ if(v.webkitDisplayingFullscreen && v.webkitExitFullscreen) v.webkitExitFullscreen(); }catch(e){}
       p.classList.add('ended'); p.classList.remove('ui');
       const cont = document.getElementById('acc-cont');
-      if(cont){ cont.innerHTML = '<div class="acc-cont-box">⏱ Үнэгүй хэсэг дууслаа — <b>та үргэлжлүүлж үзэх бол доорх төлбөрийн хэрэгслээс сонгоно уу</b></div>'; setTimeout(() => accScrollTo(cont), 300); }
+      setTimeout(() => accScrollTo(document.getElementById('acc-methods')), 300);
       if(!inline){ accClosePlayer(); const mv = (typeof MOVIES !== 'undefined' ? MOVIES : []).find(x => accCode(x.id) === code); if(mv) openBuyModal(mv.id, mv.cat); }
     };
     v.addEventListener('timeupdate', () => {
