@@ -455,6 +455,7 @@ async function vAccUsers() {
           <div><label class="f">Дан кино — хэдэн хоногт эхлүүлэх</label><input id="r_cd" type="number" value="${rules.movieClaimDays}"></div>
           <div><label class="f">Төхөөрөмжийн хязгаар</label><input id="r_md" type="number" value="${rules.maxDevices}"></div>
           <div><label class="f">Зэрэг тоглуулалт</label><input id="r_ms" type="number" value="${rules.maxStreams}"></div>
+          <div><label class="f">Үнэгүй урьдчилан үзэх (минут, 0 = үгүй)</label><input id="r_pv" type="number" min="0" value="${rules.previewMinutes ?? 15}"></div>
         </div>
         <div class="formgrid" style="margin-top:10px">${plans.map((p, i) => `<div><label class="f">${esc(p.id)} — сар / үнэ / нэр</label><div class="row" style="gap:4px"><input id="p_m${i}" type="number" value="${p.months}" style="width:60px"><input id="p_p${i}" type="number" value="${p.price}" style="width:100px"><input id="p_l${i}" value="${esc(p.label)}"></div></div>`).join('')}</div>
         <button class="btn sm" style="margin-top:10px" onclick="accSaveRules(${plans.length}, ${JSON.stringify(plans.map(p => p.id)).replace(/"/g, '&quot;')})">Хадгалах</button></div>`);
@@ -462,7 +463,7 @@ async function vAccUsers() {
 }
 async function accSaveRules(n, ids) {
   const plans = []; for (let i = 0; i < n; i++) plans.push({ id: ids[i], months: $('p_m' + i).value, price: $('p_p' + i).value, label: $('p_l' + i).value });
-  try { await api(`/hub/acc-rules?biz=${S.cur.id}`, { movieHours: $('r_mh').value, movieClaimDays: $('r_cd').value, maxDevices: $('r_md').value, maxStreams: $('r_ms').value, plans }); toast('Хадгалагдлаа'); vAccUsers(); } catch(e) { toast(e.message, true); }
+  try { await api(`/hub/acc-rules?biz=${S.cur.id}`, { movieHours: $('r_mh').value, movieClaimDays: $('r_cd').value, maxDevices: $('r_md').value, maxStreams: $('r_ms').value, previewMinutes: $('r_pv').value, plans }); toast('Хадгалагдлаа'); vAccUsers(); } catch(e) { toast(e.message, true); }
 }
 function accGrantModal(phone) {
   modal(`<h3 style="margin-bottom:4px">Гар бүртгэл / эрх олгох</h3><p class="muted" style="font-size:12px;margin-bottom:12px">Алдаа засах, урамшуулах, өөр замаар төлсөн хүнд эрх нээх. Дугаар бүртгэлгүй бол шинээр үүснэ.</p>
@@ -559,7 +560,7 @@ async function vKino() {
     await kLoad();
     const list = K.movies.filter(m => (K.filter === 'all' || String(m.cat) === K.filter) && (!K.q || m.name.toLowerCase().includes(K.q.toLowerCase())));
     setView(`<div class="row" style="justify-content:space-between"><h2>🎬 Кино</h2>
-        <div class="row"><button class="btn ghost sm" onclick="kCatsModal()">Ангилал</button><button class="btn sm" onclick="kEdit()">+ Кино нэмэх</button></div></div>
+        <div class="row">${K.movies.some(m => m.video && !m.video.startsWith('r2://')) ? '<button class="btn ghost sm" title="Хуучин worker/r2.dev линкүүдийг R2 түлхүүр болгоно" onclick="kMigrate()">⇄ Хуучин линк → R2</button>' : ''}<button class="btn ghost sm" onclick="kCatsModal()">Ангилал</button><button class="btn sm" onclick="kEdit()">+ Кино нэмэх</button></div></div>
       ${K.hasR2 ? '' : '<div class="card" style="border-color:var(--warn);margin-bottom:12px;font-size:12px">⚠ Worker-т R2 binding (<b>MOVIES_R2</b>) алга — видео/постер upload ажиллахгүй. Cloudflare → R2 → bucket үүсгэ → Worker → Settings → Bindings → R2 → нэр MOVIES_R2.</div>'}
       <div class="kpis"><div class="kpi"><div class="l">Нийт кино</div><div class="v">${K.movies.length}</div></div>
         <div class="kpi"><div class="l">Видеотой</div><div class="v">${K.movies.filter(m => m.video).length}</div><div class="s">${K.movies.filter(m => !m.video).length} видеогүй</div></div>
@@ -597,6 +598,8 @@ function kEdit(id) {
       <div><label class="f">Үнэ (₮)</label><input id="k_price" type="number" value="${m.price}"></div>
       <div><label class="f">Хэл</label><select id="k_lang"><option value="dub" ${m.lang !== 'sub' ? 'selected' : ''}>DUB — дубляж</option><option value="sub" ${m.lang === 'sub' ? 'selected' : ''}>SUB — хадмал</option></select></div>
       <div><label class="f">Анги (мэдээлэл)</label><input id="k_eps" value="${esc(m.eps || '')}" placeholder="1 анги"></div>
+      <div><label class="f">Үнэгүй үзэх минут (хоосон = ерөнхий дүрэм)</label><input id="k_preview" type="number" min="0" value="${m.preview == null ? '' : m.preview}" placeholder="ерөнхий"></div>
+      <div><label class="f">Үргэлжлэх (сек, автомат)</label><input id="k_duration" type="number" value="${m.duration || ''}" placeholder="видео сонгоход"></div>
     </div>
     <label class="f" style="margin-top:8px">Трейлер (YouTube/URL, заавал биш)</label><input id="k_trailer" value="${esc(m.trailer || '')}">
 
@@ -625,6 +628,7 @@ async function kCommit() {
   const m = K.edit;
   m.name = $('k_name').value.trim(); m.cat = Number($('k_cat').value); m.price = Number($('k_price').value) || 0;
   m.lang = $('k_lang').value; m.eps = $('k_eps').value.trim(); m.trailer = $('k_trailer').value.trim(); m.active = $('k_active').checked;
+  m.preview = $('k_preview').value === '' ? null : Number($('k_preview').value); m.duration = Number($('k_duration').value) || m.duration || 0;
   if (!m.video) m.video = $('k_vurl').value.trim();
   if (!m.cover) m.cover = $('k_cover').value.trim();
   if (!m.name) return toast('Нэр хоосон', true);
@@ -648,6 +652,9 @@ function kVideoChosen(inp) {
   const f = inp.files && inp.files[0]; if (!f) return;
   K._vfile = f; K.edit.video = '';
   $('k_vid_state').textContent = '📁 ' + f.name + ' · ' + (f.size / 1048576).toFixed(0) + ' MB — «Хадгалах» дарахад байршуулна';
+  // Үргэлжлэх хугацааг автоматаар (урьдчилан үзэх хязгаарт хэрэгтэй)
+  try { const u = URL.createObjectURL(f); const v = document.createElement('video'); v.preload = 'metadata'; v.src = u;
+    v.onloadedmetadata = () => { if (v.duration > 0) { K.edit.duration = Math.round(v.duration); $('k_duration').value = Math.round(v.duration); } URL.revokeObjectURL(u); }; } catch(e) {}
   $('k_frame_btn').disabled = false; $('k_frame_btn').removeAttribute('title');
   if (!K.edit.cover) kCaptureFrame();   // постер автоматаар
 }
@@ -707,6 +714,12 @@ async function kUploadVideo(f) {
     await api(`/hub/upload/abort?biz=${S.cur.id}`, { key: init.key, uploadId: init.uploadId }).catch(() => {});
     throw e;
   } finally { $('k_save').disabled = false; }
+}
+async function kMigrate() {
+  if (!confirm('Хуучин worker/r2.dev линктэй кинонуудын видеог MOVIES_R2 bucket-оос хайж R2 түлхүүр болгох уу? (Bucket нь хуучин видеонуудын bucket байх ёстой)')) return;
+  try { const j = await api(`/hub/migrate-legacy?biz=${S.cur.id}`, {}); const bad = j.report.filter(r => !r.ok);
+    modal(`<h3>Шилжүүлэг: ${j.migrated} амжилттай, ${bad.length} алдаа</h3><div style="max-height:50vh;overflow:auto;margin-top:10px">${j.report.map(r => `<div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">${r.ok ? '✓' : '✗'} <b>${esc(r.name)}</b> <span class="muted">${esc(r.ok ? r.key : r.error)}</span></div>`).join('')}</div><div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" onclick="closeModal();vKino()">Хаах</button></div>`);
+  } catch(e) { toast(e.message, true); }
 }
 // ── Ангилал ──
 function kCatsModal() {
