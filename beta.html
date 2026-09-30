@@ -591,7 +591,7 @@ button,input,select,textarea{font-family:var(--font);}
 .acc-plan .p{color:var(--accent)!important;}
 .acc-plans .t{font-family:var(--font);}
 .acc-ok,.acc-done{color:var(--accent)!important;}
-#acc-player .top{font-family:var(--font);}
+.acc-pl .top{font-family:var(--font);}
 #acc-lib .box{border-radius:14px 14px 0 0;border-top:1px solid var(--border);}
 #acc-notice{border-radius:var(--radius);border-color:var(--accent);}
 #acc-menu{border-radius:var(--radius);}
@@ -603,7 +603,10 @@ button,input,select,textarea{font-family:var(--font);}
 #acc-top{display:flex;align-items:center;gap:8px;}
 #acc-badge{padding:7px 12px;border-radius:99px;border:1px solid var(--border);background:transparent;color:var(--text);font:600 12px var(--font);cursor:pointer;display:flex;align-items:center;gap:4px;}
 #acc-badge .car{font-size:9px;color:var(--muted);}
-#acc-member{padding:7px 12px;border-radius:99px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-text);font:600 12px var(--font);cursor:pointer;white-space:nowrap;}
+#acc-member{padding:10px 18px;border-radius:99px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-text);font:700 13px var(--font);cursor:pointer;white-space:nowrap;}
+#acc-badge{padding:10px 14px;font-size:13px;}
+@media(min-width:800px){#acc-member{padding:11px 22px;font-size:14px;}#acc-badge{padding:11px 16px;font-size:14px;}}
+.modal-trailer{background:#000;}
 #acc-member.on{background:transparent;color:var(--accent);}
 .hero{height:auto!important;min-height:0;border-bottom:0;background:var(--bg);}
 .hero-img,.hero-overlay,.hero-text{display:none!important;}
@@ -5034,9 +5037,19 @@ function accStyle(){
   + '.acc-wait{text-align:center;font-size:12px;color:var(--muted);margin-top:12px}'
   + '.acc-done{text-align:center;padding:22px 10px;font-size:16px;font-weight:800;color:#4ade80;animation:accpop .4s ease}'
   + '@keyframes accpop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}'
-  + '.acc-acct{display:flex;align-items:center;gap:8px;margin-bottom:8px}.acc-acct .b{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 10px}'
-  + '.acc-acct .l{font-size:10px;color:var(--muted)}.acc-acct .v{font-size:15px;font-weight:800;color:#fff;font-family:Consolas,monospace}'
-  + '.acc-copy{width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;font-size:15px}'
+  + '.acc-acct{display:flex;align-items:stretch;gap:8px;margin-bottom:8px}.acc-acct .b{flex:0 1 auto;min-width:0;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:7px 12px}'
+  + '.acc-acct .l{font-size:10px;color:var(--muted);white-space:nowrap}.acc-acct .v{font-size:15px;font-weight:800;color:#fff;font-family:Consolas,monospace;letter-spacing:.04em}'
+  + '.acc-copy{flex:0 0 auto;padding:0 14px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;white-space:nowrap}'
+  + '.acc-copy:hover{border-color:var(--accent);color:var(--text)}.acc-copy.ok{border-color:var(--accent);color:var(--accent)}'
+  + '.acc-methods .acc-btn.on{border-color:var(--accent)}'
+  + '.acc-cont{margin:0}.acc-cont-box{background:rgba(47,191,113,.12);border:1px solid var(--accent);border-radius:10px;padding:12px 14px;font-size:13px;color:#fff;line-height:1.5;margin-bottom:12px;text-align:center}'
+  + '.acc-poster{position:relative;width:100%;height:100%;background:#000;cursor:pointer}.acc-poster img{width:100%;height:100%;object-fit:cover;opacity:.55;display:block}'
+  + '.acc-poster-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}'
+  + '.acc-poster-btn{width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.6);border:2px solid rgba(255,255,255,.7);color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;padding-left:4px}'
+  + '.acc-poster-t{font-size:12px;color:#fff;background:rgba(0,0,0,.55);padding:6px 12px;border-radius:99px;max-width:88%;text-align:center}'
+  + '.acc-pl .pl-end{position:absolute;inset:0;z-index:6;display:none;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:rgba(0,0,0,.82);color:#fff;text-align:center;padding:20px;animation:accpop .6s ease}'
+  + '.acc-pl.ended .pl-end{display:flex}.acc-pl.ended video{filter:brightness(.25);transition:filter 1.2s}.acc-pl.ended .pl-center,.acc-pl.ended .pl-bar,.acc-pl.ended .pl-tap{display:none!important}'
+  + '.acc-pl .pl-end-t{font:700 18px var(--hfont,inherit)}.acc-pl .pl-end-s{font-size:13px;color:#cfd8d3;max-width:320px;line-height:1.5}'
   + '#acc-badge{display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;border:1px solid var(--border);background:var(--card2);color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}'
   + '#acc-badge.plan{border-color:var(--gold);color:var(--gold)}'
   + '#acc-menu{position:fixed;top:60px;right:12px;z-index:1200;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:6px;min-width:190px;box-shadow:0 10px 30px rgba(0,0,0,.5)}'
@@ -5046,33 +5059,33 @@ function accStyle(){
   + '#acc-banner button{border:0;background:transparent;color:var(--muted);font-size:18px;cursor:pointer;line-height:1}'
   + '#acc-notice{position:fixed;top:-80px;left:50%;transform:translateX(-50%);z-index:5000;max-width:92%;background:#111a30;border:1px solid var(--accent2);color:#fff;padding:12px 16px;border-radius:12px;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.6);transition:top .3s}'
   + '#acc-notice.on{top:12px}'
-  + '#acc-player{position:fixed;inset:0;z-index:3000;background:#000;display:flex;flex-direction:column;user-select:none;-webkit-user-select:none}'
-  + '#acc-player .pl-top{position:absolute;top:0;left:0;right:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;color:#fff;font-size:14px;font-weight:600;background:linear-gradient(rgba(0,0,0,.75),transparent);opacity:0;transition:opacity .25s;pointer-events:none}'
-  + '#acc-player .pl-sub{color:#aab;font-weight:400;font-size:12px}#acc-player .pl-badge{color:var(--accent);font-weight:700;font-size:12px}'
-  + '#acc-player .pl-x{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.5);color:#fff;font-size:16px;cursor:pointer;pointer-events:auto}'
-  + '#acc-player .pl-tap{position:absolute;top:15%;bottom:25%;width:30%;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .2s}'
-  + '#acc-player .pl-tap span{background:rgba(255,255,255,.15);color:#fff;font-weight:700;padding:10px 16px;border-radius:99px;font-size:15px}'
-  + '#acc-player .pl-tap-l{left:0}#acc-player .pl-tap-r{right:0}#acc-player .pl-tap.on{opacity:1}'
-  + '#acc-player .pl-center{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);display:flex;justify-content:center;gap:clamp(22px,8vw,60px);opacity:0;transition:opacity .25s;pointer-events:none}'
-  + '#acc-player .pl-big{width:58px;height:58px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:22px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;pointer-events:auto}'
-  + '#acc-player .pl-big small{font-size:10px;margin-top:2px}#acc-player .pl-play{width:72px;height:72px;font-size:26px}'
-  + '#acc-player .pl-bar{position:absolute;left:0;right:0;bottom:0;z-index:5;padding:8px 16px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.85));opacity:0;transition:opacity .25s;pointer-events:none}'
-  + '#acc-player.ui .pl-top,#acc-player.ui .pl-center,#acc-player.ui .pl-bar{opacity:1;pointer-events:auto}'
-  + '#acc-player .pl-seek{position:relative;height:22px;display:flex;align-items:center}'
-  + '#acc-player .pl-seek::before{content:"";position:absolute;left:0;right:0;height:4px;background:rgba(255,255,255,.25);border-radius:2px}'
-  + '#acc-player .pl-buf,#acc-player .pl-prog{position:absolute;left:0;height:4px;border-radius:2px;width:0}#acc-player .pl-buf{background:rgba(255,255,255,.4)}#acc-player .pl-prog{background:var(--accent)}'
-  + '#acc-player .pl-seek input{position:absolute;left:0;right:0;width:100%;margin:0;height:22px;background:transparent;-webkit-appearance:none;appearance:none;cursor:pointer}'
-  + '#acc-player .pl-seek input::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid #fff}'
-  + '#acc-player .pl-seek input::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid #fff}'
-  + '#acc-player .pl-row{display:flex;align-items:center;gap:8px;margin-top:4px;color:#fff;font-size:12px}#acc-player .pl-sp{flex:1}'
-  + '#acc-player .pl-btn{border:0;background:transparent;color:#fff;font-size:17px;cursor:pointer;padding:6px;border-radius:6px;font-family:inherit;line-height:1}#acc-player .pl-btn:hover{background:rgba(255,255,255,.12)}'
-  + '#acc-player .pl-rate{font-size:12px;font-weight:700;border:1px solid rgba(255,255,255,.35);padding:4px 8px}'
-  + '#acc-player .pl-vol{width:70px;accent-color:var(--accent)}@media(max-width:600px){#acc-player .pl-vol{display:none}}'
-  + '#acc-player .pl-spin{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:accspin .8s linear infinite;display:none;pointer-events:none}'
-  + '#acc-player.buf .pl-spin{display:block}#acc-player.buf .pl-center{opacity:0}'
-  + '#acc-player .top{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;color:#fff;font-size:13px;background:rgba(0,0,0,.6)}'
-  + '#acc-player video{flex:1;width:100%;height:100%;object-fit:contain;background:#000}'
-  + '#acc-player .x{width:36px;height:36px;border-radius:50%;border:1px solid #444;background:#111;color:#fff;font-size:16px;cursor:pointer}'
+  + '.acc-pl{position:relative;background:#000;display:flex;flex-direction:column;user-select:none;-webkit-user-select:none;overflow:hidden}#acc-player{position:fixed;inset:0;z-index:3000}.acc-pl.inline{width:100%;aspect-ratio:16/9;max-height:70vh}.acc-pl.inline .pl-top .pl-x{display:none}.acc-pl:fullscreen{aspect-ratio:auto;max-height:none;width:100%;height:100%}.acc-pl:fullscreen video{max-height:100vh}'
+  + '.acc-pl .pl-top{position:absolute;top:0;left:0;right:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;color:#fff;font-size:14px;font-weight:600;background:linear-gradient(rgba(0,0,0,.75),transparent);opacity:0;transition:opacity .25s;pointer-events:none}'
+  + '.acc-pl .pl-sub{color:#aab;font-weight:400;font-size:12px}.acc-pl .pl-badge{color:var(--accent);font-weight:700;font-size:12px}'
+  + '.acc-pl .pl-x{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.5);color:#fff;font-size:16px;cursor:pointer;pointer-events:auto}'
+  + '.acc-pl .pl-tap{position:absolute;top:15%;bottom:25%;width:30%;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .2s}'
+  + '.acc-pl .pl-tap span{background:rgba(255,255,255,.15);color:#fff;font-weight:700;padding:10px 16px;border-radius:99px;font-size:15px}'
+  + '.acc-pl .pl-tap-l{left:0}.acc-pl .pl-tap-r{right:0}.acc-pl .pl-tap.on{opacity:1}'
+  + '.acc-pl .pl-center{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);display:flex;justify-content:center;gap:clamp(22px,8vw,60px);opacity:0;transition:opacity .25s;pointer-events:none}'
+  + '.acc-pl .pl-big{width:58px;height:58px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:22px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;pointer-events:auto}'
+  + '.acc-pl .pl-big small{font-size:10px;margin-top:2px}.acc-pl .pl-play{width:72px;height:72px;font-size:26px}'
+  + '.acc-pl .pl-bar{position:absolute;left:0;right:0;bottom:0;z-index:5;padding:8px 16px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.85));opacity:0;transition:opacity .25s;pointer-events:none}'
+  + '.acc-pl.ui .pl-top,.acc-pl.ui .pl-center,.acc-pl.ui .pl-bar{opacity:1;pointer-events:auto}'
+  + '.acc-pl .pl-seek{position:relative;height:22px;display:flex;align-items:center}'
+  + '.acc-pl .pl-seek::before{content:"";position:absolute;left:0;right:0;height:4px;background:rgba(255,255,255,.25);border-radius:2px}'
+  + '.acc-pl .pl-buf,.acc-pl .pl-prog{position:absolute;left:0;height:4px;border-radius:2px;width:0}.acc-pl .pl-buf{background:rgba(255,255,255,.4)}.acc-pl .pl-prog{background:var(--accent)}'
+  + '.acc-pl .pl-seek input{position:absolute;left:0;right:0;width:100%;margin:0;height:22px;background:transparent;-webkit-appearance:none;appearance:none;cursor:pointer}'
+  + '.acc-pl .pl-seek input::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid #fff}'
+  + '.acc-pl .pl-seek input::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid #fff}'
+  + '.acc-pl .pl-row{display:flex;align-items:center;gap:8px;margin-top:4px;color:#fff;font-size:12px}.acc-pl .pl-sp{flex:1}'
+  + '.acc-pl .pl-btn{border:0;background:transparent;color:#fff;font-size:17px;cursor:pointer;padding:6px;border-radius:6px;font-family:inherit;line-height:1}.acc-pl .pl-btn:hover{background:rgba(255,255,255,.12)}'
+  + '.acc-pl .pl-rate{font-size:12px;font-weight:700;border:1px solid rgba(255,255,255,.35);padding:4px 8px}'
+  + '.acc-pl .pl-vol{width:70px;accent-color:var(--accent)}@media(max-width:600px){.acc-pl .pl-vol{display:none}}'
+  + '.acc-pl .pl-spin{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:accspin .8s linear infinite;display:none;pointer-events:none}'
+  + '.acc-pl.buf .pl-spin{display:block}.acc-pl.buf .pl-center{opacity:0}'
+  + '.acc-pl .top{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;color:#fff;font-size:13px;background:rgba(0,0,0,.6)}'
+  + '.acc-pl video{flex:1;width:100%;height:100%;object-fit:contain;background:#000;display:block}'
+  + '.acc-pl .x{width:36px;height:36px;border-radius:50%;border:1px solid #444;background:#111;color:#fff;font-size:16px;cursor:pointer}'
   + '#acc-lib{position:fixed;inset:0;z-index:1500;background:rgba(0,0,0,.75);display:flex;align-items:flex-end;justify-content:center}'
   + '#acc-lib .box{width:100%;max-width:480px;max-height:85vh;overflow:auto;background:var(--card);border-radius:18px 18px 0 0;padding:16px}'
   + '.acc-lib-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}'
@@ -5218,7 +5231,7 @@ async function accLoginFromCard(){
   if(card) card.innerHTML = '<div class="acc-ok">✓ Нэвтэрлээ</div>';
   setTimeout(()=>{
     const lm = document.getElementById('acc-loginmodal'); if(lm) lm.remove();
-    if(document.getElementById('acc-pay')) accRenderPay();
+    if(document.getElementById('acc-pay')){ accRenderPay(); accInlineStart(); }
     if(ACC._afterLogin){ const f = ACC._afterLogin; ACC._afterLogin = null; f(); }
   }, 1500);
 }
@@ -5258,13 +5271,51 @@ function accDecorateModal(movieId, catIndex){
     const s11 = document.getElementById('section-11'); if(s11) s11.style.display = 'none';   // 1+1 урамшуулал шинэ системд хараахан алга
   }
   accRenderPay();
+  // Цонхны дээд хэсэг = манай тоглуулагч (YouTube трейлерийн оронд): нэвтэрсэн бол шууд тоглоно
+  accInlineStart();
 }
+
+// ── Цонхон доторх тоглуулагч ──
+// Нэвтрээгүй: постер + ▶ (дарахад утасны карт руу). Нэвтэрсэн: эрхтэй бол бүтэн, үгүй бол
+// 15 минутын урьдчилан үзэлт — дуусахад бүдгэрч «үргэлжлүүлэх бол доорх төлбөрөөс сонгоно уу».
+function accInlineStop(){
+  accStopHb();
+  if(ACC._hls){ try{ ACC._hls.destroy(); }catch(e){} ACC._hls = null; }
+  const box = document.getElementById('modalTrailer'); if(!box) return;
+  const v = box.querySelector('video');
+  if(v){ const pos = v.currentTime || 0; v.pause(); v.removeAttribute('src'); v.load(); if(accLogged() && ACC.playCode) accApi('/acc/stop', { code: ACC.playCode, pos }).catch(()=>{}); }
+  if(document.fullscreenElement){ try{ document.exitFullscreen(); }catch(e){} }
+  box.innerHTML = '';
+}
+async function accInlineStart(){
+  const box = document.getElementById('modalTrailer'); const t = ACC.target;
+  if(!box || !t) return;
+  accInlineStop();
+  const mv = t.kind === 'movie' ? (typeof MOVIES !== 'undefined' ? MOVIES : []).find(x => x.id === t.id) : null;
+  const cover = mv ? (mv.cover || '') : '';
+  const poster = (msg, onclick) => '<div class="acc-poster" ' + (onclick ? 'onclick="' + onclick + '"' : '') + '>'
+    + (cover ? '<img src="' + accEsc(cover) + '" alt="">' : '') + '<div class="acc-poster-c"><span class="acc-poster-btn">▶</span>' + (msg ? '<span class="acc-poster-t">' + msg + '</span>' : '') + '</div></div>';
+  if(t.kind !== 'movie'){ box.innerHTML = poster('Бүх кино нээгдэнэ', ''); return; }
+  if(!accLogged()){ box.innerHTML = poster('Үзэхийн тулд дугаараа бичнэ үү', 'document.getElementById(\'acc-phone-in\')&&document.getElementById(\'acc-phone-in\').focus()'); return; }
+  box.innerHTML = '<div class="acc-poster">' + (cover ? '<img src="' + accEsc(cover) + '" alt="">' : '') + '<div class="acc-poster-c"><span class="acc-spin" style="width:26px;height:26px;border-width:3px"></span></div></div>';
+  const j = await accApi('/acc/play', { code: t.code });
+  if(!j.ok){
+    if(j.error === 'busy') box.innerHTML = poster('⏸ ' + accEsc(j.message || 'Өөр төхөөрөмж дээр тоглож байна'), 'accInlineStart()');
+    else if(j._status === 401) box.innerHTML = poster('Дугаараа бичнэ үү', '');
+    else box.innerHTML = poster(j.error === 'expired' ? '⌛ 24 цагийн хугацаа дууссан — доороос дахин авна уу' : j.error === 'claim_expired' ? '⌛ Үзэх хугацаа дууссан' : 'Үзэхийн тулд доороос төлбөрөө сонгоно уу', '');
+    if(j.me){ ACC.me = j.me; accRenderBadge(); }
+    return;
+  }
+  ACC.playCode = t.code;
+  accMountPlayer(box, j, t.code, true);
+}
+function accStopHb(){ if(ACC.hb){ clearInterval(ACC.hb); ACC.hb = null; } }
 
 function accPlanChips(){
   const plans = ACC.plans || [];
   if(!ACC.planSel && plans.length) ACC.planSel = plans[0].id;
   return '<div class="acc-plan-row">' + plans.map(p =>
-    '<div class="acc-plan' + (ACC.planSel === p.id ? ' on' : '') + '" onclick="ACC.planSel=\'' + p.id + '\';accRenderPay()">'
+    '<div class="acc-plan' + (ACC.planSel === p.id ? ' on' : '') + '" onclick="ACC.planSel=\'' + p.id + '\';accRenderPay();accScrollTo(document.getElementById(\'acc-methods\'))">'
     + '<div class="l">' + accEsc(p.label) + '</div><div class="p">' + accFmt(p.price) + '</div></div>').join('') + '</div>';
 }
 
@@ -5272,18 +5323,17 @@ function accRenderPay(){
   const pay = document.getElementById('acc-pay'); if(!pay || !ACC.target) return;
   const t = ACC.target;
   const methods = '<div class="acc-methods" id="acc-methods">'
-    + '<button class="acc-btn pri" onclick="accCheckout(\'qpay\')">⚡ QPay төлөх</button>'
-    + '<button class="acc-btn" onclick="accCheckout(\'bank\')">🏦 Дансаар төлөх</button></div>';
+    + '<button class="acc-btn" data-m="qpay" onclick="accCheckout(\'qpay\')">⚡ QPay төлөх</button>'
+    + '<button class="acc-btn" data-m="bank" onclick="accCheckout(\'bank\')">🏦 Дансаар төлөх</button></div>';
   let html = '';
 
-  // Аль хэдийн эрхтэй кино → шууд үзэх
+  // Аль хэдийн эрхтэй кино → дээрх тоглуулагч бүтнээр тоглож байна, зөвхөн мэдээлэл
   if(t.kind === 'movie' && accLogged() && ACC.me){
     const m = ACC.me.movies.find(x => x.code === t.code);
     const viaPlan = !!ACC.me.plan;
     if(viaPlan || (m && (m.state === 'active' || m.state === 'unplayed'))){
-      const info = viaPlan ? '👑 Гишүүнчлэлээр' : (m.state === 'active' ? accHours(m.until - Date.now()) + ' үлдлээ' : '24 цаг — эхлүүлснээс');
-      pay.innerHTML = '<button class="acc-btn pri wide" style="font-size:15px;padding:16px" onclick="accPlay(\'' + t.code + '\')">▶ Үзэх</button>'
-        + '<p style="text-align:center;font-size:11px;color:var(--muted);margin-top:6px">' + info + '</p>';
+      const info = viaPlan ? '👑 Гишүүнчлэлээр үзэж байна' : (m.state === 'active' ? '✓ Эрхтэй · ' + accHours(m.until - Date.now()) + ' үлдлээ' : '✓ Эрхтэй · эхлүүлснээс 24 цаг');
+      pay.innerHTML = '<p style="text-align:center;font-size:13px;color:var(--accent);font-weight:600;padding:6px 0">' + info + '</p>';
       return;
     }
   }
@@ -5291,13 +5341,7 @@ function accRenderPay(){
   if(t.kind === 'plan'){
     html += '<div class="acc-plans" style="border:0;margin:0;padding:0"><div class="t">Хугацаагаа сонгоно уу</div>' + accPlanChips() + '</div><div style="height:12px"></div>';
   }
-  // Урьдчилан үзэх: эхний N минутыг үнэгүй (каталогийн previewMin; 0 бол гарахгүй)
-  if(t.kind === 'movie'){
-    const mv = (typeof MOVIES !== 'undefined' ? MOVIES : []).find(x => x.id === t.id);
-    if(mv && mv.previewMin > 0 && mv.hasVideo !== false){
-      html += '<button class="acc-btn wide" style="margin-bottom:10px" onclick="accPlay(\'' + t.code + '\')">▶ Эхний ' + mv.previewMin + ' минутыг үнэгүй үзэх</button>';
-    }
-  }
+  html += '<div class="acc-cont" id="acc-cont"></div>';   // preview дуусахад: «Та үргэлжлүүлж үзэх бол…»
   html += methods;
   if(t.kind === 'movie'){
     html += '<div class="acc-plans"><div class="t">эсвэл <b style="color:#fff">Бүх кино үзэх</b> — багц авах</div>' + accPlanChipsAsButtons() + '</div>';
@@ -5326,7 +5370,8 @@ async function accCheckout(method){
   if(!accLogged()){ accRenderPay(); return; }
   const t = ACC.target; if(!t) return;
   const panel = document.getElementById('acc-panel'); if(!panel) return;
-  document.querySelectorAll('#acc-methods .acc-btn').forEach(b => b.classList.remove('on'));
+  // Сонгосон арга ногооноор идэвхжинэ (QPay/Данс хоёулаа ижил загвар)
+  document.querySelectorAll('#acc-methods .acc-btn').forEach(b => { b.classList.remove('on', 'pri'); if(b.dataset.m === method) b.classList.add('pri', 'on'); });
   panel.innerHTML = '<div class="acc-panel"><div class="acc-wait"><span class="acc-spin"></span>Нэхэмжлэх бэлдэж байна…</div></div>';
   const body = t.kind === 'plan' ? { kind:'plan', planId: ACC.planSel, method } : { kind:'movie', code: t.code, method };
   const j = await accApi('/acc/checkout', body);
@@ -5361,21 +5406,23 @@ async function accCheckout(method){
     }
   } else {
     const b = j.bank || {};
-    html += '<div class="acc-acct"><div class="b"><div class="l">Данс (' + accEsc(b.bankName || 'банк') + ')</div><div class="v" id="acc-acct-no">' + accEsc(b.accountNumber || '—') + '</div></div>'
-      + '<button class="acc-copy" onclick="accCopy(\'acc-acct-no\',this)">📋</button></div>'
-      + '<div class="acc-acct"><div class="b"><div class="l">Хүлээн авагч</div><div class="v" style="font-size:13px">' + accEsc(b.accountName || '—') + '</div></div></div>'
-      + '<div class="acc-acct"><div class="b"><div class="l">Гүйлгээний утга — заавал энэ кодыг бичнэ</div><div class="v" id="acc-txn">' + accEsc(j.txn) + '</div></div>'
-      + '<button class="acc-copy" onclick="accCopy(\'acc-txn\',this)">📋</button></div>'
-      + '<p style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:6px">' + accFmt(j.amount) + '-ийг шилжүүлээд баримтаа Messenger-ээр илгээнэ үү. Шалгаад эрхийг тань нээнэ.</p>'
-      + '<a href="' + accEsc((typeof BOT_PAGE !== 'undefined' ? BOT_PAGE : 'https://m.me/1164939043379162') + '?ref=' + j.txn) + '" class="acc-btn wide" style="margin-top:8px;background:#0084ff;border-color:transparent;color:#fff;text-decoration:none">💬 Баримт илгээх (Messenger)</a>';
+    // Данс / утга: хумисан талбар + ижил өндөртэй «хуулах» товч
+    html += '<div class="acc-acct"><div class="b"><div class="l">Данс' + (b.bankName ? ' · ' + accEsc(b.bankName) : '') + '</div><div class="v" id="acc-acct-no">' + accEsc(b.accountNumber || '—') + '</div></div>'
+      + '<button class="acc-copy" onclick="accCopy(\'acc-acct-no\',this)">Данс хуулах</button></div>'
+      + (b.accountName ? '<div class="acc-acct"><div class="b"><div class="l">Хүлээн авагч</div><div class="v" style="font-size:13px">' + accEsc(b.accountName) + '</div></div></div>' : '')
+      + '<div class="acc-acct"><div class="b"><div class="l">Гүйлгээний утга — заавал энэ код</div><div class="v" id="acc-txn">' + accEsc(j.txn) + '</div></div>'
+      + '<button class="acc-copy" onclick="accCopy(\'acc-txn\',this)">Утга хуулах</button></div>'
+      + '<p style="font-size:11px;color:var(--muted);line-height:1.5;margin-top:6px">' + accFmt(j.amount) + '-ийг дээрх данс руу шилжүүлнэ үү. Гүйлгээний утга зөв бол баталгаажмагц эрх автоматаар нээгдэнэ.</p>';
   }
-  html += '<div class="acc-wait" id="acc-wait"><span class="acc-spin"></span>Төлбөр шалгагдаж байна… төлмөгц эрх автоматаар нээгдэнэ</div></div>';
+  html += '<div class="acc-wait" id="acc-wait"><span class="acc-spin"></span>Төлбөр шалгагдаж байна…</div></div>';
   panel.innerHTML = html;
+  accScrollTo(panel);   // цонх өөрөө дээш гүйлгэж төлбөрийн хэсгийг бүтэн харуулна
   accStartPoll();
 }
 function accCopy(id, btn){
   const t = document.getElementById(id)?.textContent || '';
-  const done = () => { btn.textContent = '✓'; setTimeout(()=>btn.textContent = '📋', 1800); };
+  const old = btn.textContent;
+  const done = () => { btn.textContent = '✓ Хууллаа'; btn.classList.add('ok'); setTimeout(()=>{ btn.textContent = old; btn.classList.remove('ok'); }, 1800); };
   if(navigator.clipboard) navigator.clipboard.writeText(t).then(done).catch(done); else done();
 }
 async function accSaveQr(btn){
@@ -5413,29 +5460,27 @@ function accOnPaid(o){
     setTimeout(()=>{ if(typeof closeModal === 'function') closeModal(); accNotice('👑 Гишүүнчлэл идэвхжлээ — кино сонгоод ▶ Үзэх дарна уу', 5000); }, 2500);
   } else {
     if(panel) panel.innerHTML = '<div class="acc-done">✅ Кино үзэх эрх нээгдлээ!</div>';
-    setTimeout(()=>{ accPlay(o.code); }, 1500);
+    // Дээрх тоглуулагч бүтэн эрхээр дахин эхэлнэ (үзсэн газраасаа)
+    setTimeout(()=>{ accRenderPay(); accInlineStart(); accScrollTo(document.getElementById('modalTrailer')); }, 1500);
   }
 }
 
 // ── Тоглуулах ──
+// Кино = худалдан авах цонхны дээд хэсэгт тоглоно (accInlineStart). Энэ функц гаднаас
+// (Миний сан, ?watch=) дуудагдахад тухайн киноны цонхыг нээнэ.
 async function accPlay(code){
   if(!accLogged()){ accOpenLoginModal(()=>accPlay(code)); return; }
-  const j = await accApi('/acc/play', { code });
-  if(!j.ok){
-    if(j.error === 'busy') accNotice('⏸ ' + (j.message || 'Өөр төхөөрөмж дээр тоглож байна'), 6000);
-    else if(j.error === 'expired') accNotice('⌛ Энэ киноны 24 цагийн хугацаа дууссан байна', 5000);
-    else if(j.error === 'claim_expired') accNotice('⌛ Үзэх хугацаа дууссан (7 хоногийн дотор эхлүүлэх ёстой байсан)', 6000);
-    else if(j._status === 401) accOpenLoginModal(()=>accPlay(code));
-    else accNotice('⚠ ' + (j.error || 'Тоглуулж чадсангүй'));
-    if(j.me){ ACC.me = j.me; accRenderBadge(); }
-    return;
-  }
-  if(typeof closeModal === 'function') closeModal();
   const lib = document.getElementById('acc-lib'); if(lib) lib.remove();
-  ACC.playCode = code;
-  let p = document.getElementById('acc-player'); if(p) p.remove();
-  p = document.createElement('div'); p.id = 'acc-player';
+  const mv = (typeof MOVIES !== 'undefined' ? MOVIES : []).find(x => accCode(x.id) === code);
+  if(!mv){ accNotice('Кино каталогт олдсонгүй'); return; }
+  if(ACC.target && ACC.target.code === code && document.getElementById('buyModal')?.classList.contains('open')){ accInlineStart(); return; }
+  openBuyModal(mv.id, mv.cat);
+}
+
+// Тоглуулагчийг container-т суулгана (inline = цонхон дотор)
+function accMountPlayer(container, j, code, inline){
   const isPrev = j.via === 'preview' && j.previewSec > 0;
+  const p = document.createElement('div'); p.className = 'acc-pl' + (inline ? ' inline' : ''); if(!inline) p.id = 'acc-player';
   // ── Өөрийн удирдлагатай тоглуулагч (Netflix маяг): ⏪10 ▶ 10⏩, явц, цаг, дуу, хурд, PiP, бүтэн дэлгэц ──
   p.innerHTML =
       '<div class="pl-top"><span class="pl-title">' + accEsc(accMovieName(code))
@@ -5451,22 +5496,27 @@ async function accPlay(code){
     +     '<button class="pl-btn pl-rate" title="Хурд">1×</button>'
     +     '<button class="pl-btn pl-pip" title="Мини дэлгэц">⧉</button>'
     +     '<button class="pl-btn pl-fs" title="Бүтэн дэлгэц (F)">⛶</button></div>'
-    + '</div><div class="pl-spin"></div>';
-  document.body.appendChild(p);
+    + '</div><div class="pl-spin"></div>'
+    + '<div class="pl-end"><div class="pl-end-t">Үнэгүй хэсэг дууслаа</div><div class="pl-end-s">Та үргэлжлүүлж үзэх бол доорх төлбөрийн хэрэгслээс сонгоно уу</div></div>';
+  container.innerHTML = ''; container.appendChild(p);
   const v = p.querySelector('video');
   accAttachSource(v, j).catch(() => accNotice('⚠ Тоглуулагч ачаалахад алдаа гарлаа', 5000));
   v.addEventListener('error', () => { if(!ACC._prevEnded) accNotice('⚠ Видео ачаалахад алдаа гарлаа. Дахин оролдоно уу.', 5000); });
   ACC._prevEnded = false;
   accPlayerControls(p, v, j, code);
   if(isPrev){
-    // Урьдчилан үзэх хугацаа дуусмагц зогсоож, төлбөрийн цонх руу
+    // Урьдчилан үзэх хугацаа дуусмагц: бүдгэрч зогсоно, бүтэн дэлгэц бол буцаж жижигрэнэ,
+    // «үргэлжлүүлэх бол доорх төлбөрөөс сонгоно уу» гарна (цонх хаагдахгүй)
     const lim = j.previewSec;
     const stopAt = () => {
       if(ACC._prevEnded) return; ACC._prevEnded = true;
-      v.pause(); accClosePlayer();
-      const mv = (typeof MOVIES !== 'undefined' ? MOVIES : []).find(x => accCode(x.id) === code);
-      if(mv) openBuyModal(mv.id, mv.cat);
-      accNotice('⏱ Үнэгүй хэсэг дууслаа — үргэлжлүүлж үзэхийн тулд төлбөрөө төлнө үү', 6000);
+      v.pause(); accStopHb();
+      if(document.fullscreenElement){ try{ document.exitFullscreen(); }catch(e){} }
+      try{ if(v.webkitDisplayingFullscreen && v.webkitExitFullscreen) v.webkitExitFullscreen(); }catch(e){}
+      p.classList.add('ended'); p.classList.remove('ui');
+      const cont = document.getElementById('acc-cont');
+      if(cont){ cont.innerHTML = '<div class="acc-cont-box">⏱ Үнэгүй хэсэг дууслаа — <b>та үргэлжлүүлж үзэх бол доорх төлбөрийн хэрэгслээс сонгоно уу</b></div>'; setTimeout(() => accScrollTo(cont), 300); }
+      if(!inline){ accClosePlayer(); const mv = (typeof MOVIES !== 'undefined' ? MOVIES : []).find(x => accCode(x.id) === code); if(mv) openBuyModal(mv.id, mv.cat); }
     };
     v.addEventListener('timeupdate', () => {
       const left = Math.max(0, lim - v.currentTime);
@@ -5478,13 +5528,20 @@ async function accPlay(code){
     v.addEventListener('ended', stopAt);
     v.addEventListener('error', () => { if(v.currentTime >= lim * 0.9) stopAt(); });
   }
-  if(ACC.hb) clearInterval(ACC.hb);
+  accStopHb();
   ACC.hb = setInterval(async () => {
+    if(!document.body.contains(v)) return accStopHb();
     const h = await accApi('/acc/heartbeat', { code, pos: v.currentTime || 0 });
     if(!h.ok && h.error === 'busy'){ v.pause(); accNotice('⏸ Өөр төхөөрөмж дээр тоглож эхэлсэн тул энд зогслоо', 6000); }
   }, 30000);
   if(ACC.me){ const m = ACC.me.movies.find(x => x.code === code); if(m && !m.until && j.until){ m.state = 'active'; m.until = j.until; } }
   accRenderBadge();
+  return p;
+}
+// Цонхон дотор тухайн хэсэг рүү аяархан гүйлгэнэ (утсан дээр хуруугаар, PC дээр хулганаар гүйлгэх алхмыг орлоно)
+function accScrollTo(el){
+  if(!el) return;
+  try{ el.scrollIntoView({ behavior: 'smooth', block: 'end' }); }catch(e){ el.scrollIntoView(); }
 }
 
 // ── Тоглуулагчийн удирдлага ──
@@ -5537,7 +5594,7 @@ function accPlayerControls(p, v, j, code){
     else if(v.webkitEnterFullscreen) v.webkitEnterFullscreen();   // iPhone
   };
   const key = e => {
-    if(!document.getElementById('acc-player')) { document.removeEventListener('keydown', key); return; }
+    if(!document.body.contains(p)) { document.removeEventListener('keydown', key); return; }
     if(e.target && /INPUT|TEXTAREA/.test(e.target.tagName) && e.target.type !== 'range') return;
     if(e.code === 'Space'){ e.preventDefault(); toggle(); }
     else if(e.key === 'ArrowRight') skip(10); else if(e.key === 'ArrowLeft') skip(-10);
@@ -5624,7 +5681,7 @@ function accLibRow(code, name, cover, sub, canPlay){
   const _open = openBuyModal;
   openBuyModal = function(movieId, catIndex){ _open(movieId, catIndex); accDecorateModal(movieId, catIndex); };
   const _close = closeModal;
-  closeModal = function(){ accStopPoll(); ACC.oid = null; _close(); };
+  closeModal = function(){ accStopPoll(); ACC.oid = null; accInlineStop(); _close(); };
   applyPayGate = function(){};            // Messenger холболт шаардахгүй
   selectPay = function(){};               // хуучин QPay/данс панел ашиглагдахгүй
   createQpayInvoice = async function(){}; // хуучин нэхэмжлэх үүсгэхгүй (ACC-ийн /acc/checkout орлоно)
