@@ -568,6 +568,11 @@ button,input,select,textarea{font-family:var(--font);}
 .modal-box{border-radius:14px 14px 0 0;border-top:1px solid var(--border);animation:slideUp .25s ease;}
 .modal-top{padding:12px 16px;}
 .modal-nav-btn{width:32px;height:32px;background:transparent;}
+/* «← Буцах» текстэн товч; ✕ тод цагаан хүрээтэй */
+.modal-back{width:auto;height:34px;padding:0 12px;border-radius:99px;font:600 13px var(--font);color:var(--text);gap:4px;}
+.modal-x{width:36px;height:36px;border:1.5px solid rgba(255,255,255,.7);color:#fff;font-size:18px;font-weight:700;background:rgba(255,255,255,.08);}
+.modal-x:hover{background:var(--accent);border-color:var(--accent);color:var(--accent-text);}
+.modal-top{justify-content:space-between;}
 .modal-title{font:600 12px var(--font);color:var(--muted);letter-spacing:.02em;text-transform:uppercase;}
 .modal-trailer{border-bottom:1px solid var(--border);}
 .modal-body{padding:16px 18px 22px;}
@@ -5700,6 +5705,11 @@ function accLibRow(code, name, cover, sub, canPlay){
   openBuyModal = function(movieId, catIndex){ _open(movieId, catIndex); accDecorateModal(movieId, catIndex); };
   const _close = closeModal;
   closeModal = function(){ accStopPoll(); ACC.oid = null; accInlineStop(); _close(); };
+  // Цонхны гадна (харанхуй хэсэг) дарахад хаагдана — #buyModal скриптийн дараа тодорхойлогддог тул DOM бэлэн болсны дараа
+  window.addEventListener('DOMContentLoaded', () => {
+    const ov = document.getElementById('buyModal');
+    if(ov) ov.addEventListener('click', e => { if(e.target === ov) closeModal(); });
+  });
   applyPayGate = function(){};            // Messenger холболт шаардахгүй
   selectPay = function(){};               // хуучин QPay/данс панел ашиглагдахгүй
   createQpayInvoice = async function(){}; // хуучин нэхэмжлэх үүсгэхгүй (ACC-ийн /acc/checkout орлоно)
@@ -5780,9 +5790,9 @@ window.addEventListener('DOMContentLoaded', function(){ setTimeout(accInit, 50);
 <div class="modal-overlay" id="buyModal">
   <div class="modal-box">
     <div class="modal-top">
-      <button class="modal-nav-btn" onclick="closeModal()">←</button>
+      <button class="modal-nav-btn modal-back" onclick="closeModal()">← Буцах</button>
       <span class="modal-title" id="modalTitle">Кино авах</span>
-      <button class="modal-nav-btn" onclick="closeModal()">✕</button>
+      <button class="modal-nav-btn modal-x" onclick="closeModal()" title="Хаах">✕</button>
     </div>
 
     <div class="modal-trailer" id="modalTrailer"></div>
