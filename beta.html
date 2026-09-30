@@ -572,9 +572,9 @@ button,input,select,textarea{font-family:var(--font);}
 .modal-trailer{border-bottom:1px solid var(--border);}
 .modal-body{padding:16px 18px 22px;}
 .modal-movie-name{font:800 20px/1.2 var(--hfont);letter-spacing:-.01em;margin-bottom:6px;}
-.modal-price{font:800 18px var(--font);color:var(--text);margin-bottom:14px;}
-.modal-price::after{content:' · дан кино, 24 цаг';font:400 11px var(--font);color:var(--muted);}
-#buyModal.acc .modal-price[data-plan]::after{content:'';}
+.modal-price{font:800 18px var(--font);color:var(--accent);margin-bottom:14px;}.modal-price small{font:400 11px var(--font);color:var(--muted);margin-left:6px;}
+
+
 .pay-btn{border-radius:var(--radius);font-family:var(--font);}
 .pay-btn.active{background:var(--accent);color:var(--accent-text);box-shadow:none;}
 .pay-panel{border-color:var(--border);border-radius:var(--radius);}
@@ -619,7 +619,7 @@ button,input,select,textarea{font-family:var(--font);}
 .acc-slide-t{position:absolute;left:18px;right:18px;bottom:16px;z-index:2;}
 .acc-slide-k{font:600 10px var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);}
 .acc-slide-n{font:800 clamp(20px,5.5vw,28px)/1.15 var(--hfont);letter-spacing:-.01em;color:var(--text);margin-top:4px;}
-.acc-slide-p{font:500 12px var(--font);color:var(--muted);margin-top:4px;}
+.acc-slide-p{font:500 12px var(--font);color:var(--muted);margin-top:4px;}.acc-slide-p b{color:var(--accent);font-weight:700;}
 .acc-dots{position:absolute;right:16px;bottom:14px;z-index:3;display:flex;gap:5px;}
 .acc-dots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.35);display:block;transition:.2s;}
 .acc-dots i.on{background:var(--accent);width:16px;border-radius:3px;}
@@ -628,6 +628,11 @@ button,input,select,textarea{font-family:var(--font);}
 .eps-badge,.badge-11{display:none!important;}
 .lang-badge{position:absolute;top:6px;left:6px;font:700 9.5px var(--font);letter-spacing:.06em;padding:3px 6px;border-radius:2px;background:rgba(0,0,0,.6);color:#fff;backdrop-filter:blur(4px);}
 .lang-badge.sub{background:rgba(0,0,0,.6);color:var(--accent);}
+/* Идэвхтэй эрхтэй кино: баруун дээд өнцөгт «⏱ N цаг үлдсэн» (DUB/SUB-ийн эсрэг тал) */
+.ent-badge{position:absolute;top:6px;right:6px;z-index:3;display:none;font:700 9.5px var(--font);letter-spacing:.02em;padding:3px 7px;border-radius:2px;background:var(--accent);color:var(--accent-text);white-space:nowrap;}
+.ent-badge.on{display:block;}
+.acc-slide .ent-badge{top:14px;right:4%;font-size:11px;padding:4px 9px;}
+@media(min-width:800px){.ent-badge{font-size:11px;padding:4px 8px;}}
 #admin-panel .tab-select{grid-template-columns:repeat(auto-fit,minmax(90px,1fr));}
 /* ── Хариу үйлдэлтэй загвар (Netflix стандарт): 4% захын зай, өргөнөөр багана
    2 (<500) · 3 (<800) · 4 (<1100) · 5 (<1400) · 6 (≥1400); hero ≤ 70vh; PC дээр modal төвд ── */
@@ -1839,6 +1844,7 @@ function renderGrids(){
           </div>
           <span class="price-badge">${m.price}</span>
           ${langBadge}
+          <span class="ent-badge" data-code="M${String(m.id).padStart(2,'0')}"></span>
         </div>
         <div class="card-info">
           <p class="card-name">${m.name}</p>
@@ -5136,7 +5142,7 @@ function accRenderHero(){
     '<div class="acc-slide" onclick="openBuyModal(' + m.id + ',' + m.cat + ')">'
     + '<img src="' + accEsc(m.cover || '') + '" alt="" onerror="this.style.display=\'none\'">'
     + '<div class="acc-slide-t"><span class="acc-slide-k">Сүүлд нэмэгдсэн</span><div class="acc-slide-n">' + accEsc(m.name) + '</div>'
-    + '<div class="acc-slide-p">' + accPriceText(m.price) + (m.lang === 'sub' ? ' · SUB' : ' · DUB') + '</div></div></div>').join('')
+    + '<div class="acc-slide-p"><b>' + accPriceText(m.price) + '</b>' + (m.lang === 'sub' ? ' · SUB' : ' · DUB') + '</div></div>' + '<span class="ent-badge" data-code="' + accCode(m.id) + '"></span></div>').join('')
     + '</div><div class="acc-dots" id="acc-dots">' + items.map((_, i) => '<i' + (i ? '' : ' class="on"') + '></i>').join('') + '</div>';
   const track = document.getElementById('acc-hero-track'), dots = document.getElementById('acc-dots');
   const cur = () => Math.round(track.scrollLeft / track.clientWidth);
@@ -5151,10 +5157,22 @@ function accRenderHero(){
 }
 function accHeroPause(){ ACC._heroPaused = Date.now() + 9000; }
 (function accHookHero(){
-  if(typeof renderGrids === 'function'){ const _g = renderGrids; renderGrids = function(){ const x = _g.apply(this, arguments); accRenderHero(); return x; }; }
+  if(typeof renderGrids === 'function'){ const _g = renderGrids; renderGrids = function(){ const x = _g.apply(this, arguments); accRenderHero(); accMarkEntitled(); return x; }; }
   if(typeof updateHeroCover === 'function') updateHeroCover = function(){};   // таб солиход hero солигдохгүй
 })();
 function accScrollPlans(){ openBuyModal('ALL', (typeof currentCat === 'number' ? currentCat : 0)); }
+function accMovieHours(){ return (ACC.rules && ACC.rules.movieHours) || 30; }
+// Карт/тойрог дээр идэвхтэй эрхийн тэмдэг: дан кино → «⏱ 18 цаг үлдсэн», багц → «👑»
+function accMarkEntitled(){
+  const me = accLogged() && ACC.me ? ACC.me : null;
+  document.querySelectorAll('.ent-badge').forEach(b => {
+    b.classList.remove('on'); b.textContent = '';
+    if(!me) return;
+    const m = me.movies.find(x => x.code === b.dataset.code && x.state === 'active');
+    if(m){ b.textContent = '⏱ ' + accHours(m.until - Date.now()) + ' үлдсэн'; b.classList.add('on'); }
+    else if(me.plan){ b.textContent = '👑'; b.classList.add('on'); }
+  });
+}
 
 // Нэвтрэх бүрд нэг удаа (өдөрт нэг) үлдэгдэл хугацааны мөр
 function accRenderBanner(force){
@@ -5193,7 +5211,7 @@ async function accLogin(phone, onDone){
   const j = await accApi('/acc/login', { phone: p, device: ACC.dev || undefined, ua: navigator.userAgent });
   if(!j.ok){ accNotice('⚠ ' + (j.error || 'Нэвтэрч чадсангүй')); return false; }
   ACC.phone = j.phone; ACC.dev = j.device; ACC.me = j.me; accSaveLocal();
-  accRenderBadge(); accRenderBanner(true);
+  accRenderBadge(); accRenderBanner(true); accMarkEntitled();
   if(j.kicked) accNotice('ℹ Төхөөрөмжийн хязгаар ' + (ACC.rules ? ACC.rules.maxDevices : 2) + ' тул ' + accDeviceName(j.kicked.ua) + ' дээрх нэвтрэлт хаагдлаа', 5000);
   if(onDone) onDone(j);
   return true;
@@ -5201,14 +5219,14 @@ async function accLogin(phone, onDone){
 async function accLogout(){
   const m = document.getElementById('acc-menu'); if(m) m.remove();
   try{ await accApi('/acc/logout', {}); }catch(e){}
-  ACC.phone = null; ACC.dev = null; ACC.me = null; accSaveLocal(); accRenderBadge();
+  ACC.phone = null; ACC.dev = null; ACC.me = null; accSaveLocal(); accRenderBadge(); accMarkEntitled();
   const b = document.getElementById('acc-banner'); if(b) b.remove();
   accNotice('Гарлаа');
 }
 async function accRefreshMe(){
   if(!accLogged()) return null;
   const j = await accApi('/acc/me');
-  if(j.ok){ ACC.me = j.me; accRenderBadge(); }
+  if(j.ok){ ACC.me = j.me; accRenderBadge(); accMarkEntitled(); }
   return j.ok ? j.me : null;
 }
 
@@ -5267,7 +5285,7 @@ function accDecorateModal(movieId, catIndex){
     const s11 = document.getElementById('section-11'); if(s11) s11.style.display = 'none';
   } else {
     ACC.target = { kind:'movie', code: accCode(movieId), id: movieId, cat: catIndex };
-    priceEl.textContent = accPriceText(priceEl.textContent); delete priceEl.dataset.plan;
+    priceEl.innerHTML = accEsc(accPriceText(priceEl.textContent)) + '<small>· дан кино, ' + accMovieHours() + ' цаг</small>'; delete priceEl.dataset.plan;
     const s11 = document.getElementById('section-11'); if(s11) s11.style.display = 'none';   // 1+1 урамшуулал шинэ системд хараахан алга
   }
   accRenderPay();
@@ -5302,7 +5320,7 @@ async function accInlineStart(){
   if(!j.ok){
     if(j.error === 'busy') box.innerHTML = poster('⏸ ' + accEsc(j.message || 'Өөр төхөөрөмж дээр тоглож байна'), 'accInlineStart()');
     else if(j._status === 401) box.innerHTML = poster('Дугаараа бичнэ үү', '');
-    else box.innerHTML = poster(j.error === 'expired' ? '⌛ 24 цагийн хугацаа дууссан — доороос дахин авна уу' : j.error === 'claim_expired' ? '⌛ Үзэх хугацаа дууссан' : 'Үзэхийн тулд доороос төлбөрөө сонгоно уу', '');
+    else box.innerHTML = poster(j.error === 'expired' ? '⌛ ' + accMovieHours() + ' цагийн хугацаа дууссан — доороос дахин авна уу' : j.error === 'claim_expired' ? '⌛ Үзэх хугацаа дууссан' : 'Үзэхийн тулд доороос төлбөрөө сонгоно уу', '');
     if(j.me){ ACC.me = j.me; accRenderBadge(); }
     return;
   }
@@ -5332,7 +5350,7 @@ function accRenderPay(){
     const m = ACC.me.movies.find(x => x.code === t.code);
     const viaPlan = !!ACC.me.plan;
     if(viaPlan || (m && (m.state === 'active' || m.state === 'unplayed'))){
-      const info = viaPlan ? '👑 Гишүүнчлэлээр үзэж байна' : (m.state === 'active' ? '✓ Эрхтэй · ' + accHours(m.until - Date.now()) + ' үлдлээ' : '✓ Эрхтэй · эхлүүлснээс 24 цаг');
+      const info = viaPlan ? '👑 Гишүүнчлэлээр үзэж байна' : (m.state === 'active' ? '✓ Эрхтэй · ' + accHours(m.until - Date.now()) + ' үлдлээ' : '✓ Эрхтэй · эхлүүлснээс ' + accMovieHours() + ' цаг');
       pay.innerHTML = '<p style="text-align:center;font-size:13px;color:var(--accent);font-weight:600;padding:6px 0">' + info + '</p>';
       return;
     }
