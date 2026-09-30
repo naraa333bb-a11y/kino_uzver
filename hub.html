@@ -456,6 +456,7 @@ async function vAccUsers() {
           <div><label class="f">Төхөөрөмжийн хязгаар</label><input id="r_md" type="number" value="${rules.maxDevices}"></div>
           <div><label class="f">Зэрэг тоглуулалт</label><input id="r_ms" type="number" value="${rules.maxStreams}"></div>
           <div><label class="f">Үнэгүй урьдчилан үзэх (минут, 0 = үгүй)</label><input id="r_pv" type="number" min="0" value="${rules.previewMinutes ?? 15}"></div>
+          <div><label class="f">Идэвхгүй төхөөрөмж хаах (хоног, 0 = хэзээ ч)</label><input id="r_idle" type="number" min="0" value="${rules.idleDays ?? 90}"></div>
         </div>
         <div class="formgrid" style="margin-top:10px">${plans.map((p, i) => `<div><label class="f">${esc(p.id)} — сар / үнэ / нэр</label><div class="row" style="gap:4px"><input id="p_m${i}" type="number" value="${p.months}" style="width:60px"><input id="p_p${i}" type="number" value="${p.price}" style="width:100px"><input id="p_l${i}" value="${esc(p.label)}"></div></div>`).join('')}</div>
         <button class="btn sm" style="margin-top:10px" onclick="accSaveRules(${plans.length}, ${JSON.stringify(plans.map(p => p.id)).replace(/"/g, '&quot;')})">Хадгалах</button></div>`);
@@ -463,7 +464,7 @@ async function vAccUsers() {
 }
 async function accSaveRules(n, ids) {
   const plans = []; for (let i = 0; i < n; i++) plans.push({ id: ids[i], months: $('p_m' + i).value, price: $('p_p' + i).value, label: $('p_l' + i).value });
-  try { await api(`/hub/acc-rules?biz=${S.cur.id}`, { movieHours: $('r_mh').value, movieClaimDays: $('r_cd').value, maxDevices: $('r_md').value, maxStreams: $('r_ms').value, previewMinutes: $('r_pv').value, plans }); toast('Хадгалагдлаа'); vAccUsers(); } catch(e) { toast(e.message, true); }
+  try { await api(`/hub/acc-rules?biz=${S.cur.id}`, { movieHours: $('r_mh').value, movieClaimDays: $('r_cd').value, maxDevices: $('r_md').value, maxStreams: $('r_ms').value, previewMinutes: $('r_pv').value, idleDays: $('r_idle').value, plans }); toast('Хадгалагдлаа'); vAccUsers(); } catch(e) { toast(e.message, true); }
 }
 function accGrantModal(phone) {
   modal(`<h3 style="margin-bottom:4px">Гар бүртгэл / эрх олгох</h3><p class="muted" style="font-size:12px;margin-bottom:12px">Алдаа засах, урамшуулах, өөр замаар төлсөн хүнд эрх нээх. Дугаар бүртгэлгүй бол шинээр үүснэ.</p>
