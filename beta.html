@@ -4974,6 +4974,10 @@ async function accApi(path, body){
     const who = j.kicked && j.kicked.ua ? accDeviceName(j.kicked.ua) : 'өөр төхөөрөмж';
     accNotice('⚠ ' + who + ' дээр энэ дугаараар нэвтэрсэн тул энэ төхөөрөмж гарлаа. Дахин нэвтэрч болно.', 7000);
     if(document.getElementById('acc-pay')) accRenderPay();
+  } else if(res.status === 401 && j.error === 'idle_out'){
+    ACC.phone = null; ACC.dev = null; ACC.me = null; accSaveLocal(); accRenderBadge();
+    accNotice('ℹ ' + (j.idleDays || 90) + ' хоног ороогүй тул нэвтрэлт хаагдлаа. Дугаараа бичээд дахин нэвтэрнэ үү.', 7000);
+    if(document.getElementById('acc-pay')) accRenderPay();
   } else if(res.status === 401 && accLogged() && path !== '/acc/login'){
     // Бүртгэл серверт алга (устгагдсан) — локал нэвтрэлтийг цэвэрлэж дахин утас асууна
     ACC.phone = null; ACC.dev = null; ACC.me = null; accSaveLocal(); accRenderBadge();
