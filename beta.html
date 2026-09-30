@@ -626,6 +626,32 @@ button,input,select,textarea{font-family:var(--font);}
 .lang-badge{position:absolute;top:6px;left:6px;font:700 9.5px var(--font);letter-spacing:.06em;padding:3px 6px;border-radius:2px;background:rgba(0,0,0,.6);color:#fff;backdrop-filter:blur(4px);}
 .lang-badge.sub{background:rgba(0,0,0,.6);color:var(--accent);}
 #admin-panel .tab-select{grid-template-columns:repeat(auto-fit,minmax(90px,1fr));}
+/* ── Хариу үйлдэлтэй загвар (Netflix стандарт): 4% захын зай, өргөнөөр багана
+   2 (<500) · 3 (<800) · 4 (<1100) · 5 (<1400) · 6 (≥1400); hero ≤ 70vh; PC дээр modal төвд ── */
+.topbar{padding:12px 4%;}
+.tabs-wrap{padding:6px 4% 0;}
+.tab-panel{padding:16px 4% 8px;}
+.hero{max-width:none;}
+.acc-slide{height:clamp(220px,42vw,70vh);}
+.acc-slide img{object-position:50% 22%;}
+.acc-slide-t{left:4%;right:4%;bottom:max(16px,4vw);max-width:640px;}
+.acc-slide-n{font-size:clamp(20px,3.2vw,44px);}
+.acc-slide-p{font-size:clamp(12px,1.1vw,15px);}
+.acc-dots{right:4%;}
+.movie-grid{grid-template-columns:repeat(2,1fr);gap:14px 10px;}
+@media(min-width:500px){.movie-grid{grid-template-columns:repeat(3,1fr);}}
+@media(min-width:800px){.movie-grid{grid-template-columns:repeat(4,1fr);gap:18px 14px;}.card-name{font-size:13px;}.panel-label{font-size:18px;}.tab-chip{font-size:14px;}}
+@media(min-width:1100px){.movie-grid{grid-template-columns:repeat(5,1fr);}}
+@media(min-width:1400px){.movie-grid{grid-template-columns:repeat(6,1fr);gap:20px 16px;}}
+@media(min-width:768px){
+  .modal-overlay{align-items:center;padding:24px;}
+  .modal-box{max-width:720px;max-height:90vh;border-radius:14px;border:1px solid var(--border);animation:accpop .25s ease;}
+  .modal-body{padding:20px 24px 26px;}
+  .modal-movie-name{font-size:24px;}
+  #acc-lib{align-items:center;padding:24px;}
+  #acc-lib .box{max-width:640px;border-radius:14px;border:1px solid var(--border);}
+  #acc-player video{max-height:100vh;}
+}
 </style>
 </head>
 <body>
@@ -5238,6 +5264,13 @@ function accRenderPay(){
   if(t.kind === 'plan'){
     html += '<div class="acc-plans" style="border:0;margin:0;padding:0"><div class="t">Хугацаагаа сонгоно уу</div>' + accPlanChips() + '</div><div style="height:12px"></div>';
   }
+  // Урьдчилан үзэх: эхний N минутыг үнэгүй (каталогийн previewMin; 0 бол гарахгүй)
+  if(t.kind === 'movie'){
+    const mv = (typeof MOVIES !== 'undefined' ? MOVIES : []).find(x => x.id === t.id);
+    if(mv && mv.previewMin > 0 && mv.hasVideo !== false){
+      html += '<button class="acc-btn wide" style="margin-bottom:10px" onclick="accPlay(\'' + t.code + '\')">▶ Эхний ' + mv.previewMin + ' минутыг үнэгүй үзэх</button>';
+    }
+  }
   html += methods;
   if(t.kind === 'movie'){
     html += '<div class="acc-plans"><div class="t">эсвэл <b style="color:#fff">Бүх кино үзэх</b> — багц авах</div>' + accPlanChipsAsButtons() + '</div>';
@@ -5375,11 +5408,35 @@ async function accPlay(code){
   ACC.playCode = code;
   let p = document.getElementById('acc-player'); if(p) p.remove();
   p = document.createElement('div'); p.id = 'acc-player';
-  p.innerHTML = '<div class="top"><span>🎬 ' + accEsc(accMovieName(code)) + (j.until ? ' · <span style="color:var(--muted)">' + accHours(j.until - Date.now()) + ' үлдлээ</span>' : '') + '</span><button class="x" onclick="accClosePlayer()">✕</button></div>'
+  const isPrev = j.via === 'preview' && j.previewSec > 0;
+  p.innerHTML = '<div class="top"><span>🎬 ' + accEsc(accMovieName(code))
+    + (isPrev ? ' · <span id="acc-prev-left" style="color:var(--accent)">үнэгүй ' + Math.round(j.previewSec / 60) + ':00</span>' : (j.until ? ' · <span style="color:var(--muted)">' + accHours(j.until - Date.now()) + ' үлдлээ</span>' : ''))
+    + '</span><button class="x" onclick="accClosePlayer()">✕</button></div>'
     + '<video controls playsinline autoplay controlsList="nodownload" oncontextmenu="return false"></video>';
   document.body.appendChild(p);
   const v = p.querySelector('video'); v.src = j.src;
-  v.addEventListener('error', () => accNotice('⚠ Видео ачаалахад алдаа гарлаа. Дахин оролдоно уу.', 5000));
+  v.addEventListener('error', () => { if(!ACC._prevEnded) accNotice('⚠ Видео ачаалахад алдаа гарлаа. Дахин оролдоно уу.', 5000); });
+  ACC._prevEnded = false;
+  if(isPrev){
+    // Урьдчилан үзэх хугацаа дуусмагц зогсоож, төлбөрийн цонх руу
+    const lim = j.previewSec;
+    const stopAt = () => {
+      if(ACC._prevEnded) return; ACC._prevEnded = true;
+      v.pause(); accClosePlayer();
+      const mv = (typeof MOVIES !== 'undefined' ? MOVIES : []).find(x => accCode(x.id) === code);
+      if(mv) openBuyModal(mv.id, mv.cat);
+      accNotice('⏱ Үнэгүй хэсэг дууслаа — үргэлжлүүлж үзэхийн тулд төлбөрөө төлнө үү', 6000);
+    };
+    v.addEventListener('timeupdate', () => {
+      const left = Math.max(0, lim - v.currentTime);
+      const el = document.getElementById('acc-prev-left');
+      if(el) el.textContent = 'үнэгүй ' + Math.floor(left / 60) + ':' + String(Math.floor(left % 60)).padStart(2, '0');
+      if(v.currentTime >= lim) stopAt();
+    });
+    v.addEventListener('seeking', () => { if(v.currentTime > lim) v.currentTime = Math.max(0, lim - 1); });
+    v.addEventListener('ended', stopAt);
+    v.addEventListener('error', () => { if(v.currentTime >= lim * 0.9) stopAt(); });
+  }
   if(ACC.hb) clearInterval(ACC.hb);
   ACC.hb = setInterval(async () => {
     const h = await accApi('/acc/heartbeat', {});
