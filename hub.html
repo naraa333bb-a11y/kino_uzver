@@ -243,6 +243,8 @@ const PAGES = [
   { id: 'orders', ic: '🛒', nm: 'Захиалга' },
   { id: 'revenue', ic: '💰', nm: 'Орлого' },
   { id: 'customers', ic: '👤', nm: 'Хэрэглэгчид' },
+  { id: 'accusers', ic: '📱', nm: 'Утасны бүртгэл', kino: true },
+  { id: 'accorders', ic: '🧾', nm: 'Эрхийн захиалга', kino: true },
   { sec: 'КОНТЕНТ' },
   { id: 'items', ic: '📦', nm: 'Бараа' },
   { sec: 'СИСТЕМ' },
@@ -259,9 +261,9 @@ function openBiz(id, page) {
 }
 function go(page) {
   S.page = page; location.hash = S.cur.id + '/' + page;
-  $('nav').innerHTML = PAGES.map(p => p.sec ? `<div class="sec">${p.sec}</div>` : `<a href="#" class="${p.id === page ? 'on' : ''}" onclick="go('${p.id}');return false">${p.ic} ${p.nm}</a>`).join('');
+  $('nav').innerHTML = PAGES.filter(p => !p.kino || S.cur.kind === 'kino').map(p => p.sec ? `<div class="sec">${p.sec}</div>` : `<a href="#" class="${p.id === page ? 'on' : ''}" onclick="go('${p.id}');return false">${p.ic} ${p.nm}</a>`).join('');
   $('side').classList.remove('open');
-  ({ dash: vDash, orders: vOrders, revenue: vRevenue, customers: vCustomers, items: vItems, bot: vBot, cfg: vCfg }[page] || vDash)();
+  ({ dash: vDash, orders: vOrders, revenue: vRevenue, customers: vCustomers, accusers: vAccUsers, accorders: vAccOrders, items: vItems, bot: vBot, cfg: vCfg }[page] || vDash)();
 }
 function setView(h) { $('view').innerHTML = h; }
 function loading(t) { setView(`<p class="muted">⏳ ${t || 'Ачаалж байна…'}</p>`); }
@@ -426,6 +428,77 @@ async function vCustomers() {
         ${[...new Set(custs)].map(n => `<tr><td>${esc(n)}</td><td>${os.filter(o => o.customer === n && o.status === 'paid').length}</td><td>${fmt(os.filter(o => o.customer === n && o.status === 'paid').reduce((s, o) => s + o.amount, 0))}</td><td class="muted">гар захиалга</td></tr>`).join('')}
         ${!rows.length && !custs.length ? '<tr><td colspan="4" class="muted">Хэрэглэгч алга</td></tr>' : ''}</table></div>`);
   } catch(e) { setView(`<p style="color:var(--bad)">${esc(e.message)}</p>`); }
+}
+
+// ── Утасны бүртгэл (ACC): хэрэглэгч, эрх, гар бүртгэл, дүрэм ──
+let accQ = '';
+async function vAccUsers() {
+  loading();
+  try {
+    const j = await api(`/hub/acc-users?biz=${S.cur.id}&q=${encodeURIComponent(accQ)}`);
+    const plans = j.plans || [], rules = j.rules || {};
+    const dl = ms => ms ? Math.ceil((ms - Date.now()) / 86400e3) : 0;
+    setView(`<div class="row" style="justify-content:space-between"><h2>📱 Утасны бүртгэл</h2><button class="btn sm" onclick="accGrantModal()">✏️ Гар бүртгэл / эрх олгох</button></div>
+      <div class="kpis"><div class="kpi"><div class="l">Нийт хэрэглэгч</div><div class="v">${j.users.length}</div></div>
+        <div class="kpi"><div class="l">👑 Идэвхтэй гишүүн</div><div class="v">${j.users.filter(u => u.plan).length}</div></div>
+        <div class="kpi"><div class="l">🎬 Идэвхтэй дан кино</div><div class="v">${j.users.reduce((s, u) => s + u.movies.filter(m => m.state !== 'expired').length, 0)}</div></div></div>
+      <div class="row" style="margin-bottom:10px"><input id="accq" placeholder="Дугаараар хайх…" value="${esc(accQ)}" style="max-width:220px" onkeydown="if(event.key==='Enter'){accQ=this.value;vAccUsers()}"><button class="btn ghost sm" onclick="accQ=$('accq').value;vAccUsers()">Хайх</button></div>
+      <div class="card" style="padding:0;overflow:auto"><table><tr><th>Утас</th><th>Гишүүнчлэл</th><th>Дан кино</th><th>Төхөөрөмж</th><th></th></tr>
+        ${j.users.map(u => `<tr><td class="mono">${esc(u.phone)}</td>
+          <td>${u.plan ? `<span class="pill paid">👑 ${u.plan.daysLeft} хоног</span>` : '<span class="muted">—</span>'}</td>
+          <td>${u.movies.length ? u.movies.map(m => `<span class="pill ${m.state === 'expired' ? 'cancelled' : m.state === 'active' ? 'paid' : 'pending'}" title="${m.state}">${esc(m.code)}${m.state === 'active' ? ' ' + m.hoursLeft + 'ц' : m.state === 'unplayed' ? ' ●' : ''}</span>`).join(' ') : '<span class="muted">—</span>'}</td>
+          <td>${u.devices}/${u.maxDevices}</td>
+          <td><button class="btn ghost sm" onclick="accGrantModal('${esc(u.phone)}')">+ эрх</button></td></tr>`).join('') || '<tr><td colspan="5" class="muted">Бүртгэл алга</td></tr>'}</table></div>
+      <div class="card" style="margin-top:14px"><h3 style="margin-bottom:8px">⚙️ Дүрэм, багцын үнэ</h3>
+        <div class="formgrid">
+          <div><label class="f">Дан кино — цаг (анх тоглуулснаас)</label><input id="r_mh" type="number" value="${rules.movieHours}"></div>
+          <div><label class="f">Дан кино — хэдэн хоногт эхлүүлэх</label><input id="r_cd" type="number" value="${rules.movieClaimDays}"></div>
+          <div><label class="f">Төхөөрөмжийн хязгаар</label><input id="r_md" type="number" value="${rules.maxDevices}"></div>
+          <div><label class="f">Зэрэг тоглуулалт</label><input id="r_ms" type="number" value="${rules.maxStreams}"></div>
+        </div>
+        <div class="formgrid" style="margin-top:10px">${plans.map((p, i) => `<div><label class="f">${esc(p.id)} — сар / үнэ / нэр</label><div class="row" style="gap:4px"><input id="p_m${i}" type="number" value="${p.months}" style="width:60px"><input id="p_p${i}" type="number" value="${p.price}" style="width:100px"><input id="p_l${i}" value="${esc(p.label)}"></div></div>`).join('')}</div>
+        <button class="btn sm" style="margin-top:10px" onclick="accSaveRules(${plans.length}, ${JSON.stringify(plans.map(p => p.id)).replace(/"/g, '&quot;')})">Хадгалах</button></div>`);
+  } catch(e) { setView(`<p style="color:var(--bad)">${esc(e.message)}</p>`); }
+}
+async function accSaveRules(n, ids) {
+  const plans = []; for (let i = 0; i < n; i++) plans.push({ id: ids[i], months: $('p_m' + i).value, price: $('p_p' + i).value, label: $('p_l' + i).value });
+  try { await api(`/hub/acc-rules?biz=${S.cur.id}`, { movieHours: $('r_mh').value, movieClaimDays: $('r_cd').value, maxDevices: $('r_md').value, maxStreams: $('r_ms').value, plans }); toast('Хадгалагдлаа'); vAccUsers(); } catch(e) { toast(e.message, true); }
+}
+function accGrantModal(phone) {
+  modal(`<h3 style="margin-bottom:4px">Гар бүртгэл / эрх олгох</h3><p class="muted" style="font-size:12px;margin-bottom:12px">Алдаа засах, урамшуулах, өөр замаар төлсөн хүнд эрх нээх. Дугаар бүртгэлгүй бол шинээр үүснэ.</p>
+    <label class="f">Утасны дугаар</label><input id="g_ph" value="${esc(phone || '')}" placeholder="88xxxxxx" inputmode="numeric" maxlength="8">
+    <div class="formgrid" style="margin-top:8px">
+      <div><label class="f">Төрөл</label><select id="g_k" onchange="$('g_mv').style.display=this.value==='movie'?'':'none';$('g_pl').style.display=this.value==='plan'?'':'none'"><option value="plan">👑 Гишүүнчлэл</option><option value="movie">🎬 Дан кино</option></select></div>
+      <div id="g_pl"><label class="f">Хоног (эсвэл сар)</label><div class="row" style="gap:4px"><input id="g_days" type="number" placeholder="хоног" style="width:90px"><input id="g_months" type="number" placeholder="сар" style="width:70px"></div></div>
+      <div id="g_mv" style="display:none"><label class="f">Киноны код</label><input id="g_code" placeholder="M17"></div>
+    </div>
+    <label class="f" style="margin-top:8px">Тэмдэглэл</label><input id="g_note" placeholder="ж: урамшуулал, гүйлгээ буруу утгатай">
+    <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn ghost" onclick="closeModal()">Болих</button><button class="btn" onclick="accGrant()">Эрх олгох</button></div>`);
+}
+async function accGrant() {
+  const kind = $('g_k').value;
+  const body = { phone: $('g_ph').value, kind, code: $('g_code').value, days: $('g_days').value, months: $('g_months').value, note: $('g_note').value };
+  if (kind === 'plan' && !body.days && !body.months) return toast('Хоног эсвэл сар оруулна уу', true);
+  try { const j = await api(`/hub/acc-grant?biz=${S.cur.id}`, body); closeModal(); toast('Эрх олгогдлоо: ' + (j.me.plan ? '👑 ' + j.me.plan.daysLeft + ' хоног' : j.me.movies.map(m => m.code).join(', '))); vAccUsers(); } catch(e) { toast(e.message, true); }
+}
+let accOrdF = 'pending_manual';
+async function vAccOrders() {
+  loading();
+  try {
+    const j = await api(`/hub/acc-orders?biz=${S.cur.id}${accOrdF === 'all' ? '' : '&status=' + accOrdF}`);
+    const st = s => ({ pending: ['Хүлээгдэж буй', 'pending'], pending_manual: ['🏦 Баримт хүлээж байна', 'pending'], paid: ['Төлсөн', 'paid'], rejected: ['Татгалзсан', 'cancelled'] }[s] || [s, 'pending']);
+    setView(`<h2>🧾 Эрхийн захиалга</h2>
+      <div class="tabs">${[['pending_manual', '🏦 Дансаар — шалгах'], ['pending', 'QPay хүлээгдэж буй'], ['paid', 'Төлсөн'], ['rejected', 'Татгалзсан'], ['all', 'Бүгд']].map(([k, l]) => `<button class="${accOrdF === k ? 'on' : ''}" onclick="accOrdF='${k}';vAccOrders()">${l}</button>`).join('')}</div>
+      <div class="card" style="padding:0;overflow:auto"><table><tr><th>Огноо</th><th>Утас</th><th>Бараа</th><th>Дүн</th><th>Арга</th><th>Гүйлгээний утга</th><th>Төлөв</th><th></th></tr>
+        ${j.orders.map(o => `<tr><td class="muted">${fdt(o.createdAt)}${o.paidAt ? `<br><span style="color:#4ade80">✓ ${fdt(o.paidAt)}</span>` : ''}</td><td class="mono">${esc(o.phone)}</td><td>${esc(o.title || o.code)}</td><td>${fmt(o.amount)}</td><td>${esc(o.method)}</td><td class="mono">${esc(o.txn || '')}</td>
+          <td><span class="pill ${st(o.status)[1]}">${st(o.status)[0]}</span></td>
+          <td>${o.status === 'pending_manual' ? `<button class="btn ok sm" onclick="accConfirm('${o.oid}',false)">✓ Баталгаажуулах</button> <button class="btn ghost sm" onclick="accConfirm('${o.oid}',true)">✕</button>` : ''}</td></tr>`).join('') || '<tr><td colspan="8" class="muted">Захиалга алга</td></tr>'}</table></div>
+      <p class="muted" style="margin-top:8px">Дансаар төлсөн захиалгыг банкны SMS/баримттай тулгаад «Баталгаажуулах» дарахад хэрэглэгчийн сайт дээр эрх шууд нээгдэнэ.</p>`);
+  } catch(e) { setView(`<p style="color:var(--bad)">${esc(e.message)}</p>`); }
+}
+async function accConfirm(oid, reject) {
+  if (!confirm(reject ? 'Энэ захиалгыг татгалзах уу?' : 'Төлбөрийг баталгаажуулж эрх нээх үү?')) return;
+  try { await api(`/hub/acc-confirm?biz=${S.cur.id}`, { oid, reject }); toast(reject ? 'Татгалзлаа' : 'Эрх нээгдлээ'); vAccOrders(); } catch(e) { toast(e.message, true); }
 }
 
 // ── Бараа ──
