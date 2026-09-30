@@ -598,6 +598,34 @@ button,input,select,textarea{font-family:var(--font);}
 .toast{border-radius:var(--radius);font-family:var(--font);box-shadow:none;}
 /* footer зай */
 .bottom-space{height:40px;}
+/* ── 2026-09-30 нэмэлт: лого, дээд мөрний товчнууд, hero тойрог, DUB/SUB ── */
+.logo-img{width:32px;height:32px;border-radius:50%;object-fit:cover;display:block;}
+#acc-top{display:flex;align-items:center;gap:8px;}
+#acc-badge{padding:7px 12px;border-radius:99px;border:1px solid var(--border);background:transparent;color:var(--text);font:600 12px var(--font);cursor:pointer;display:flex;align-items:center;gap:4px;}
+#acc-badge .car{font-size:9px;color:var(--muted);}
+#acc-member{padding:7px 12px;border-radius:99px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-text);font:600 12px var(--font);cursor:pointer;white-space:nowrap;}
+#acc-member.on{background:transparent;color:var(--accent);}
+.hero{height:auto!important;min-height:0;border-bottom:0;background:var(--bg);}
+.hero-img,.hero-overlay,.hero-text{display:none!important;}
+#acc-hero{position:relative;}
+.acc-hero-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.acc-hero-track::-webkit-scrollbar{display:none;}
+.acc-slide{flex:0 0 100%;scroll-snap-align:start;position:relative;height:min(62vw,300px);cursor:pointer;background:var(--card2);}
+.acc-slide img{width:100%;height:100%;object-fit:cover;object-position:50% 20%;display:block;filter:brightness(.7);}
+.acc-slide::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,var(--bg) 0%,rgba(12,18,16,.15) 55%,transparent 100%);}
+.acc-slide-t{position:absolute;left:18px;right:18px;bottom:16px;z-index:2;}
+.acc-slide-k{font:600 10px var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--accent);}
+.acc-slide-n{font:700 clamp(20px,5.5vw,28px)/1.15 var(--hfont);color:var(--text);margin-top:4px;}
+.acc-slide-p{font:500 12px var(--font);color:var(--muted);margin-top:4px;}
+.acc-dots{position:absolute;right:16px;bottom:14px;z-index:3;display:flex;gap:5px;}
+.acc-dots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.35);display:block;transition:.2s;}
+.acc-dots i.on{background:var(--accent);width:16px;border-radius:3px;}
+.tabs-wrap{padding-top:4px;}
+.vip-promo-row{display:none!important;}
+.eps-badge,.badge-11{display:none!important;}
+.lang-badge{position:absolute;top:6px;left:6px;font:700 9.5px var(--font);letter-spacing:.06em;padding:3px 6px;border-radius:2px;background:rgba(0,0,0,.6);color:#fff;backdrop-filter:blur(4px);}
+.lang-badge.sub{background:rgba(0,0,0,.6);color:var(--accent);}
+#admin-panel .tab-select{grid-template-columns:repeat(auto-fit,minmax(90px,1fr));}
 </style>
 </head>
 <body>
@@ -615,8 +643,8 @@ button,input,select,textarea{font-family:var(--font);}
 <!-- TOP LOGO BAR -->
 <div class="topbar">
   <div class="logo">
-    <div class="logo-mark">Т</div>
-    <div class="logo-text">КИНО ҮЗВЭР</div>
+    <img class="logo-img" src="logo.png" alt="Тагтаа" width="32" height="32">
+    <div class="logo-text">ТАГТАА КИНО</div>
   </div>
 </div>
 
@@ -827,23 +855,32 @@ const DEFAULT_GROUP_PRICES = {
 const DEFAULT_CATEGORIES = [
   {
     "id": 0,
-    "name": "AI DRAMA",
-    "label": "AI Drama"
+    "name": "ДРАМА",
+    "label": "Драма"
+  },
+  {
+    "id": 3,
+    "name": "ТУЛААНТ",
+    "label": "Тулаант"
+  },
+  {
+    "id": 4,
+    "name": "ФАНТАЗИ",
+    "label": "Фантази"
   },
   {
     "id": 1,
-    "name": "ACTION",
-    "label": "Action"
-  },
-  {
-    "id": 2,
-    "name": "+21 ЭРОЧИК",
-    "label": "+21 ЭРОЧИК"
+    "name": "БУСАД",
+    "label": "Бусад"
   }
 ];
+// 2026-09-30: «+21 ЭРОЧИК» (id 2) ангилал хасагдсан — тэр ангиллын кинонууд
+// өгөгдөлд үлдсэн ч ямар ч таб дээр харагдахгүй. «ACTION» (id 1) → «БУСАД».
+// «Сүүлд нэмэгдсэн» тойргоос БУСАД ангиллыг хасна:
+const HERO_EXCLUDE_CATS = [1, 2];
 
 // ══ ДАТА УНШИХ — localStorage эсвэл DEFAULT ══
-const CATALOG_VERSION = 1786518438907;
+const CATALOG_VERSION = 1790753975546;
 function loadData(){
   try{
     const saved = localStorage.getItem('toorxon_data');
@@ -877,7 +914,7 @@ function loadData(){
           categories: JSON.parse(JSON.stringify(DEFAULT_CATEGORIES)),
           heroTitle: DEFAULT_HERO_TITLE, heroSub: DEFAULT_HERO_SUBTITLE,
           tabCoverPos: JSON.parse(JSON.stringify(DEFAULT_TAB_COVER_POS)),
-          nextCatId: 3};
+          nextCatId: 5};
 }
 
 function saveData(){
@@ -1724,26 +1761,11 @@ function renderTabsAndPanels(){
     `<button class="tab-chip${idx===0?' active':''}" onclick="openTab(${c.id},this)">${c.name}</button>`
   ).join('');
 
-  // Panel-ууд (vip-promo cards + movie-grid)
+  // Panel-ууд (зөвхөн movie-grid; гишүүнчлэлийн хавтангууд 2026-09-30-нд
+  // хасагдсан — багц худалдан авах цонх болон дээд мөрний товчоор явна)
   panelsContainer.innerHTML = CATEGORIES.map((c,idx)=>`
     <div class="tab-panel${idx===0?' open':''}" id="panel-${c.id}">
       <p class="panel-label">${c.label}</p>
-      <div class="vip-promo-row">
-        <div class="vip-promo" onclick="openBuyModal('GRP',${c.id})">
-          <div class="vip-promo-overlay"></div>
-          <div class="vip-promo-content">
-            <p class="vip-promo-title">${c.name} ГРУПП</p>
-            <p class="vip-promo-price" id="price-grp-${c.id}"></p>
-          </div>
-        </div>
-        <div class="vip-promo" onclick="openBuyModal('ALL',${c.id})">
-          <div class="vip-promo-overlay"></div>
-          <div class="vip-promo-content">
-            <p class="vip-promo-title">БҮХ VIP ГРУПП</p>
-            <p class="vip-promo-price" id="price-grp-all-${c.id}"></p>
-          </div>
-        </div>
-      </div>
       <div class="movie-grid" id="grid-${c.id}"></div>
     </div>
   `).join('');
@@ -1775,9 +1797,8 @@ function renderGrids(){
     }
     grid.innerHTML = items.map(m=>{
       const imgSrc = m.cover || IMAGES[m.id] || '';
-      const eps = m.eps || '1 анги';
-      // 1+1 урамшуулалтай кинонд badge харуулна
-      const badge11 = m.promo11 ? `<div class="badge-11">1+${m.promo11Count||1} — урамшуулал!</div>` : '';
+      // Хадмал/дубляж тэмдэг (1+1 урамшууллын оронд; «1 анги» тэмдэг хасагдсан)
+      const langBadge = `<span class="lang-badge ${m.lang === 'sub' ? 'sub' : 'dub'}">${m.lang === 'sub' ? 'SUB' : 'DUB'}</span>`;
       return `
       <div class="movie-card" onclick="openBuyModal(${m.id},${m.cat})">
         <div class="poster">
@@ -1787,9 +1808,8 @@ function renderGrids(){
             <span class="poster-ph-icon">🎬</span>
             <span class="poster-ph-name">${m.name}</span>
           </div>
-          <span class="eps-badge">${eps}</span>
           <span class="price-badge">${m.price}</span>
-          ${badge11}
+          ${langBadge}
         </div>
         <div class="card-info">
           <p class="card-name">${m.name}</p>
@@ -1888,12 +1908,13 @@ function submitMovie(){
   const eps = document.getElementById('f-eps').value.trim() || '1 анги';
   const promo11 = document.getElementById('f-promo11').checked;
   const promo11Count = promo11 ? (parseInt(document.getElementById('f-promo11-count').value) || 1) : 0;
+  const lang = (document.getElementById('f-lang') && document.getElementById('f-lang').value === 'sub') ? 'sub' : 'dub';
 
   if(!name){ alert('Кино нэрийг оруулна уу!'); return; }
 
   if(editingId === null){
     // ─ ШИНЭ КИНО НЭМЭХ ─
-    const movie = {id: nextId++, name, cover, trailer, cat: selectedCat, price, eps, promo11, promo11Count};
+    const movie = {id: nextId++, name, cover, trailer, cat: selectedCat, price, eps, promo11, promo11Count, lang};
     MOVIES.unshift(movie); // шинэ кино хамгийн түрүүнд
     saveData();
     renderGrids();
@@ -1902,7 +1923,7 @@ function submitMovie(){
     showToast(`"${name}" нэмэгдлээ`);
   } else {
     // ─ ЗАСАХ — байрлалын сонголт асуух ─
-    window._editData = {name, cover, trailer, cat: selectedCat, price, eps, promo11, promo11Count};
+    window._editData = {name, cover, trailer, cat: selectedCat, price, eps, promo11, promo11Count, lang};
     document.getElementById('saveOverlay').classList.add('open');
   }
 }
@@ -1945,6 +1966,7 @@ function editMovie(id){
   document.getElementById('f-promo11').checked = !!m.promo11;
   document.getElementById('f-promo11-count').value = m.promo11Count || 1;
   togglePromo11Input();
+  if(document.getElementById('f-lang')) document.getElementById('f-lang').value = m.lang === 'sub' ? 'sub' : 'dub';
 
   document.querySelectorAll('#tab-select .tab-opt').forEach(o=>{
     o.classList.toggle('active', parseInt(o.dataset.cat)===m.cat);
@@ -2544,7 +2566,8 @@ function buildFinalHtml(){
   const moviesStr = 'const DEFAULT_MOVIES=[\n' + MOVIES.map(m=>{
     const base = `  {id:${m.id},name:${JSON.stringify(m.name)},price:${JSON.stringify(m.price)},cat:${m.cat},cover:${JSON.stringify(m.cover||'')},trailer:${JSON.stringify(m.trailer||'')},eps:${JSON.stringify(m.eps||'1 анги')}`;
     const promo = m.promo11 ? `,promo11:true,promo11Count:${m.promo11Count||1}` : '';
-    return base + promo + '}';
+    const lang  = m.lang === 'sub' ? `,lang:"sub"` : '';
+    return base + promo + lang + '}';
   }).join(',\n') + '\n];';
 
   // ── CATEGORIES ──
@@ -5003,31 +5026,65 @@ function accStyle(){
 }
 
 // ── Дээд мөрний товч/тэмдэг ──
+// Дээд мөр: [Нэвтрэх] → нэвтэрсний дараа [9911 ▾] + [Гишүүн болох | 23 хоног]
 function accRenderBadge(){
   const bar = document.querySelector('.topbar'); if(!bar) return;
-  let b = document.getElementById('acc-badge');
-  if(!b){ b = document.createElement('button'); b.id = 'acc-badge'; b.onclick = accBadgeClick; bar.appendChild(b); }
-  b.classList.remove('plan');
-  if(!accLogged()){ b.textContent = '📱 Нэвтрэх'; return; }
+  let wrap = document.getElementById('acc-top');
+  if(!wrap){ wrap = document.createElement('div'); wrap.id = 'acc-top'; bar.appendChild(wrap); }
+  if(!accLogged()){
+    wrap.innerHTML = '<button id="acc-badge" onclick="accBadgeClick()">Нэвтрэх</button>';
+    return;
+  }
   const me = ACC.me;
-  if(me && me.plan){ b.classList.add('plan'); b.textContent = '👑 ' + me.plan.daysLeft + ' хоног'; return; }
-  const act = me && me.movies.filter(m => m.state === 'active').length;
-  b.textContent = '📱 ' + ACC.phone.slice(0,4) + '••' + ACC.phone.slice(-2) + (act ? ' · ' + act + ' кино' : '');
+  const member = me && me.plan
+    ? '<button id="acc-member" class="on" onclick="accScrollPlans()" title="Гишүүнчлэл сунгах">' + me.plan.daysLeft + ' хоног</button>'
+    : '<button id="acc-member" onclick="accScrollPlans()">Гишүүн болох</button>';
+  wrap.innerHTML = '<button id="acc-badge" onclick="accBadgeClick()">' + accEsc(ACC.phone.slice(0,4)) + ' <span class="car">▾</span></button>' + member;
 }
 function accBadgeClick(){
   if(!accLogged()){ accOpenLoginModal(); return; }
   let m = document.getElementById('acc-menu');
   if(m){ m.remove(); return; }
   m = document.createElement('div'); m.id = 'acc-menu';
-  const me = ACC.me || {plan:null, movies:[]};
-  m.innerHTML = '<div style="padding:8px 12px;font-size:11px;color:var(--muted)">📱 ' + accEsc(ACC.phone) + '</div>'
-    + (me.plan ? '<div style="padding:0 12px 8px;font-size:12px;color:var(--gold)">👑 Гишүүнчлэл ' + me.plan.daysLeft + ' хоног</div>' : '')
-    + '<button onclick="document.getElementById(\'acc-menu\').remove();accShowLibrary()">🎬 Миний сан</button>'
-    + '<button onclick="document.getElementById(\'acc-menu\').remove();accScrollPlans()">👑 Гишүүнчлэл авах / сунгах</button>'
-    + '<button onclick="accLogout()">🚪 Гарах</button>';
+  m.innerHTML = '<div style="padding:8px 12px;font-size:11px;color:var(--muted)">' + accEsc(ACC.phone.slice(0,4)) + '••••</div>'
+    + '<button onclick="document.getElementById(\'acc-menu\').remove();accShowLibrary()">Миний сан</button>'
+    + '<button onclick="accLogout()">Гарах</button>';
   document.body.appendChild(m);
   setTimeout(()=>document.addEventListener('click', function h(e){ if(!e.target.closest('#acc-menu') && !e.target.closest('#acc-badge')){ m.remove(); document.removeEventListener('click', h); } }), 10);
 }
+
+// ── «Сүүлд нэмэгдсэн» — hero хэсэгт сүүлийн 5 кино (БУСАД ангиллаас биш), чирж солигдоно ──
+function accRenderHero(){
+  const hero = document.getElementById('hero-banner'); if(!hero) return;
+  const list = (typeof MOVIES !== 'undefined' && MOVIES) || [];
+  const ex = (typeof HERO_EXCLUDE_CATS !== 'undefined') ? HERO_EXCLUDE_CATS : [1, 2];
+  const items = list.filter(m => !ex.includes(m.cat)).slice(0, 5);
+  let c = document.getElementById('acc-hero');
+  if(!c){ c = document.createElement('div'); c.id = 'acc-hero'; hero.appendChild(c); }
+  if(!items.length){ c.innerHTML = ''; hero.style.height = '0'; return; }
+  hero.style.height = '';
+  c.innerHTML = '<div class="acc-hero-track" id="acc-hero-track">' + items.map(m =>
+    '<div class="acc-slide" onclick="openBuyModal(' + m.id + ',' + m.cat + ')">'
+    + '<img src="' + accEsc(m.cover || '') + '" alt="" onerror="this.style.display=\'none\'">'
+    + '<div class="acc-slide-t"><span class="acc-slide-k">Сүүлд нэмэгдсэн</span><div class="acc-slide-n">' + accEsc(m.name) + '</div>'
+    + '<div class="acc-slide-p">' + accPriceText(m.price) + (m.lang === 'sub' ? ' · SUB' : ' · DUB') + '</div></div></div>').join('')
+    + '</div><div class="acc-dots" id="acc-dots">' + items.map((_, i) => '<i' + (i ? '' : ' class="on"') + '></i>').join('') + '</div>';
+  const track = document.getElementById('acc-hero-track'), dots = document.getElementById('acc-dots');
+  const cur = () => Math.round(track.scrollLeft / track.clientWidth);
+  const setDot = () => { const i = cur(); [...dots.children].forEach((d, k) => d.classList.toggle('on', k === i)); };
+  track.addEventListener('scroll', () => { setDot(); accHeroPause(); }, { passive: true });
+  if(ACC._heroTimer) clearInterval(ACC._heroTimer);
+  ACC._heroTimer = setInterval(() => {
+    if(ACC._heroPaused > Date.now() || document.hidden) return;
+    const n = (cur() + 1) % items.length;
+    track.scrollTo({ left: n * track.clientWidth, behavior: 'smooth' });
+  }, 5000);
+}
+function accHeroPause(){ ACC._heroPaused = Date.now() + 9000; }
+(function accHookHero(){
+  if(typeof renderGrids === 'function'){ const _g = renderGrids; renderGrids = function(){ const x = _g.apply(this, arguments); accRenderHero(); return x; }; }
+  if(typeof updateHeroCover === 'function') updateHeroCover = function(){};   // таб солиход hero солигдохгүй
+})();
 function accScrollPlans(){ openBuyModal('ALL', (typeof currentCat === 'number' ? currentCat : 0)); }
 
 // Нэвтрэх бүрд нэг удаа (өдөрт нэг) үлдэгдэл хугацааны мөр
@@ -5411,7 +5468,7 @@ function accRelabelTiles(){
 async function accInit(){
   accStyle(); accLoadLocal(); accRenderBadge();
   try{ const p = await accApi('/acc/plans'); if(p.ok){ ACC.plans = p.plans; ACC.rules = p.rules; } }catch(e){}
-  accRelabelTiles();
+  accRelabelTiles(); accRenderHero();
   if(accLogged()){
     const me = await accRefreshMe();
     if(me) accRenderBanner(false);
@@ -5583,8 +5640,11 @@ window.addEventListener('DOMContentLoaded', function(){ setTimeout(accInit, 50);
     <label>Үнийн дүн</label>
     <input type="text" id="f-price" placeholder="Жишээ: 5,000 ₮" oninput="onPriceInput(this)" onblur="onPriceBlur(this)">
 
-    <label>Ангийн тоо (кино зүүн дээд буланд харагдана)</label>
+    <label>Ангийн тоо (мэдээллийн зориулалтаар; карт дээр харагдахгүй)</label>
     <input type="text" id="f-eps" placeholder="Жишээ: 1 анги / 12 анги / 24 анги">
+
+    <label>Хэл (карт дээр DUB / SUB тэмдэг)</label>
+    <select id="f-lang"><option value="dub">DUB — Монгол дубляж</option><option value="sub">SUB — Хадмал орчуулга</option></select>
 
     <div style="margin-top:14px;padding:12px;background:rgba(255,56,96,.06);border:1px solid rgba(255,56,96,.2);border-radius:8px;">
       <label style="display:flex;align-items:center;gap:8px;margin-top:0;cursor:pointer;">
