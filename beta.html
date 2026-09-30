@@ -5042,7 +5042,30 @@ function accStyle(){
   + '#acc-banner button{border:0;background:transparent;color:var(--muted);font-size:18px;cursor:pointer;line-height:1}'
   + '#acc-notice{position:fixed;top:-80px;left:50%;transform:translateX(-50%);z-index:5000;max-width:92%;background:#111a30;border:1px solid var(--accent2);color:#fff;padding:12px 16px;border-radius:12px;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.6);transition:top .3s}'
   + '#acc-notice.on{top:12px}'
-  + '#acc-player{position:fixed;inset:0;z-index:3000;background:#000;display:flex;flex-direction:column}'
+  + '#acc-player{position:fixed;inset:0;z-index:3000;background:#000;display:flex;flex-direction:column;user-select:none;-webkit-user-select:none}'
+  + '#acc-player .pl-top{position:absolute;top:0;left:0;right:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;color:#fff;font-size:14px;font-weight:600;background:linear-gradient(rgba(0,0,0,.75),transparent);opacity:0;transition:opacity .25s;pointer-events:none}'
+  + '#acc-player .pl-sub{color:#aab;font-weight:400;font-size:12px}#acc-player .pl-badge{color:var(--accent);font-weight:700;font-size:12px}'
+  + '#acc-player .pl-x{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.5);color:#fff;font-size:16px;cursor:pointer;pointer-events:auto}'
+  + '#acc-player .pl-tap{position:absolute;top:15%;bottom:25%;width:30%;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .2s}'
+  + '#acc-player .pl-tap span{background:rgba(255,255,255,.15);color:#fff;font-weight:700;padding:10px 16px;border-radius:99px;font-size:15px}'
+  + '#acc-player .pl-tap-l{left:0}#acc-player .pl-tap-r{right:0}#acc-player .pl-tap.on{opacity:1}'
+  + '#acc-player .pl-center{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);display:flex;justify-content:center;gap:clamp(22px,8vw,60px);opacity:0;transition:opacity .25s;pointer-events:none}'
+  + '#acc-player .pl-big{width:58px;height:58px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:22px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;pointer-events:auto}'
+  + '#acc-player .pl-big small{font-size:10px;margin-top:2px}#acc-player .pl-play{width:72px;height:72px;font-size:26px}'
+  + '#acc-player .pl-bar{position:absolute;left:0;right:0;bottom:0;z-index:5;padding:8px 16px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.85));opacity:0;transition:opacity .25s;pointer-events:none}'
+  + '#acc-player.ui .pl-top,#acc-player.ui .pl-center,#acc-player.ui .pl-bar{opacity:1;pointer-events:auto}'
+  + '#acc-player .pl-seek{position:relative;height:22px;display:flex;align-items:center}'
+  + '#acc-player .pl-seek::before{content:"";position:absolute;left:0;right:0;height:4px;background:rgba(255,255,255,.25);border-radius:2px}'
+  + '#acc-player .pl-buf,#acc-player .pl-prog{position:absolute;left:0;height:4px;border-radius:2px;width:0}#acc-player .pl-buf{background:rgba(255,255,255,.4)}#acc-player .pl-prog{background:var(--accent)}'
+  + '#acc-player .pl-seek input{position:absolute;left:0;right:0;width:100%;margin:0;height:22px;background:transparent;-webkit-appearance:none;appearance:none;cursor:pointer}'
+  + '#acc-player .pl-seek input::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid #fff}'
+  + '#acc-player .pl-seek input::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid #fff}'
+  + '#acc-player .pl-row{display:flex;align-items:center;gap:8px;margin-top:4px;color:#fff;font-size:12px}#acc-player .pl-sp{flex:1}'
+  + '#acc-player .pl-btn{border:0;background:transparent;color:#fff;font-size:17px;cursor:pointer;padding:6px;border-radius:6px;font-family:inherit;line-height:1}#acc-player .pl-btn:hover{background:rgba(255,255,255,.12)}'
+  + '#acc-player .pl-rate{font-size:12px;font-weight:700;border:1px solid rgba(255,255,255,.35);padding:4px 8px}'
+  + '#acc-player .pl-vol{width:70px;accent-color:var(--accent)}@media(max-width:600px){#acc-player .pl-vol{display:none}}'
+  + '#acc-player .pl-spin{position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:accspin .8s linear infinite;display:none;pointer-events:none}'
+  + '#acc-player.buf .pl-spin{display:block}#acc-player.buf .pl-center{opacity:0}'
   + '#acc-player .top{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;color:#fff;font-size:13px;background:rgba(0,0,0,.6)}'
   + '#acc-player video{flex:1;width:100%;height:100%;object-fit:contain;background:#000}'
   + '#acc-player .x{width:36px;height:36px;border-radius:50%;border:1px solid #444;background:#111;color:#fff;font-size:16px;cursor:pointer}'
@@ -5409,15 +5432,28 @@ async function accPlay(code){
   let p = document.getElementById('acc-player'); if(p) p.remove();
   p = document.createElement('div'); p.id = 'acc-player';
   const isPrev = j.via === 'preview' && j.previewSec > 0;
-  p.innerHTML = '<div class="top"><span>🎬 ' + accEsc(accMovieName(code))
-    + (isPrev ? ' · <span id="acc-prev-left" style="color:var(--accent)">үнэгүй ' + Math.round(j.previewSec / 60) + ':00</span>' : (j.until ? ' · <span style="color:var(--muted)">' + accHours(j.until - Date.now()) + ' үлдлээ</span>' : ''))
-    + '</span><button class="x" onclick="accClosePlayer()">✕</button></div>'
-    + '<video controls playsinline autoplay controlsList="nodownload" oncontextmenu="return false"></video>';
+  // ── Өөрийн удирдлагатай тоглуулагч (Netflix маяг): ⏪10 ▶ 10⏩, явц, цаг, дуу, хурд, PiP, бүтэн дэлгэц ──
+  p.innerHTML =
+      '<div class="pl-top"><span class="pl-title">' + accEsc(accMovieName(code))
+    + (isPrev ? ' <span id="acc-prev-left" class="pl-badge">үнэгүй ' + Math.round(j.previewSec / 60) + ':00</span>' : (j.until ? ' <span class="pl-sub">' + accHours(j.until - Date.now()) + ' үлдлээ</span>' : ''))
+    + '</span><button class="pl-x" onclick="accClosePlayer()" title="Хаах (Esc)">✕</button></div>'
+    + '<video playsinline autoplay controlsList="nodownload" oncontextmenu="return false"></video>'
+    + '<div class="pl-tap pl-tap-l" data-skip="-10"><span>⏪ 10</span></div><div class="pl-tap pl-tap-r" data-skip="10"><span>10 ⏩</span></div>'
+    + '<div class="pl-center"><button class="pl-big" data-skip="-10" title="10 сек буцах (←)">⏪<small>10</small></button><button class="pl-big pl-play" title="Тоглуулах/зогсоох (Space)">❚❚</button><button class="pl-big" data-skip="10" title="10 сек урагш (→)">⏩<small>10</small></button></div>'
+    + '<div class="pl-bar">'
+    +   '<div class="pl-seek"><div class="pl-buf"></div><div class="pl-prog"></div><input type="range" min="0" max="1000" value="0" step="1" aria-label="Явц"></div>'
+    +   '<div class="pl-row"><span class="pl-time">0:00 / 0:00</span><span class="pl-sp"></span>'
+    +     '<button class="pl-btn pl-mute" title="Дуугүй (M)">🔊</button><input type="range" class="pl-vol" min="0" max="1" step="0.05" value="1" aria-label="Дуу">'
+    +     '<button class="pl-btn pl-rate" title="Хурд">1×</button>'
+    +     '<button class="pl-btn pl-pip" title="Мини дэлгэц">⧉</button>'
+    +     '<button class="pl-btn pl-fs" title="Бүтэн дэлгэц (F)">⛶</button></div>'
+    + '</div><div class="pl-spin"></div>';
   document.body.appendChild(p);
   const v = p.querySelector('video');
   accAttachSource(v, j).catch(() => accNotice('⚠ Тоглуулагч ачаалахад алдаа гарлаа', 5000));
   v.addEventListener('error', () => { if(!ACC._prevEnded) accNotice('⚠ Видео ачаалахад алдаа гарлаа. Дахин оролдоно уу.', 5000); });
   ACC._prevEnded = false;
+  accPlayerControls(p, v, j, code);
   if(isPrev){
     // Урьдчилан үзэх хугацаа дуусмагц зогсоож, төлбөрийн цонх руу
     const lim = j.previewSec;
@@ -5440,11 +5476,79 @@ async function accPlay(code){
   }
   if(ACC.hb) clearInterval(ACC.hb);
   ACC.hb = setInterval(async () => {
-    const h = await accApi('/acc/heartbeat', {});
+    const h = await accApi('/acc/heartbeat', { code, pos: v.currentTime || 0 });
     if(!h.ok && h.error === 'busy'){ v.pause(); accNotice('⏸ Өөр төхөөрөмж дээр тоглож эхэлсэн тул энд зогслоо', 6000); }
   }, 30000);
   if(ACC.me){ const m = ACC.me.movies.find(x => x.code === code); if(m && !m.until && j.until){ m.state = 'active'; m.until = j.until; } }
   accRenderBadge();
+}
+
+// ── Тоглуулагчийн удирдлага ──
+function accFmtTime(s){ s = Math.max(0, Math.floor(s || 0)); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(x).padStart(2, '0'); }
+function accPlayerControls(p, v, j, code){
+  const $ = s => p.querySelector(s);
+  const seek = $('.pl-seek input'), prog = $('.pl-prog'), buf = $('.pl-buf'), time = $('.pl-time'), playBtn = $('.pl-play');
+  const rates = [1, 1.25, 1.5, 0.75]; let ri = 0, hideT = null, dragging = false, resumed = false;
+  const show = () => { p.classList.add('ui'); clearTimeout(hideT); hideT = setTimeout(() => { if(!v.paused && !dragging) p.classList.remove('ui'); }, 3000); };
+  show();
+  const dur = () => (isFinite(v.duration) && v.duration > 0) ? v.duration : (j.duration || 0);
+  const upd = () => {
+    const d = dur(); if(!dragging && d){ seek.value = Math.round(v.currentTime / d * 1000); prog.style.width = (v.currentTime / d * 100) + '%'; }
+    try{ if(d && v.buffered.length) buf.style.width = (v.buffered.end(v.buffered.length - 1) / d * 100) + '%'; }catch(e){}
+    time.textContent = accFmtTime(v.currentTime) + ' / ' + accFmtTime(d);
+    playBtn.textContent = v.paused ? '▶' : '❚❚';
+  };
+  const skip = n => { v.currentTime = Math.max(0, Math.min((dur() || 1e9) - 0.5, v.currentTime + n)); flash(n > 0 ? '10 ⏩' : '⏪ 10'); show(); };
+  const flash = txt => { const t = $('.pl-tap-' + (txt.startsWith('⏪') ? 'l' : 'r')); if(!t) return; t.classList.add('on'); setTimeout(() => t.classList.remove('on'), 500); };
+  const toggle = () => { if(v.paused) v.play().catch(()=>{}); else v.pause(); show(); };
+  // Үзсэн газраасаа үргэлжлүүлэх (серверээс ирсэн байрлал)
+  v.addEventListener('loadedmetadata', () => {
+    if(!resumed && j.resume > 10 && j.resume < (dur() || 1e9) - 30){ v.currentTime = j.resume; accNotice('↺ ' + accFmtTime(j.resume) + '-өөс үргэлжилж байна', 3000); }
+    resumed = true; upd();
+  });
+  v.addEventListener('timeupdate', upd); v.addEventListener('progress', upd); v.addEventListener('play', upd); v.addEventListener('pause', () => { upd(); show(); });
+  v.addEventListener('waiting', () => p.classList.add('buf')); v.addEventListener('playing', () => p.classList.remove('buf')); v.addEventListener('canplay', () => p.classList.remove('buf'));
+  seek.addEventListener('input', () => { dragging = true; const d = dur(); if(d){ prog.style.width = (seek.value / 10) + '%'; time.textContent = accFmtTime(seek.value / 1000 * d) + ' / ' + accFmtTime(d); } show(); });
+  seek.addEventListener('change', () => { const d = dur(); if(d) v.currentTime = seek.value / 1000 * d; dragging = false; });
+  playBtn.onclick = toggle;
+  p.querySelectorAll('[data-skip]').forEach(b => { b.addEventListener('click', e => { e.stopPropagation(); skip(Number(b.dataset.skip)); }); });
+  // Утсан дээр: хажуу талд 2 дарах = 10 сек; төвд 1 дарах = удирдлага харуулах/нуух
+  let lastTap = 0, tapT = null;
+  v.addEventListener('click', e => {
+    const now = Date.now(), r = v.getBoundingClientRect(), x = (e.clientX - r.left) / r.width;
+    if(now - lastTap < 320){ clearTimeout(tapT); lastTap = 0; if(x < 0.35) skip(-10); else if(x > 0.65) skip(10); else toggle(); return; }
+    lastTap = now; tapT = setTimeout(() => { if(p.classList.contains('ui') && !v.paused) p.classList.remove('ui'); else show(); }, 330);
+  });
+  p.addEventListener('mousemove', show);
+  $('.pl-mute').onclick = () => { v.muted = !v.muted; $('.pl-mute').textContent = v.muted ? '🔇' : '🔊'; show(); };
+  $('.pl-vol').addEventListener('input', e => { v.volume = Number(e.target.value); v.muted = v.volume === 0; $('.pl-mute').textContent = v.muted ? '🔇' : '🔊'; });
+  $('.pl-rate').onclick = () => { ri = (ri + 1) % rates.length; v.playbackRate = rates[ri]; $('.pl-rate').textContent = rates[ri] + '×'; show(); };
+  const pip = $('.pl-pip');
+  if(!document.pictureInPictureEnabled && !v.webkitSupportsPresentationMode) pip.style.display = 'none';
+  pip.onclick = async () => { try{ if(document.pictureInPictureElement) await document.exitPictureInPicture(); else if(v.requestPictureInPicture) await v.requestPictureInPicture(); else if(v.webkitSetPresentationMode) v.webkitSetPresentationMode('picture-in-picture'); }catch(e){} };
+  const fs = $('.pl-fs');
+  fs.onclick = () => {
+    if(document.fullscreenElement){ document.exitFullscreen(); return; }
+    if(p.requestFullscreen) p.requestFullscreen().catch(() => { if(v.webkitEnterFullscreen) v.webkitEnterFullscreen(); });
+    else if(v.webkitEnterFullscreen) v.webkitEnterFullscreen();   // iPhone
+  };
+  const key = e => {
+    if(!document.getElementById('acc-player')) { document.removeEventListener('keydown', key); return; }
+    if(e.target && /INPUT|TEXTAREA/.test(e.target.tagName) && e.target.type !== 'range') return;
+    if(e.code === 'Space'){ e.preventDefault(); toggle(); }
+    else if(e.key === 'ArrowRight') skip(10); else if(e.key === 'ArrowLeft') skip(-10);
+    else if(e.key === 'ArrowUp'){ v.volume = Math.min(1, v.volume + 0.1); $('.pl-vol').value = v.volume; }
+    else if(e.key === 'ArrowDown'){ v.volume = Math.max(0, v.volume - 0.1); $('.pl-vol').value = v.volume; }
+    else if(e.key === 'm' || e.key === 'M') $('.pl-mute').click();
+    else if(e.key === 'f' || e.key === 'F') fs.click();
+    else if(e.key === 'Escape') accClosePlayer();
+  };
+  document.addEventListener('keydown', key);
+  // Хаах/нуухад байрлалыг хадгална
+  const persist = () => { if(!accLogged()) return; try{ navigator.sendBeacon && navigator.sendBeacon(ACC_URL + '/acc/stop?phone=' + ACC.phone + '&dev=' + ACC.dev, new Blob([JSON.stringify({ code, pos: v.currentTime || 0 })], { type: 'application/json' })); }catch(e){} };
+  window.addEventListener('pagehide', persist, { once: true });
+  ACC._playerPersist = persist;
+  upd();
 }
 // Эх сурвалж залгах: mp4 → шууд; HLS → iPhone/Safari native, бусад нь hls.js (MSE)
 function accLoadHlsJs(){
@@ -5472,10 +5576,12 @@ async function accAttachSource(v, j){
 }
 async function accClosePlayer(){
   const p = document.getElementById('acc-player');
+  let pos = 0;
   if(ACC._hls){ try{ ACC._hls.destroy(); }catch(e){} ACC._hls = null; }
-  if(p){ const v = p.querySelector('video'); if(v){ v.pause(); v.removeAttribute('src'); v.load(); } p.remove(); }
+  if(p){ const v = p.querySelector('video'); if(v){ pos = v.currentTime || 0; v.pause(); v.removeAttribute('src'); v.load(); } p.remove(); }
+  if(document.fullscreenElement){ try{ document.exitFullscreen(); }catch(e){} }
   if(ACC.hb){ clearInterval(ACC.hb); ACC.hb = null; }
-  try{ await accApi('/acc/stop', {}); }catch(e){}
+  try{ await accApi('/acc/stop', { code: ACC.playCode, pos }); }catch(e){}
   accRefreshMe();
 }
 
@@ -5502,9 +5608,11 @@ async function accShowLibrary(){
   document.body.appendChild(l);
 }
 function accLibRow(code, name, cover, sub, canPlay){
+  const pos = (ACC.me && ACC.me.positions && ACC.me.positions[code]) || 0;
+  const btn = pos > 10 ? '↺ ' + accFmtTime(pos) : '▶ Үзэх';
   return '<div class="acc-lib-row">' + (cover ? '<img src="' + accEsc(cover) + '" alt="">' : '<div style="width:44px;height:60px;border-radius:6px;background:var(--card2)"></div>')
-    + '<div class="n">' + accEsc(name) + '<span class="s">' + accEsc(sub) + '</span></div>'
-    + (canPlay ? '<button class="acc-btn pri" style="padding:9px 14px" onclick="accPlay(\'' + code + '\')">▶ Үзэх</button>' : '') + '</div>';
+    + '<div class="n">' + accEsc(name) + '<span class="s">' + accEsc(sub) + (pos > 10 ? ' · үзсэн газраас үргэлжилнэ' : '') + '</span></div>'
+    + (canPlay ? '<button class="acc-btn pri" style="padding:9px 14px;white-space:nowrap" onclick="accPlay(\'' + code + '\')">' + btn + '</button>' : '') + '</div>';
 }
 
 // ── Хуучин Messenger-хаалгыг унтраах, modal-ыг ACC горимд оруулах ──
