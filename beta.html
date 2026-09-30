@@ -8,7 +8,7 @@ body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relati
 </style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>КИНО ҮЗВЭР — Prototype</title>
+<title>Тагтаа Кино — Кино үзвэр</title>
 <style>
 :root{
   --bg:#0d1526;
@@ -497,6 +497,107 @@ html,body{background:var(--bg);color:var(--text);font-family:'Times New Roman',T
 #admin-panel .diag-text{flex:1;}
 #admin-panel .diag-text b{color:#fff;}
 
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style id="theme-editorial-forest">
+/* ══════════════════════════════════════════════════════════
+   ЗАГВАР: Editorial бүтэц × Forest өнгө (2026-09-30 хэрэглэгчийн сонголт)
+   Дээрх үндсэн стилийг ДАРЖ бичнэ — нэг акцент өнгө, serif гарчиг,
+   sans-serif бие, gradient/эможи/хүнд сүүдэргүй.
+   ══════════════════════════════════════════════════════════ */
+:root{
+  --bg:#0c1210;--card:#131c18;--card2:#1a2620;--border:#243229;
+  --text:#eef3ef;--muted:#8fa094;--accent:#2fbf71;--accent2:#2fbf71;--gold:#2fbf71;
+  --accent-text:#06120b;--radius:6px;
+  --font:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --hfont:'Playfair Display',Georgia,'Times New Roman',serif;
+}
+html,body{font-family:var(--font);}
+button,input,select,textarea{font-family:var(--font);}
+.gate-overlay{display:none!important;}
+/* дээд мөр */
+.topbar{padding:14px 18px;background:rgba(12,18,16,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
+.logo{gap:9px;}
+.logo-mark{width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--accent-text);font:800 13px var(--font);}
+.logo-text{font:700 15px var(--hfont);letter-spacing:.02em;}
+.badge-18-mini{display:none;}
+#acc-badge{background:transparent;border-color:var(--border);font:600 12px var(--font);}
+#acc-badge.plan{color:var(--accent);border-color:var(--accent);}
+#acc-banner{background:var(--card);border-bottom:1px solid var(--border);font:500 12px var(--font);}
+/* hero */
+.hero{border-bottom:1px solid var(--border);}
+.hero-img{opacity:1!important;filter:brightness(.55);}
+.hero-overlay{background:linear-gradient(to top,var(--bg) 0%,rgba(12,18,16,.2) 60%,transparent 100%);}
+.hero-text{padding:14px 18px 16px;}
+.hero-title{font:700 clamp(22px,6vw,30px)/1.15 var(--hfont);letter-spacing:-.01em;text-shadow:none;}
+.hero-sub{font:400 12px var(--font);color:var(--muted);margin-top:6px;text-shadow:none;}
+/* таб — доогуур зураастай */
+.tabs-wrap{padding:6px 18px 0;}
+.tab-row{gap:20px;border-bottom:1px solid var(--border);}
+.tab-chip{flex:0 0 auto;padding:12px 0 10px;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;
+  color:var(--muted);font:600 13px var(--font);letter-spacing:0;text-transform:none;}
+.tab-chip.active{background:transparent;color:var(--text);border-color:var(--accent);box-shadow:none;}
+.tab-chip:not(.active):hover{color:var(--text);border-color:transparent;}
+.tab-panel{background:transparent;border:0;border-radius:0;padding:16px 0 8px;margin-bottom:6px;animation:none;}
+.panel-label{font:700 15px var(--hfont);color:var(--text);letter-spacing:0;text-transform:none;margin-bottom:12px;}
+.panel-label::after{display:none;}
+/* багцын хавтан — зүүн талдаа акцент зураастай карт */
+.vip-promo-row{grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+.vip-promo{min-height:66px;border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius);background:var(--card);justify-content:flex-start;transition:border-color .2s;}
+.vip-promo:hover{transform:none;border-color:var(--accent);}
+.vip-promo-overlay,.vip-promo-img{display:none;}
+.vip-promo-content{text-align:left;padding:10px 12px;}
+.vip-promo-title{font:600 12.5px var(--font);text-shadow:none;color:var(--text);}
+.vip-promo-price{font:700 12px var(--font);color:var(--accent);margin-top:3px;text-shadow:none;}
+/* кино карт — хүрээгүй, постер + нэр */
+.movie-grid{grid-template-columns:repeat(3,1fr);gap:12px 10px;}
+.movie-card{background:transparent;border:0;border-radius:0;overflow:visible;transition:none;}
+.movie-card:hover{transform:none;box-shadow:none;}
+.poster{border-radius:var(--radius);background:var(--card2);}
+.poster img{transition:transform .25s;}
+.movie-card:hover .poster img{transform:scale(1.03);}
+.eps-badge{top:auto;bottom:6px;left:auto;right:6px;background:rgba(0,0,0,.6);font:500 10px var(--font);padding:2px 7px;border-radius:2px;}
+.price-badge{top:auto;bottom:6px;left:6px;right:auto;background:var(--accent);color:var(--accent-text);font:700 10.5px var(--font);padding:3px 7px;border-radius:2px;}
+.badge-11{top:6px;bottom:auto;left:6px;right:auto;width:auto;background:var(--card);color:var(--accent);border:1px solid var(--accent);font:600 9px var(--font);padding:2px 6px;border-radius:2px;letter-spacing:0;}
+.card-info{padding:8px 0 0;}
+.card-name{font:500 11.5px/1.35 var(--font);min-height:0;}
+.poster-ph-name{color:var(--muted);}
+/* худалдан авах цонх */
+.modal-overlay{background:rgba(0,0,0,.7);}
+.modal-box{border-radius:14px 14px 0 0;border-top:1px solid var(--border);animation:slideUp .25s ease;}
+.modal-top{padding:12px 16px;}
+.modal-nav-btn{width:32px;height:32px;background:transparent;}
+.modal-title{font:600 12px var(--font);color:var(--muted);letter-spacing:.02em;text-transform:uppercase;}
+.modal-trailer{border-bottom:1px solid var(--border);}
+.modal-body{padding:16px 18px 22px;}
+.modal-movie-name{font:700 20px/1.2 var(--hfont);margin-bottom:6px;}
+.modal-price{font:800 18px var(--font);color:var(--text);margin-bottom:14px;}
+.modal-price::after{content:' · дан кино, 24 цаг';font:400 11px var(--font);color:var(--muted);}
+#buyModal.acc .modal-price[data-plan]::after{content:'';}
+.pay-btn{border-radius:var(--radius);font-family:var(--font);}
+.pay-btn.active{background:var(--accent);color:var(--accent-text);box-shadow:none;}
+.pay-panel{border-color:var(--border);border-radius:var(--radius);}
+.qpay-bank{border-radius:var(--radius);}
+/* ACC элементүүд — нэг хэв маяг */
+.acc-btn{border-radius:var(--radius)!important;font-family:var(--font)!important;}
+.acc-btn.pri{background:var(--accent)!important;color:var(--accent-text)!important;border-color:var(--accent)!important;}
+.acc-btn.pri:hover{filter:brightness(1.08);}
+.acc-login{border-radius:var(--radius)!important;border:1px solid var(--accent)!important;box-shadow:0 12px 40px rgba(0,0,0,.6)!important;}
+.acc-login h4{font:700 16px var(--hfont)!important;}
+.acc-login input{border-radius:var(--radius)!important;font-family:var(--font)!important;}
+.acc-plan,.acc-panel,.acc-acct .b,.acc-copy{border-radius:var(--radius)!important;}
+.acc-plan.on{border-color:var(--accent)!important;box-shadow:none!important;}
+.acc-plan .p{color:var(--accent)!important;}
+.acc-plans .t{font-family:var(--font);}
+.acc-ok,.acc-done{color:var(--accent)!important;}
+#acc-player .top{font-family:var(--font);}
+#acc-lib .box{border-radius:14px 14px 0 0;border-top:1px solid var(--border);}
+#acc-notice{border-radius:var(--radius);border-color:var(--accent);}
+#acc-menu{border-radius:var(--radius);}
+.toast{border-radius:var(--radius);font-family:var(--font);box-shadow:none;}
+/* footer зай */
+.bottom-space{height:40px;}
 </style>
 </head>
 <body>
@@ -5031,14 +5132,16 @@ function accDecorateModal(movieId, catIndex){
     (warn || modal.querySelector('.modal-body')).insertAdjacentElement(warn ? 'afterend' : 'beforeend', pay);
   }
   accStopPoll(); ACC.oid = null;
+  const priceEl = document.getElementById('modalPrice');
   if(movieId === 'GRP' || movieId === 'ALL'){
     ACC.target = { kind:'plan' };
     document.getElementById('modalTitle').textContent = 'Бүх кино үзэх';
-    document.getElementById('modalMovieName').textContent = '👑 Гишүүнчлэл';
-    document.getElementById('modalPrice').textContent = 'Бүх ангиллын бүх кино';
+    document.getElementById('modalMovieName').textContent = 'Гишүүнчлэл';
+    priceEl.textContent = 'Бүх ангиллын бүх кино'; priceEl.dataset.plan = '1';
     const s11 = document.getElementById('section-11'); if(s11) s11.style.display = 'none';
   } else {
     ACC.target = { kind:'movie', code: accCode(movieId), id: movieId, cat: catIndex };
+    priceEl.textContent = accPriceText(priceEl.textContent); delete priceEl.dataset.plan;
     const s11 = document.getElementById('section-11'); if(s11) s11.style.display = 'none';   // 1+1 урамшуулал шинэ системд хараахан алга
   }
   accRenderPay();
@@ -5270,6 +5373,23 @@ function accLibRow(code, name, cover, sub, canPlay){
   applyPayGate = function(){};            // Messenger холболт шаардахгүй
   selectPay = function(){};               // хуучин QPay/данс панел ашиглагдахгүй
   createQpayInvoice = async function(){}; // хуучин нэхэмжлэх үүсгэхгүй (ACC-ийн /acc/checkout орлоно)
+})();
+
+// Каталогийн «16 ₮» тэмдэглэгээг «16,000₮» болгож харуулна (өгөгдөл өөрчлөгдөхгүй)
+function accPriceText(s){
+  const m = String(s || '').match(/(\d+(?:[.,]\d+)?)/); if(!m) return s;
+  let n = parseFloat(m[1].replace(',', '.')); if(n > 0 && n < 1000) n = n * 1000;
+  return accFmt(n);
+}
+function accFmtBadges(root){
+  (root || document).querySelectorAll('.price-badge').forEach(b => { if(!b.dataset.f){ b.textContent = accPriceText(b.textContent); b.dataset.f = '1'; } });
+}
+(function accWatchGrids(){
+  const mo = new MutationObserver(() => accFmtBadges());
+  window.addEventListener('DOMContentLoaded', () => {
+    const c = document.getElementById('tab-panels-container'); if(c) mo.observe(c, { childList: true, subtree: true });
+    accFmtBadges();
+  });
 })();
 
 // Хуучин «ГРУПП» хавтангуудыг багцын хавтан болгож нэрлэнэ (FB групп зам хаагдсан)
