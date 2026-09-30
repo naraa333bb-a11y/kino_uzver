@@ -572,7 +572,7 @@ async function vKino() {
           <td>${kThumb(m)}</td>
           <td><b>${esc(m.name)}</b><br><span class="muted mono" style="font-size:11px">${kCode(m.id)} · ${m.lang === 'sub' ? 'SUB' : 'DUB'}${m.eps ? ' · ' + esc(m.eps) : ''}</span></td>
           <td>${esc(kCat(m.cat))}</td><td>${fmt(m.price)}</td>
-          <td>${m.video ? (m.video.startsWith('r2://') ? '<span class="pill paid">R2</span>' : '<span class="pill pending" title="' + esc(m.video) + '">линк</span>') : '<span class="pill cancelled">алга</span>'}</td>
+          <td>${m.video ? (m.video.startsWith('hls://') ? '<span class="pill paid">HLS 🔒</span>' : m.video.startsWith('r2://') ? '<span class="pill paid">R2 mp4</span>' : '<span class="pill pending" title="' + esc(m.video) + '">линк</span>') : '<span class="pill cancelled">алга</span>'}</td>
           <td>${m.active ? '<span class="pill paid">нээлттэй</span>' : '<span class="pill cancelled">нуусан</span>'}</td>
           <td style="white-space:nowrap"><button class="btn ghost sm" onclick="kEdit(${m.id})">Засах</button> <button class="btn ghost sm" title="Эхэнд авчрах (Сүүлд нэмэгдсэн)" onclick="kTop(${m.id})">↑</button></td></tr>`).join('') || '<tr><td colspan="7" class="muted">Кино алга</td></tr>'}</table></div>
       <p class="muted" style="margin-top:8px">Жагсаалтын дараалал = сайт дээрх дараалал. Эхний 5 (Бусад-аас бусад) «Сүүлд нэмэгдсэн» тойрогт орно.</p>`);
