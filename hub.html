@@ -652,6 +652,14 @@ function kVideoChosen(inp) {
   const f = inp.files && inp.files[0]; if (!f) return;
   K._vfile = f; K.edit.video = '';
   $('k_vid_state').textContent = '📁 ' + f.name + ' · ' + (f.size / 1048576).toFixed(0) + ' MB — «Хадгалах» дарахад байршуулна';
+  // MP4 faststart шалгалт: 'moov' атом 'mdat'-ын ӨМНӨ байх ёстой — эс бөгөөс утсан дээр
+  // бүхэлд нь татаж дуустал тоглохгүй, гүйлгэх ажиллахгүй (ffmpeg -movflags +faststart)
+  f.slice(0, 4 * 1024 * 1024).arrayBuffer().then(b => {
+    const u8 = new Uint8Array(b); const find = tag => { for (let i = 4; i < u8.length - 4; i++) if (u8[i] === tag.charCodeAt(0) && u8[i+1] === tag.charCodeAt(1) && u8[i+2] === tag.charCodeAt(2) && u8[i+3] === tag.charCodeAt(3)) return i; return -1; };
+    const moov = find('moov'), mdat = find('mdat');
+    if (moov < 0 || (mdat >= 0 && mdat < moov)) $('k_vid_state').textContent += ' — ⚠ faststart БИШ: утсан дээр удаан эхэлнэ. ffmpeg -movflags +faststart хийгээд дахин сонгоно уу';
+    else $('k_vid_state').textContent += ' · ✓ faststart';
+  }).catch(() => {});
   // Үргэлжлэх хугацааг автоматаар (урьдчилан үзэх хязгаарт хэрэгтэй)
   try { const u = URL.createObjectURL(f); const v = document.createElement('video'); v.preload = 'metadata'; v.src = u;
     v.onloadedmetadata = () => { if (v.duration > 0) { K.edit.duration = Math.round(v.duration); $('k_duration').value = Math.round(v.duration); } URL.revokeObjectURL(u); }; } catch(e) {}
