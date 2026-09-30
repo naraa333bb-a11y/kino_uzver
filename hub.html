@@ -588,7 +588,7 @@ async function vKino() {
     await kLoad();
     const list = K.movies.filter(m => (K.filter === 'all' || String(m.cat) === K.filter) && (!K.q || m.name.toLowerCase().includes(K.q.toLowerCase())));
     setView(`<div class="row" style="justify-content:space-between"><h2>🎬 Кино</h2>
-        <div class="row">${K.movies.some(m => m.video && !m.video.startsWith('r2://')) ? '<button class="btn ghost sm" title="Хуучин worker/r2.dev линкүүдийг R2 түлхүүр болгоно" onclick="kMigrate()">⇄ Хуучин линк → R2</button>' : ''}<button class="btn ghost sm" onclick="kCatsModal()">Ангилал</button><button class="btn sm" onclick="kEdit()">+ Кино нэмэх</button></div></div>
+        <div class="row">${K.movies.some(m => m.video && !m.video.startsWith('r2://')) ? '<button class="btn ghost sm" title="Хуучин worker/r2.dev линкүүдийг R2 түлхүүр болгоно" onclick="kMigrate()">⇄ Хуучин линк → R2</button>' : ''}<button class="btn ghost sm" onclick="kCatsModal()">Ангилал</button><button class="btn ghost sm" onclick="kBulkImport()">☁️ R2-оос олноор нэмэх</button><button class="btn sm" onclick="kEdit()">+ Кино нэмэх</button></div></div>
       ${K.hasR2 ? '' : '<div class="card" style="border-color:var(--warn);margin-bottom:12px;font-size:12px">⚠ Worker-т R2 binding (<b>MOVIES_R2</b>) алга — видео/постер upload ажиллахгүй. Cloudflare → R2 → bucket үүсгэ → Worker → Settings → Bindings → R2 → нэр MOVIES_R2.</div>'}
       <div class="kpis"><div class="kpi"><div class="l">Нийт кино</div><div class="v">${K.movies.length}</div></div>
         <div class="kpi"><div class="l">Видеотой</div><div class="v">${K.movies.filter(m => m.video).length}</div><div class="s">${K.movies.filter(m => !m.video).length} видеогүй</div></div>
@@ -683,6 +683,54 @@ function kR2Pick(bucket, key, isHls) {
   $('k_vurl').value = '';
   document.getElementById('kr2host').innerHTML = '';
   toast('Видео сонгогдлоо — «Хадгалах» дарна уу');
+}
+// ── R2-оос ОЛНООР нэмэх: bucket → он сараар эрэмбэлсэн жагсаалт → ☑ сонгосон бүр нэг кино болно ──
+const BI = { bucket: 'tagtaa', objs: [], sel: new Set(), q: '' };
+async function kBulkImport(bucket) {
+  if (bucket !== undefined) { BI.bucket = bucket; BI.sel.clear(); }
+  modal('<p class="muted">Ачаалж байна…</p>');
+  try {
+    const j = await api(`/hub/upload/list?biz=${S.cur.id}&bucket=${encodeURIComponent(BI.bucket)}`);
+    const used = new Set(K.movies.map(m => m.video || ''));
+    const refOf = o => (o.key.endsWith('index.m3u8') ? 'hls://' : 'r2://') + (BI.bucket ? '@' + BI.bucket + '/' : '') + (o.key.endsWith('index.m3u8') ? o.key.slice(0, -'index.m3u8'.length) : o.key);
+    BI.objs = j.objects.filter(o => /\.(mp4|m4v|mov|mkv|webm)$/i.test(o.key) || o.key.endsWith('index.m3u8')).map(o => ({ ...o, ref: refOf(o), used: used.has(refOf(o)), name: kNameFromKey(o.key) }));
+    kBulkRender();
+  } catch(e) { modal(`<p style="color:var(--bad)">${esc(e.message)}</p><button class="btn ghost" onclick="closeModal()">Хаах</button>`); }
+}
+function kNameFromKey(key) {
+  let n = key.endsWith('index.m3u8') ? key.slice(0, -'/index.m3u8'.length) : key.replace(/\.[^.]+$/, '');
+  n = n.split('/').pop().replace(/[_\-.]+/g, ' ').replace(/\s+/g, ' ').trim();
+  return n.toUpperCase();
+}
+function kBulkRender() {
+  const list = BI.objs.filter(o => !BI.q || o.name.toLowerCase().includes(BI.q.toLowerCase()) || o.key.toLowerCase().includes(BI.q.toLowerCase()));
+  const day = d => { const x = new Date(d); return isNaN(x) ? '' : x.toLocaleDateString('mn-MN', { year: 'numeric', month: '2-digit', day: '2-digit' }); };
+  modal(`<div class="row" style="justify-content:space-between"><h3>☁️ R2-оос олноор нэмэх</h3><span class="muted" style="font-size:12px">${BI.sel.size} сонгосон</span></div>
+    <div class="tabs" style="margin-top:10px">${R2_BUCKETS.map(([b, l]) => `<button class="${b === BI.bucket ? 'on' : ''}" onclick="kBulkImport('${b}')">${l}</button>`).join('')}
+      <input placeholder="Хайх…" value="${esc(BI.q)}" style="max-width:160px;margin-left:auto" oninput="BI.q=this.value;kBulkRender()"></div>
+    <div class="row" style="margin-bottom:6px;font-size:12px"><button class="btn ghost sm" onclick="kBulkAll(true)">☑ Бүгдийг</button><button class="btn ghost sm" onclick="kBulkAll(false)">☐ Арилгах</button><span class="muted">${list.length} файл · шинээс хуучин руу · бүртгэлтэй нь саарал</span></div>
+    <div style="max-height:44vh;overflow:auto;border:1px solid var(--border);border-radius:10px">
+      ${list.map(o => `<label class="acc-r2row" style="${o.used ? 'opacity:.45' : ''}"><input type="checkbox" ${o.used ? 'disabled' : ''} ${BI.sel.has(o.ref) ? 'checked' : ''} onchange="this.checked?BI.sel.add('${esc(o.ref)}'):BI.sel.delete('${esc(o.ref)}');kBulkCount()" style="width:auto">
+        ${o.key.endsWith('index.m3u8') ? '<span class="pill paid">HLS 🔒</span>' : ''}<b style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">${esc(o.name)}</b><span class="muted" style="font-size:11px;white-space:nowrap">${o.size ? (o.size / 1048576).toFixed(0) + ' MB · ' : ''}${day(o.uploaded)}${o.used ? ' · бүртгэлтэй' : ''}</span></label>`).join('') || '<p class="muted" style="padding:14px">Видео алга</p>'}
+    </div>
+    <div class="formgrid" style="margin-top:12px">
+      <div><label class="f">Ангилал (бүгдэд, дараа нь тус бүрд засна)</label><select id="bi_cat">${K.cats.map(c => `<option value="${c.id}" ${c.id === 1 ? 'selected' : ''}>${esc(c.label)}</option>`).join('')}</select></div>
+      <div><label class="f">Үнэ (₮, бүгдэд)</label><input id="bi_price" type="number" value="15000"></div>
+      <div><label class="f">Хэл</label><select id="bi_lang"><option value="dub">DUB</option><option value="sub">SUB</option></select></div>
+      <div><label class="f">Сайт дээр</label><select id="bi_active"><option value="0">Нуусан (эхлээд засна)</option><option value="1">Шууд нээлттэй</option></select></div>
+    </div>
+    <div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn ghost" onclick="closeModal()">Болих</button><button class="btn" id="bi_go" onclick="kBulkGo()">Сонгосныг кино болгох</button></div>`);
+}
+function kBulkAll(on) { BI.objs.filter(o => !o.used).forEach(o => on ? BI.sel.add(o.ref) : BI.sel.delete(o.ref)); kBulkRender(); }
+function kBulkCount() { const el = document.querySelector('.modal h3 + span'); if (el) el.textContent = BI.sel.size + ' сонгосон'; }
+async function kBulkGo() {
+  if (!BI.sel.size) return toast('Кино сонгоно уу', true);
+  const cat = Number($('bi_cat').value), price = Number($('bi_price').value) || 0, lang = $('bi_lang').value, active = $('bi_active').value === '1';
+  let nextId = K.movies.reduce((s, x) => Math.max(s, x.id), 0) + 1;
+  const picked = BI.objs.filter(o => BI.sel.has(o.ref));
+  const added = picked.map(o => ({ id: nextId++, name: o.name, price, cat, lang, cover: '', trailer: '', eps: '', video: o.ref, active, preview: null, duration: 0, createdAt: new Date().toISOString() }));
+  K.movies = [...added, ...K.movies];   // шинэ нь эхэнд (Сүүлд нэмэгдсэн)
+  try { await kSaveAll(added.length + ' кино нэмэгдлээ' + (active ? '' : ' (нуусан — засаад нээнэ)')); BI.sel.clear(); closeModal(); vKino(); } catch(e) { toast(e.message, true); }
 }
 // ── HLS хавтас (hls_pack.bat-ийн гарц) ──
 function kHlsChosen(inp) {
