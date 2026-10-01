@@ -1035,7 +1035,7 @@ function genTxnCode(movieId, catIndex){
   const defaultRefByCat = {0:'ai1', 1:'act1', 2:'ero1'};
   let ref = CURRENT_REF;
   if(!ref || !CATEGORY_REFS[catIndex] || !CATEGORY_REFS[catIndex].includes(ref)){
-    ref = defaultRefByCat[catIndex];
+    ref = defaultRefByCat[catIndex] || 'web';   // шинэ жанр (Тулаант=3, Фантази=4…) ref-гүй — алдаа шидэхгүй
   }
   // Кино код: M01, M02 ... · нэг ангиллын групп бол GRP · бүх групп бол ALL
   // (GRP болон ALL-ыг ялгаж бичсэнээр бот аль группын линкийг илгээхээ мэднэ)
