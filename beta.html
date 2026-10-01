@@ -5551,7 +5551,8 @@ function accMountPlayer(container, j, code, inline){
   container.innerHTML = ''; container.appendChild(p);
   // Динамик watermark: үзэгчийн дугаар бүдэг, 25 сек тутам байрлал солино (дэлгэц бичлэг хэнийх нь мэдэгдэнэ)
   if(!(ACC.rules && ACC.rules.watermark === false) && ACC.phone){
-    const wm = p.querySelector('.pl-wm'); wm.textContent = ACC.phone;
+    const wm = p.querySelector('.pl-wm'); wm.textContent = (ACC.me && ACC.me.wm) || '';   // утасны дугаар БИШ — үзэгчийн 10 оронтой код
+    if(!wm.textContent) accRefreshMe().then(me => { if(me && me.wm) wm.textContent = me.wm; });   // хуучин бүртгэл: код дөнгөж олгогдоно
     const move = () => { wm.style.left = (8 + Math.random() * 70) + '%'; wm.style.top = (8 + Math.random() * 74) + '%'; };
     move(); const wt = setInterval(() => { if(!document.body.contains(p)) return clearInterval(wt); move(); }, 25000);
   }
