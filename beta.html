@@ -633,6 +633,16 @@ button,input,select,textarea{font-family:var(--font);}
 .eps-badge,.badge-11{display:none!important;}
 .lang-badge{position:absolute;top:6px;left:6px;font:700 9.5px var(--font);letter-spacing:.06em;padding:3px 6px;border-radius:2px;background:rgba(0,0,0,.6);color:#fff;backdrop-filter:blur(4px);}
 .lang-badge.sub{background:rgba(0,0,0,.6);color:var(--accent);}
+/* Нэрээр хайх талбар (табуудын дээр) */
+#acc-search{margin:10px 0 2px;}
+.acc-search-in{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:99px;padding:0 14px;height:42px;max-width:520px;}
+.acc-search-in:focus-within{border-color:var(--accent);}
+.acc-search-ic{color:var(--muted);font-size:18px;line-height:1;}
+#acc-search-q{flex:1;min-width:0;background:transparent;border:0;outline:0;color:var(--text);font:500 14px var(--font);-webkit-appearance:none;appearance:none;}
+#acc-search-q::-webkit-search-cancel-button{display:none;}
+#acc-search-q::placeholder{color:var(--muted);}
+#acc-search-x{visibility:hidden;border:0;background:transparent;color:var(--muted);font-size:14px;cursor:pointer;padding:4px;}
+#acc-search-res{padding:16px 0 8px;}
 /* Идэвхтэй эрхтэй кино: баруун дээд өнцөгт «⏱ N цаг үлдсэн» (DUB/SUB-ийн эсрэг тал) */
 .ent-badge{position:absolute;top:6px;right:6px;z-index:3;display:none;font:700 9.5px var(--font);letter-spacing:.02em;padding:3px 7px;border-radius:2px;background:var(--accent);color:var(--accent-text);white-space:nowrap;}
 .ent-badge.on{display:block;}
@@ -5756,6 +5766,43 @@ function accRelabelTiles(){
   if(typeof renderGroupPrices === 'function'){ const _g = renderGroupPrices; renderGroupPrices = function(){ const x = _g.apply(this, arguments); accRelabelTiles(); return x; }; }
 })();
 
+// ── НЭРЭЭР ХАЙХ: табуудын дээр талбар; бичихэд бүх ангиллаас үр дүн нэг сүлжээнд ──
+function accSearchInit(){
+  if(document.getElementById('acc-search')) return;
+  const wrap = document.querySelector('.tabs-wrap'); if(!wrap) return;
+  const box = document.createElement('div'); box.id = 'acc-search';
+  box.innerHTML = '<div class="acc-search-in"><span class="acc-search-ic">⌕</span><input id="acc-search-q" type="search" placeholder="Кино хайх…" autocomplete="off" enterkeyhint="search"><button id="acc-search-x" title="Арилгах">✕</button></div>'
+    + '<div id="acc-search-res" style="display:none"><p class="panel-label" id="acc-search-t"></p><div class="movie-grid" id="acc-search-grid"></div></div>';
+  wrap.insertBefore(box, wrap.firstChild);
+  const q = document.getElementById('acc-search-q'), x = document.getElementById('acc-search-x');
+  let t = null;
+  q.addEventListener('input', () => { clearTimeout(t); t = setTimeout(accSearchRun, 120); });
+  x.addEventListener('click', () => { q.value = ''; accSearchRun(); q.focus(); });
+}
+function accSearchRun(){
+  const q = (document.getElementById('acc-search-q')?.value || '').trim().toLowerCase();
+  const res = document.getElementById('acc-search-res'), grid = document.getElementById('acc-search-grid');
+  const tabs = document.getElementById('tab-row-container'), panels = document.getElementById('tab-panels-container');
+  document.getElementById('acc-search-x').style.visibility = q ? 'visible' : 'hidden';
+  if(!q){ res.style.display = 'none'; if(tabs) tabs.style.display = ''; if(panels) panels.style.display = ''; return; }
+  const catIds = new Set((typeof CATEGORIES !== 'undefined' ? CATEGORIES : []).map(c => c.id));
+  const list = (typeof MOVIES !== 'undefined' ? MOVIES : []).filter(m => catIds.has(m.cat) && String(m.name || '').toLowerCase().includes(q));
+  if(tabs) tabs.style.display = 'none'; if(panels) panels.style.display = 'none';
+  res.style.display = '';
+  document.getElementById('acc-search-t').textContent = list.length ? ('«' + q + '» — ' + list.length + ' кино') : ('«' + q + '» — олдсонгүй');
+  grid.innerHTML = list.map(m => {
+    const img = m.cover || '';
+    return '<div class="movie-card" onclick="openBuyModal(' + m.id + ',' + m.cat + ')"><div class="poster">'
+      + '<img src="' + accEsc(img) + '" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+      + '<div class="poster-ph" style="display:none"><span class="poster-ph-icon">🎬</span><span class="poster-ph-name">' + accEsc(m.name) + '</span></div>'
+      + '<span class="price-badge">' + accEsc(m.price) + '</span>'
+      + '<span class="lang-badge ' + (m.lang === 'sub' ? 'sub' : 'dub') + '">' + (m.lang === 'sub' ? 'SUB' : 'DUB') + '</span>'
+      + '<span class="ent-badge" data-code="' + accCode(m.id) + '"></span></div>'
+      + '<div class="card-info"><p class="card-name">' + accEsc(m.name) + '</p></div></div>';
+  }).join('');
+  accFmtBadges(grid); accMarkEntitled();
+}
+
 // ── КАТАЛОГИЙГ WORKER-ООС ТАТАХ (эх үнэн = KV; HTML доторх өгөгдөл зөвхөн нөөц) ──
 // HUB-аас кино нэмэх/засахад сайт дахин deploy хийлгүй шинэчлэгдэнэ.
 async function accLoadCatalog(){
@@ -5779,7 +5826,7 @@ async function accInit(){
   accStyle(); accLoadLocal(); accRenderBadge();
   await accLoadCatalog();
   try{ const p = await accApi('/acc/plans'); if(p.ok){ ACC.plans = p.plans; ACC.rules = p.rules; } }catch(e){}
-  accRelabelTiles(); accRenderHero(); accFmtBadges();
+  accRelabelTiles(); accRenderHero(); accFmtBadges(); accSearchInit();
   if(accLogged()){
     const me = await accRefreshMe();
     if(me) accRenderBanner(false);
