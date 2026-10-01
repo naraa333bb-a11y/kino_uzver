@@ -5184,9 +5184,24 @@ function accMarkEntitled(){
   document.querySelectorAll('.ent-badge').forEach(b => {
     b.classList.remove('on'); b.textContent = '';
     if(!me) return;
-    const m = me.movies.find(x => x.code === b.dataset.code && x.state === 'active');
-    if(m){ b.textContent = '⏱ ' + accHours(m.until - Date.now()) + ' үлдсэн'; b.classList.add('on'); }
+    const m = me.movies.find(x => x.code === b.dataset.code && (x.state === 'active' || x.state === 'unplayed'));
+    // Эхлүүлээгүй бол бүтэн цаг («Идэвхтэй 30 цаг»), эхэлсэн бол үлдсэн цаг
+    if(m){ b.textContent = 'Идэвхтэй ' + (m.state === 'active' ? accHours(m.until - Date.now()) : accMovieHours() + ' цаг'); b.classList.add('on'); }
     else if(me.plan){ b.textContent = '👑'; b.classList.add('on'); }
+  });
+  accOwnedFirst();
+}
+// Дан киноны эрхтэй картуудыг жанрынхаа эхэнд гаргана (эрх дуусвал / гарвал каталогийн дараалалдаа буцна)
+function accOwnedFirst(){
+  const me = accLogged() && ACC.me ? ACC.me : null;
+  const owned = new Set(me ? me.movies.filter(x => x.state === 'active' || x.state === 'unplayed').map(x => x.code) : []);
+  document.querySelectorAll('#tab-panels-container .movie-grid').forEach(grid => {
+    const cards = [...grid.querySelectorAll(':scope > .movie-card')];
+    if(cards.length < 2) return;
+    cards.forEach((c, i) => { if(c.dataset.ord == null) c.dataset.ord = i; });
+    const isOwned = c => { const b = c.querySelector('.ent-badge'); return b && owned.has(b.dataset.code) ? 0 : 1; };
+    const sorted = cards.slice().sort((a, b) => (isOwned(a) - isOwned(b)) || (a.dataset.ord - b.dataset.ord));
+    if(sorted.some((c, i) => c !== cards[i])) sorted.forEach(c => grid.appendChild(c));
   });
 }
 
