@@ -607,7 +607,7 @@ async function vKino() {
   } catch(e) { setView(`<p style="color:var(--bad)">${esc(e.message)}</p>`); }
 }
 async function kSaveAll(msg) {
-  const j = await api(`/hub/catalog?biz=${S.cur.id}`, { movies: K.movies, categories: K.cats });
+  const j = await api(`/hub/catalog?biz=${S.cur.id}`, { movies: K.movies, categories: K.cats, videoEdited: K._videoEdited || [] });
   if (!j.ok) throw new Error(j.error || 'Хадгалж чадсангүй');
   toast(msg || 'Хадгалагдлаа — сайт шинэчлэгдлээ');
 }
@@ -618,7 +618,7 @@ async function kTop(id) {
 }
 function kEdit(id) {
   const m = id != null ? { ...K.movies.find(x => x.id === id) } : { id: (K.movies.reduce((s, x) => Math.max(s, x.id), 0) + 1), name: '', price: 15000, cat: K.cats[0] ? K.cats[0].id : 0, cover: '', trailer: '', eps: '', lang: 'dub', video: '', active: true, _new: true };
-  K.edit = m;
+  K.edit = m; K._origVideo = m.video || '';
   modal(`<h3 style="margin-bottom:12px">${m._new ? 'Шинэ кино' : 'Кино засах'} <span class="muted mono" style="font-size:12px">${kCode(m.id)}</span></h3>
     <label class="f">Нэр</label><input id="k_name" value="${esc(m.name)}">
     <div class="formgrid" style="margin-top:8px">
@@ -784,7 +784,9 @@ async function kCommit() {
   delete m._new;
   const i = K.movies.findIndex(x => x.id === m.id);
   if (i >= 0) K.movies[i] = m; else K.movies.unshift(m);
-  try { await kSaveAll(); K._vfile = null; closeModal(); vKino(); } catch(e) { toast(e.message, true); }
+  // Видеог энэ засвараар зориуд сольсон бол серверийн HLS-хамгаалалтыг энэ кинонд алгасуулна
+  K._videoEdited = (m.video || '') !== K._origVideo ? [m.id] : [];
+  try { await kSaveAll(); K._vfile = null; closeModal(); vKino(); } catch(e) { toast(e.message, true); } finally { K._videoEdited = []; }
 }
 async function kDelete(id) {
   if (!confirm('Энэ киног каталогоос устгах уу? (R2 дахь файл хэвээр үлдэнэ)')) return;
