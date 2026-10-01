@@ -444,13 +444,13 @@ async function vAccUsers() {
       <div class="kpis"><div class="kpi"><div class="l">Нийт хэрэглэгч</div><div class="v">${j.users.length}</div></div>
         <div class="kpi"><div class="l">👑 Идэвхтэй гишүүн</div><div class="v">${j.users.filter(u => u.plan).length}</div></div>
         <div class="kpi"><div class="l">🎬 Идэвхтэй дан кино</div><div class="v">${j.users.reduce((s, u) => s + u.movies.filter(m => m.state !== 'expired').length, 0)}</div></div></div>
-      <div class="row" style="margin-bottom:10px"><input id="accq" placeholder="Дугаараар хайх…" value="${esc(accQ)}" style="max-width:220px" onkeydown="if(event.key==='Enter'){accQ=this.value;vAccUsers()}"><button class="btn ghost sm" onclick="accQ=$('accq').value;vAccUsers()">Хайх</button></div>
-      <div class="card" style="padding:0;overflow:auto"><table><tr><th>Утас</th><th>Гишүүнчлэл</th><th>Дан кино</th><th>Төхөөрөмж</th><th></th></tr>
-        ${j.users.map(u => `<tr><td class="mono">${esc(u.phone)}</td>
+      <div class="row" style="margin-bottom:10px"><input id="accq" placeholder="Утас эсвэл үзэгчийн кодоор хайх…" value="${esc(accQ)}" style="max-width:220px" onkeydown="if(event.key==='Enter'){accQ=this.value;vAccUsers()}"><button class="btn ghost sm" onclick="accQ=$('accq').value;vAccUsers()">Хайх</button></div>
+      <div class="card" style="padding:0;overflow:auto"><table><tr><th>Утас</th><th title="Видеон дээр гардаг 10 оронтой код">Үзэгчийн код</th><th>Гишүүнчлэл</th><th>Дан кино</th><th>Төхөөрөмж</th><th></th></tr>
+        ${j.users.map(u => `<tr><td class="mono">${esc(u.phone)}</td><td class="mono muted">${esc(u.wm || '—')}</td>
           <td>${u.plan ? `<span class="pill paid">👑 ${u.plan.daysLeft} хоног</span>` : '<span class="muted">—</span>'}</td>
           <td>${u.movies.length ? u.movies.map(m => `<span class="pill ${m.state === 'expired' ? 'cancelled' : m.state === 'active' ? 'paid' : 'pending'}" title="${m.state}">${esc(m.code)}${m.state === 'active' ? ' ' + m.hoursLeft + 'ц' : m.state === 'unplayed' ? ' ●' : ''}</span>`).join(' ') : '<span class="muted">—</span>'}</td>
           <td>${u.devices}/${u.maxDevices}</td>
-          <td style="white-space:nowrap"><button class="btn ghost sm" onclick="accUserModal('${esc(u.phone)}')">Дэлгэрэнгүй</button> <button class="btn ghost sm" onclick="accGrantModal('${esc(u.phone)}')">+ эрх</button></td></tr>`).join('') || '<tr><td colspan="5" class="muted">Бүртгэл алга</td></tr>'}</table></div>
+          <td style="white-space:nowrap"><button class="btn ghost sm" onclick="accUserModal('${esc(u.phone)}')">Дэлгэрэнгүй</button> <button class="btn ghost sm" onclick="accGrantModal('${esc(u.phone)}')">+ эрх</button></td></tr>`).join('') || '<tr><td colspan="6" class="muted">Бүртгэл алга</td></tr>'}</table></div>
       <div class="card" style="margin-top:14px"><h3 style="margin-bottom:8px">⚙️ Дүрэм, багцын үнэ</h3>
         <div class="formgrid">
           <div><label class="f">Дан кино — цаг (анх тоглуулснаас)</label><input id="r_mh" type="number" value="${rules.movieHours}"></div>
@@ -459,7 +459,7 @@ async function vAccUsers() {
           <div><label class="f">Зэрэг тоглуулалт</label><input id="r_ms" type="number" value="${rules.maxStreams}"></div>
           <div><label class="f">Үнэгүй урьдчилан үзэх (минут, 0 = үгүй)</label><input id="r_pv" type="number" min="0" value="${rules.previewMinutes ?? 15}"></div>
           <div><label class="f">Идэвхгүй төхөөрөмж хаах (хоног, 0 = хэзээ ч)</label><input id="r_idle" type="number" min="0" value="${rules.idleDays ?? 90}"></div>
-          <div><label class="f">Динамик watermark (үзэгчийн дугаар видеон дээр)</label><select id="r_wm"><option value="1" ${rules.watermark !== false ? 'selected' : ''}>Идэвхтэй</option><option value="0" ${rules.watermark === false ? 'selected' : ''}>Идэвхгүй</option></select></div>
+          <div><label class="f">Динамик watermark (үзэгчийн 10 оронтой код видеон дээр)</label><select id="r_wm"><option value="1" ${rules.watermark !== false ? 'selected' : ''}>Идэвхтэй</option><option value="0" ${rules.watermark === false ? 'selected' : ''}>Идэвхгүй</option></select></div>
         </div>
         <div class="formgrid" style="margin-top:10px">${plans.map((p, i) => `<div><label class="f">${esc(p.id)} — сар / үнэ / нэр</label><div class="row" style="gap:4px"><input id="p_m${i}" type="number" value="${p.months}" style="width:60px"><input id="p_p${i}" type="number" value="${p.price}" style="width:100px"><input id="p_l${i}" value="${esc(p.label)}"></div></div>`).join('')}</div>
         <button class="btn sm" style="margin-top:10px" onclick="accSaveRules(${plans.length}, ${JSON.stringify(plans.map(p => p.id)).replace(/"/g, '&quot;')})">Хадгалах</button></div>`);
