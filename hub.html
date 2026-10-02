@@ -587,6 +587,8 @@ async function vKino() {
   try {
     await kLoad();
     const list = K.movies.filter(m => (K.filter === 'all' || String(m.cat) === K.filter) && (!K.q || m.name.toLowerCase().includes(K.q.toLowerCase())));
+    K.sel = K.sel || new Set(); K._listIds = list.map(m => m.id);
+    [...K.sel].forEach(id => { if (!K.movies.some(m => m.id === id)) K.sel.delete(id); });
     setView(`<div class="row" style="justify-content:space-between"><h2>🎬 Кино</h2>
         <div class="row">${K.movies.some(m => m.video && !m.video.startsWith('r2://')) ? '<button class="btn ghost sm" title="Хуучин worker/r2.dev линкүүдийг R2 түлхүүр болгоно" onclick="kMigrate()">⇄ Хуучин линк → R2</button>' : ''}<button class="btn ghost sm" onclick="kCatsModal()">Ангилал</button><button class="btn ghost sm" onclick="kBulkImport()">☁️ R2-оос олноор нэмэх</button><button class="btn sm" onclick="kEdit()">+ Кино нэмэх</button></div></div>
       ${K.hasR2 ? '' : '<div class="card" style="border-color:var(--warn);margin-bottom:12px;font-size:12px">⚠ Worker-т R2 binding (<b>MOVIES_R2</b>) алга — видео/постер upload ажиллахгүй. Cloudflare → R2 → bucket үүсгэ → Worker → Settings → Bindings → R2 → нэр MOVIES_R2.</div>'}
@@ -595,16 +597,70 @@ async function vKino() {
         <div class="kpi"><div class="l">Нуусан</div><div class="v">${K.movies.filter(m => !m.active).length}</div></div></div>
       <div class="tabs"><button class="${K.filter === 'all' ? 'on' : ''}" onclick="K.filter='all';vKino()">Бүгд</button>${K.cats.map(c => `<button class="${K.filter === String(c.id) ? 'on' : ''}" onclick="K.filter='${c.id}';vKino()">${esc(c.label)}</button>`).join('')}
         <input placeholder="Нэрээр хайх…" value="${esc(K.q)}" style="max-width:180px;margin-left:auto" oninput="K.q=this.value" onkeydown="if(event.key==='Enter')vKino()"></div>
-      <div class="card" style="padding:0;overflow:auto"><table><tr><th></th><th>Кино</th><th>Ангилал</th><th>Үнэ</th><th>Видео</th><th>Төлөв</th><th></th></tr>
+      <div id="k_selbar" class="row" style="margin-bottom:8px;gap:8px;align-items:center"></div>
+      <div class="card" style="padding:0;overflow:auto"><table><tr><th style="width:28px"><input type="checkbox" id="k_selall" title="Харагдаж буй бүгдийг сонгох" style="width:16px;height:16px" onchange="kSelAll(this.checked)"></th><th></th><th>Кино</th><th>Ангилал</th><th>Үнэ</th><th>Видео</th><th>Төлөв</th><th></th></tr>
         ${list.map((m, i) => `<tr style="${m.active ? '' : 'opacity:.5'}">
+          <td><input type="checkbox" class="k_sel" data-id="${m.id}" ${K.sel.has(m.id) ? 'checked' : ''} style="width:16px;height:16px" onchange="kSel(${m.id},this.checked)"></td>
           <td>${kThumb(m)}</td>
           <td><b>${esc(m.name)}</b><br><span class="muted mono" style="font-size:11px">${kCode(m.id)} · ${m.lang === 'sub' ? 'SUB' : 'DUB'}${m.eps ? ' · ' + esc(m.eps) : ''}</span></td>
           <td>${esc(kCat(m.cat))}</td><td>${fmt(m.price)}</td>
           <td>${m.video ? (m.video.startsWith('hls://') ? '<span class="pill paid">HLS 🔒</span>' : m.video.startsWith('r2://') ? '<span class="pill paid">R2 mp4</span>' : '<span class="pill pending" title="' + esc(m.video) + '">линк</span>') : '<span class="pill cancelled">алга</span>'}</td>
           <td>${m.active ? '<span class="pill paid">нээлттэй</span>' : '<span class="pill cancelled">нуусан</span>'}</td>
-          <td style="white-space:nowrap"><button class="btn ghost sm" onclick="kEdit(${m.id})">Засах</button> <button class="btn ghost sm" title="Эхэнд авчрах (Сүүлд нэмэгдсэн)" onclick="kTop(${m.id})">↑</button></td></tr>`).join('') || '<tr><td colspan="7" class="muted">Кино алга</td></tr>'}</table></div>
+          <td style="white-space:nowrap"><button class="btn ghost sm" onclick="kEdit(${m.id})">Засах</button> <button class="btn ghost sm" title="Эхэнд авчрах (Сүүлд нэмэгдсэн)" onclick="kTop(${m.id})">↑</button></td></tr>`).join('') || '<tr><td colspan="8" class="muted">Кино алга</td></tr>'}</table></div>
       <p class="muted" style="margin-top:8px">Жагсаалтын дараалал = сайт дээрх дараалал. Эхний 5 (Бусад-аас бусад) «Сүүлд нэмэгдсэн» тойрогт орно.</p>`);
+    kSelBar();
   } catch(e) { setView(`<p style="color:var(--bad)">${esc(e.message)}</p>`); }
+}
+// ── Олноор сонгох / засах ──
+function kSel(id, on) { if (on) K.sel.add(id); else K.sel.delete(id); kSelBar(); }
+function kSelAll(on) {
+  (K._listIds || []).forEach(id => { if (on) K.sel.add(id); else K.sel.delete(id); });
+  document.querySelectorAll('.k_sel').forEach(c => { c.checked = on; });
+  kSelBar();
+}
+function kSelBar() {
+  const bar = $('k_selbar'); if (!bar) return;
+  const n = K.sel.size, ids = K._listIds || [];
+  const all = $('k_selall'); if (all) { const c = ids.filter(id => K.sel.has(id)).length; all.checked = ids.length > 0 && c === ids.length; all.indeterminate = c > 0 && c < ids.length; }
+  bar.innerHTML = n ? `<b style="font-size:13px">${n} кино сонгосон</b><button class="btn sm" onclick="kBulkEdit()">Засах</button><button class="btn ghost sm" onclick="K.sel.clear();vKino()">Сонголт цуцлах</button>` : '';
+}
+function kBulkEdit() {
+  const n = K.sel.size; if (!n) return;
+  const keep = '<option value="">— өөрчлөхгүй —</option>';
+  modal(`<h3 style="margin-bottom:4px">${n} кино олноор засах</h3><p class="muted" style="font-size:12px;margin-bottom:10px">Зөвхөн сонгосон талбар өөрчлөгдөнө. Нэр, постер, видео нь кино тус бүрийн «Засах»-аар.</p>
+    <div class="formgrid">
+      <div><label class="f">Ангилал (жанр)</label><select id="b_cat">${keep}${K.cats.map(c => `<option value="${c.id}">${esc(c.label)}</option>`).join('')}</select></div>
+      <div><label class="f">Үнэ (₮)</label><input id="b_price" type="number" min="0" placeholder="өөрчлөхгүй"></div>
+      <div><label class="f">Хэл</label><select id="b_lang">${keep}<option value="dub">DUB (дубляж)</option><option value="sub">SUB (хадмал)</option></select></div>
+      <div><label class="f">Төлөв</label><select id="b_active">${keep}<option value="1">Нээлттэй</option><option value="0">Нуусан</option></select></div>
+      <div><label class="f">Үнэгүй урьдчилан үзэх</label><select id="b_pvm" onchange="$('b_pv').style.display=this.value==='set'?'':'none'">${keep}<option value="rule">Ерөнхий дүрмээр</option><option value="set">Минут заах</option></select>
+        <input id="b_pv" type="number" min="0" placeholder="минут (0 = үгүй)" style="display:none;margin-top:6px"></div>
+      <div><label class="f">Жагсаалт дахь байрлал</label><select id="b_pos">${keep}<option value="top">Эхэнд авчрах</option><option value="end">Төгсгөлд тавих</option></select></div>
+    </div>
+    <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn ghost" onclick="closeModal()">Болих</button><button class="btn" id="b_go" onclick="kBulkApply()">Хадгалах</button></div>`);
+}
+async function kBulkApply() {
+  const cat = $('b_cat').value, price = $('b_price').value, lang = $('b_lang').value, act = $('b_active').value, pvm = $('b_pvm').value, pv = $('b_pv').value, pos = $('b_pos').value;
+  if (pvm === 'set' && pv === '') return toast('Минутаа бичнэ үү', true);
+  if (cat === '' && price === '' && !lang && act === '' && !pvm && !pos) return toast('Өөрчлөх талбар сонгоогүй байна', true);
+  $('b_go').disabled = true;
+  try {
+    await kLoad();   // хамгийн шинэ каталог дээр засна (ард HLS хөрвүүлэлт явж байж болно)
+    const ids = K.sel; let n = 0;
+    K.movies.forEach(m => {
+      if (!ids.has(m.id)) return; n++;
+      if (cat !== '') m.cat = Number(cat);
+      if (price !== '') m.price = Math.max(0, Number(price) || 0);
+      if (lang) m.lang = lang;
+      if (act !== '') m.active = act === '1';
+      if (pvm === 'rule') m.preview = null; else if (pvm === 'set') m.preview = Math.max(0, Number(pv) || 0);
+    });
+    if (pos) {
+      const picked = K.movies.filter(m => ids.has(m.id)), rest = K.movies.filter(m => !ids.has(m.id));
+      K.movies = pos === 'top' ? picked.concat(rest) : rest.concat(picked);
+    }
+    await kSaveAll(n + ' кино шинэчлэгдлээ'); K.sel.clear(); closeModal(); vKino();
+  } catch(e) { toast(e.message, true); if ($('b_go')) $('b_go').disabled = false; }
 }
 async function kSaveAll(msg) {
   const j = await api(`/hub/catalog?biz=${S.cur.id}`, { movies: K.movies, categories: K.cats, videoEdited: K._videoEdited || [] });
