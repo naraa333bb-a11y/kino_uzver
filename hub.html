@@ -873,8 +873,21 @@ function kImageChosen(inp) {
   const f = inp.files && inp.files[0]; if (!f) return;
   kUploadImage(f, f.name.replace(/\.[^.]+$/, '')).catch(e => toast('Зураг: ' + e.message, true));
 }
+// Постерыг байршуулахын өмнө ≤600×900 JPEG болгож багасгана (утсан дээр хурдан ачаалах; эх 1–3MB зураг 60–120KB болно)
+async function kShrinkImage(blob) {
+  try {
+    const bmp = await createImageBitmap(blob);
+    const sc = Math.min(1, 600 / bmp.width, 900 / bmp.height);
+    if (sc === 1 && blob.size < 160 * 1024) return blob;
+    const c = document.createElement('canvas'); c.width = Math.round(bmp.width * sc); c.height = Math.round(bmp.height * sc);
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    const out = await new Promise(ok => c.toBlob(ok, 'image/jpeg', 0.84));
+    return out && out.size < blob.size ? out : blob;
+  } catch(e) { return blob; }
+}
 async function kUploadImage(blob, base) {
   if (!K.hasR2) throw new Error('R2 binding алга');
+  blob = await kShrinkImage(blob);
   const name = (base || 'p' + K.edit.id).replace(/[^a-zA-Z0-9_-]/g, '_') + '_' + Date.now() + '.jpg';
   const res = await fetch(`${WORKER}/hub/upload/image?biz=${S.cur.id}&name=${encodeURIComponent(name)}`, { method: 'POST', headers: { 'X-Hub-Token': S.tok, 'Content-Type': blob.type || 'image/jpeg' }, body: blob });
   const j = await res.json(); if (!j.ok) throw new Error(j.error || 'upload');
