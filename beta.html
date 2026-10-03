@@ -5469,11 +5469,13 @@ async function accCheckout(method){
       // + «Линк хуулах»; доор нь QR (банкны аппаар уншуулах). Safari-д нэвтрэлт нь утасны дугаараараа дахин орно.
       const here = location.href.split('#')[0];
       const safari = 'x-safari-https://' + here.replace(/^https?:\/\//, '');
+      // 2026-10-03 бодит туршилт (iPhone Messenger): x-safari-https товч ажиллаагүй → Messenger-ийн өөрийн
+      // «⋯ → Open in Safari» цэсийг зааж өгнө; «Линк хуулах» нөөц. (QPay-ийн өөрийн хуудас ч энд «open external browser» гэдэг.)
       html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;margin:4px 0 10px;text-align:left">'
-        + '<p style="font-size:13px;color:#fff;font-weight:600;line-height:1.45;margin:0 0 10px">Банкны апп Facebook/Messenger доторх browser-ээс нээгдэхгүй. Төлбөрөө хийхийн тулд гадны browser-ээр нээнэ үү.</p>'
-        + '<a href="' + accEsc(safari) + '" class="acc-btn wide pri" style="display:block;text-align:center;text-decoration:none;margin-bottom:8px">Browser-ээр нээж төлөх ↗</a>'
-        + '<button class="acc-btn wide" onclick="accCopyLink(this)">Линк хуулах</button>'
-        + (bridge ? '<p style="font-size:11px;color:var(--muted);text-align:center;margin:8px 0 0">Нээгдэхгүй бол → <a href="' + accEsc(bridge) + '" style="color:var(--accent)">зааврыг харах</a></p>' : '')
+        + '<p style="font-size:13px;color:#fff;font-weight:600;line-height:1.45;margin:0 0 8px">Банкны апп Facebook/Messenger доторх browser-ээс нээгдэхгүй. Safari-д нээгээд төлнө үү:</p>'
+        + '<ol style="font-size:13px;color:var(--text);line-height:1.7;margin:0 0 10px 18px;padding:0"><li>Дэлгэцийн <b>баруун дээд буланд ⋯</b> (эсвэл доод буланд) дарна</li><li><b>«Open in Safari»</b> / «Open in external browser» сонгоно</li><li>Нээгдсэн Safari дээр утасны дугаараа оруулаад банкаа сонгоно</li></ol>'
+        + '<button class="acc-btn wide" onclick="accCopyLink(this)">Линк хуулах (Safari-д буулгах)</button>'
+        + '<p style="font-size:11px;color:var(--muted);text-align:center;margin:8px 0 0">' + (bridge ? '<a href="' + accEsc(bridge) + '" style="color:var(--accent)">Зурагтай заавар</a> · ' : '') + '<a href="' + accEsc(safari) + '" style="color:var(--muted)">Safari-д шууд нээхийг оролдох</a></p>'
         + '</div>';
       if(qrHtml) html += '<details><summary style="font-size:11px;color:var(--muted);text-align:center;cursor:pointer;list-style:none">эсвэл QR кодоор төлөх ▾</summary><div style="margin-top:8px">' + qrHtml + '</div></details>';
     } else if(mobile && bankHtml){
