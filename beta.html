@@ -5440,12 +5440,12 @@ async function accCheckout(method){
     const dl = j.deeplinks || [];
     const mobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
     const inApp = typeof isInAppBrowser === 'function' && isInAppBrowser();
-    let href = null;
-    if(inApp){
-      href = (typeof isAndroid === 'function' && isAndroid())
+    // kora шиг: банкны deeplink-ийг ШУУД <a href> болгоно (Facebook/Messenger дотор ч гүүргүй оролдоно);
+    // апп нээгдэхгүй тохиолдолд л доор «браузераар нээх» нөөц линк байна.
+    const href = null;
+    const bridge = inApp ? ((typeof isAndroid === 'function' && isAndroid())
         ? (j.shortUrl ? escapeToBrowserUrl(j.shortUrl) : null)
-        : ('pay.html?u=' + encodeURIComponent(j.shortUrl || ''));
-    }
+        : ('pay.html?u=' + encodeURIComponent(j.shortUrl || ''))) : null;
     const qrHtml = j.qr ? '<div style="text-align:center"><img src="data:image/png;base64,' + j.qr + '" alt="QPay QR" style="width:200px;height:200px;border-radius:12px;background:#fff;padding:8px">'
         + '<p style="font-size:11px;color:var(--muted);margin:6px 0">Банкны аппаараа QR-ийг уншуулна уу</p>'
         + '<button onclick="accSaveQr(this)" style="padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--muted);font-size:11px;cursor:pointer">🖼 QR-ийг цомогт хадгалах</button></div>' : '';
@@ -5455,7 +5455,7 @@ async function accCheckout(method){
           + '<div class="qpay-bank-name">' + accEsc(d.name || '') + '</div></a>').join('') + '</div>' : '';
     if(mobile && bankHtml){
       html += '<p style="font-size:12px;color:#fff;text-align:center;margin:4px 0 8px">Банкаа сонгоход апп нээгдэж, төлбөр бэлэн байна</p>' + bankHtml;
-      if(inApp) html += '<p style="font-size:11px;color:var(--muted);text-align:center;margin:8px 0 0">Facebook/Messenger дотроос нээсэн тул банкны апп руу «браузераар нээх» алхмаар орно.</p>';
+      if(bridge) html += '<p style="font-size:11px;color:var(--muted);text-align:center;margin:8px 0 0">Банкны апп нээгдэхгүй бол → <a href="' + accEsc(bridge) + '" style="color:var(--accent)">браузераар нээх</a></p>';
       if(qrHtml) html += '<details style="margin-top:12px"><summary style="font-size:11px;color:var(--muted);text-align:center;cursor:pointer;list-style:none">QR кодоор төлөх ▾</summary><div style="margin-top:8px">' + qrHtml + '</div></details>';
     } else {
       html += qrHtml;
