@@ -5463,14 +5463,19 @@ async function accCheckout(method){
         + dl.map(d => '<a class="qpay-bank" href="' + accEsc(href || bankLink(d)) + '" style="text-decoration:none" onclick="accBankTap(this)">'
           + (d.logo ? '<img src="' + accEsc(d.logo) + '" alt="" loading="lazy" style="width:26px;height:26px;border-radius:6px;margin-bottom:4px" onerror="this.style.display=\'none\'">' : '<div class="qpay-bank-icon">🏦</div>')
           + '<div class="qpay-bank-name">' + accEsc(d.name || '') + '</div></a>').join('') + '</div>' : '';
-    if(inApp && ios && qrHtml){
-      // iPhone дээр Facebook/Messenger-ийн дотоод цонх банкны апп нээхийг зөвшөөрдөггүй (Meta-гийн хязгаар,
-      // kora ч үүнийг тойрч чаддаггүй). Ажилладаг зам: QR-ийг цомогт хадгалаад банкны аппаар цомгоос уншуулах.
-      html += '<p style="font-size:12px;color:#fff;text-align:center;margin:4px 0 8px">iPhone дээр Facebook/Messenger дотроос банкны апп шууд нээгдэхгүй. Хамгийн хялбар нь:</p>'
-        + '<ol style="font-size:12px;color:var(--text);line-height:1.6;margin:0 0 10px 18px;padding:0"><li>Доорх «QR-ийг цомогт хадгалах» дарна</li><li>Банкны аппаа нээж QR уншуулах → <b>цомгоос сонгоно</b></li><li>Төлмөгц энэ хуудас өөрөө «эрх нээгдлээ» болно</li></ol>'
-        + qrHtml
-        + (bridge ? '<p style="font-size:11px;color:var(--muted);text-align:center;margin:10px 0 0">эсвэл <a href="' + accEsc(bridge) + '" style="color:var(--accent)">Safari-д нээж банкаа сонгох</a> (3 алхамтай заавар)</p>' : '');
-      if(bankHtml) html += '<details style="margin-top:12px"><summary style="font-size:11px;color:var(--muted);text-align:center;cursor:pointer;list-style:none">Банкны аппаар оролдох ▾</summary><div style="margin-top:8px">' + bankHtml + '</div></details>';
+    if(inApp && ios){
+      // iPhone + Facebook/Messenger дотоод цонх: банкны апп нээгдэхгүй (Meta-гийн хязгаар). pay.wire.mn-ийн
+      // амьд кодтой ижил арга: «Browser-ээр нээж төлөх» (x-safari-https → энэ хуудас Safari-д, төлбөрийн төлөв хадгалагдана)
+      // + «Линк хуулах»; доор нь QR (банкны аппаар уншуулах). Safari-д нэвтрэлт нь утасны дугаараараа дахин орно.
+      const here = location.href.split('#')[0];
+      const safari = 'x-safari-https://' + here.replace(/^https?:\/\//, '');
+      html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;margin:4px 0 10px;text-align:left">'
+        + '<p style="font-size:13px;color:#fff;font-weight:600;line-height:1.45;margin:0 0 10px">Банкны апп Facebook/Messenger доторх browser-ээс нээгдэхгүй. Төлбөрөө хийхийн тулд гадны browser-ээр нээнэ үү.</p>'
+        + '<a href="' + accEsc(safari) + '" class="acc-btn wide pri" style="display:block;text-align:center;text-decoration:none;margin-bottom:8px">Browser-ээр нээж төлөх ↗</a>'
+        + '<button class="acc-btn wide" onclick="accCopyLink(this)">Линк хуулах</button>'
+        + (bridge ? '<p style="font-size:11px;color:var(--muted);text-align:center;margin:8px 0 0">Нээгдэхгүй бол → <a href="' + accEsc(bridge) + '" style="color:var(--accent)">зааврыг харах</a></p>' : '')
+        + '</div>';
+      if(qrHtml) html += '<details><summary style="font-size:11px;color:var(--muted);text-align:center;cursor:pointer;list-style:none">эсвэл QR кодоор төлөх ▾</summary><div style="margin-top:8px">' + qrHtml + '</div></details>';
     } else if(mobile && bankHtml){
       html += '<p style="font-size:12px;color:#fff;text-align:center;margin:4px 0 8px">Банкаа сонгоход апп нээгдэж, төлбөр бэлэн байна</p>' + bankHtml;
       html += '<p id="acc-bank-hint" style="display:none;font-size:11px;color:#fbbf24;text-align:center;margin:8px 0 0">Апп нээгдсэнгүй юу? ' + (bridge ? '<a href="' + accEsc(bridge) + '" style="color:var(--accent)">Браузераар нээх</a> эсвэл ' : '') + 'доорх QR-ийг цомогт хадгалаад банкны аппаар уншуулна уу.</p>';
@@ -5501,6 +5506,11 @@ function accBankTap(a){
     const h = document.getElementById('acc-bank-hint'); if(h) h.style.display = '';
     const d = document.getElementById('acc-qr-details'); if(d) d.open = true;
   }, 1500);
+}
+function accCopyLink(btn){
+  const t = location.href.split('#')[0]; const old = btn.textContent;
+  const done = () => { btn.textContent = 'Хуулагдлаа ✓ — Safari-д буулгана уу'; setTimeout(() => { btn.textContent = old; }, 3000); };
+  if(navigator.clipboard) navigator.clipboard.writeText(t).then(done).catch(done); else done();
 }
 function accCopy(id, btn){
   const t = document.getElementById(id)?.textContent || '';
