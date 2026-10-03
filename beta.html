@@ -1851,7 +1851,7 @@ function renderGrids(){
       return `
       <div class="movie-card" onclick="openBuyModal(${m.id},${m.cat})">
         <div class="poster">
-          <img src="${imgSrc}" alt="${m.name}"
+          <img src="${imgSrc}" alt="${m.name}" loading="lazy" decoding="async"
             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
           <div class="poster-ph" style="display:none">
             <span class="poster-ph-icon">🎬</span>
@@ -5435,23 +5435,31 @@ async function accCheckout(method){
   let html = '<div class="acc-panel">';
   html += '<p style="font-size:12px;color:#fff;font-weight:700;margin-bottom:8px">' + accEsc(j.title) + ' — ' + accFmt(j.amount) + '</p>';
   if(method === 'qpay'){
-    if(j.qr){
-      html += '<div style="text-align:center"><img src="data:image/png;base64,' + j.qr + '" alt="QPay QR" style="width:200px;height:200px;border-radius:12px;background:#fff;padding:8px">'
-        + '<p style="font-size:11px;color:var(--muted);margin:6px 0">Банкны аппаараа QR-ийг уншуулна уу</p>'
-        + '<button onclick="accSaveQr(this)" style="padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--muted);font-size:11px;cursor:pointer">🖼 QR-ийг цомогт хадгалах</button></div>';
-    }
+    // kora загвар: утсан дээр банкны аппын жагсаалт ТҮРҮҮНД (дарахад апп шууд нээгдэнэ), QR нь нэмэлт;
+    // компьютер дээр QR түрүүнд (утасны аппаар уншуулна).
     const dl = j.deeplinks || [];
-    if(dl.length){
-      let href = null;
-      if(typeof isInAppBrowser === 'function' && isInAppBrowser()){
-        href = (typeof isAndroid === 'function' && isAndroid())
-          ? (j.shortUrl ? escapeToBrowserUrl(j.shortUrl) : null)
-          : ('pay.html?u=' + encodeURIComponent(j.shortUrl || ''));
-      }
-      html += '<p style="font-size:11px;color:var(--muted);text-align:center;margin:12px 0 6px">эсвэл банкаа сонгоно уу</p><div class="qpay-bank-list">'
+    const mobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+    const inApp = typeof isInAppBrowser === 'function' && isInAppBrowser();
+    let href = null;
+    if(inApp){
+      href = (typeof isAndroid === 'function' && isAndroid())
+        ? (j.shortUrl ? escapeToBrowserUrl(j.shortUrl) : null)
+        : ('pay.html?u=' + encodeURIComponent(j.shortUrl || ''));
+    }
+    const qrHtml = j.qr ? '<div style="text-align:center"><img src="data:image/png;base64,' + j.qr + '" alt="QPay QR" style="width:200px;height:200px;border-radius:12px;background:#fff;padding:8px">'
+        + '<p style="font-size:11px;color:var(--muted);margin:6px 0">Банкны аппаараа QR-ийг уншуулна уу</p>'
+        + '<button onclick="accSaveQr(this)" style="padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--muted);font-size:11px;cursor:pointer">🖼 QR-ийг цомогт хадгалах</button></div>' : '';
+    const bankHtml = dl.length ? '<div class="qpay-bank-list">'
         + dl.map(d => '<a class="qpay-bank" href="' + accEsc(href || d.link) + '" style="text-decoration:none">'
-          + (d.logo ? '<img src="' + accEsc(d.logo) + '" alt="" style="width:26px;height:26px;border-radius:6px;margin-bottom:4px" onerror="this.style.display=\'none\'">' : '<div class="qpay-bank-icon">🏦</div>')
-          + '<div class="qpay-bank-name">' + accEsc(d.name || '') + '</div></a>').join('') + '</div>';
+          + (d.logo ? '<img src="' + accEsc(d.logo) + '" alt="" loading="lazy" style="width:26px;height:26px;border-radius:6px;margin-bottom:4px" onerror="this.style.display=\'none\'">' : '<div class="qpay-bank-icon">🏦</div>')
+          + '<div class="qpay-bank-name">' + accEsc(d.name || '') + '</div></a>').join('') + '</div>' : '';
+    if(mobile && bankHtml){
+      html += '<p style="font-size:12px;color:#fff;text-align:center;margin:4px 0 8px">Банкаа сонгоход апп нээгдэж, төлбөр бэлэн байна</p>' + bankHtml;
+      if(inApp) html += '<p style="font-size:11px;color:var(--muted);text-align:center;margin:8px 0 0">Facebook/Messenger дотроос нээсэн тул банкны апп руу «браузераар нээх» алхмаар орно.</p>';
+      if(qrHtml) html += '<details style="margin-top:12px"><summary style="font-size:11px;color:var(--muted);text-align:center;cursor:pointer;list-style:none">QR кодоор төлөх ▾</summary><div style="margin-top:8px">' + qrHtml + '</div></details>';
+    } else {
+      html += qrHtml;
+      if(bankHtml) html += '<p style="font-size:11px;color:var(--muted);text-align:center;margin:12px 0 6px">эсвэл банкаа сонгоно уу</p>' + bankHtml;
     }
   } else {
     const b = j.bank || {};
@@ -5809,7 +5817,7 @@ function accSearchRun(){
   grid.innerHTML = list.map(m => {
     const img = m.cover || '';
     return '<div class="movie-card" onclick="openBuyModal(' + m.id + ',' + m.cat + ')"><div class="poster">'
-      + '<img src="' + accEsc(img) + '" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+      + '<img src="' + accEsc(img) + '" alt="" loading="lazy" decoding="async" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
       + '<div class="poster-ph" style="display:none"><span class="poster-ph-icon">🎬</span><span class="poster-ph-name">' + accEsc(m.name) + '</span></div>'
       + '<span class="price-badge">' + accEsc(m.price) + '</span>'
       + '<span class="lang-badge ' + (m.lang === 'sub' ? 'sub' : 'dub') + '">' + (m.lang === 'sub' ? 'SUB' : 'DUB') + '</span>'
